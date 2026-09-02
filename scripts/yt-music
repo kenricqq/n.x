@@ -1,0 +1,78 @@
+# Packaged as a Bash application by hm/shell-commands.nix.
+
+usage() {
+  printf '%s\n' \
+    'Usage: yt-music [-o DIRECTORY] [-f FORMAT] URL' \
+    '' \
+    'Defaults:' \
+    '  directory  YT_MUSIC_DIR, XDG_MUSIC_DIR, or ~/Music' \
+    '  format     mp3'
+}
+
+output_dir=
+format=mp3
+
+while (( $# )); do
+  case "$1" in
+    -o|--output)
+      [[ $# -ge 2 ]] || {
+        usage >&2
+        exit 2
+      }
+      output_dir=$2
+      shift 2
+      ;;
+    --output=*)
+      output_dir=${1#*=}
+      shift
+      ;;
+    -f|--format)
+      [[ $# -ge 2 ]] || {
+        usage >&2
+        exit 2
+      }
+      format=$2
+      shift 2
+      ;;
+    --format=*)
+      format=${1#*=}
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      printf 'yt-music: unknown option: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+[[ $# -eq 1 ]] || {
+  usage >&2
+  exit 2
+}
+
+url=$1
+output_dir=${output_dir:-${YT_MUSIC_DIR:-${XDG_MUSIC_DIR:-$HOME/Music}}}
+mkdir -p -- "$output_dir"
+
+exec yt-dlp \
+  --extract-audio \
+  --audio-format "$format" \
+  --audio-quality 0 \
+  --embed-thumbnail \
+  --add-metadata \
+  --restrict-filenames \
+  --sponsorblock-remove 'sponsor,selfpromo,interaction' \
+  --output "$output_dir/%(title)s.%(ext)s" \
+  -- "$url"

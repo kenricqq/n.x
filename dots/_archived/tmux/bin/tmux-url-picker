@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+action="${1:-open}"
+history_file="$(mktemp)"
+trap 'rm -f "$history_file"' EXIT
+
+tmux capture-pane -J -p -S - -E - >"$history_file"
+
+urls=$(python3 - "$history_file" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text(errors="ignore")
+seen = set()
+pattern = "https?://[^\\s<>\\\"']+"
+for match in re.finditer(pattern, text):
+    url = match.group(0).rstrip(".),;:]}>'\"")
+    if url and url not in seen:
+        seen.add(url)
+        print(url)
+PY
+)
+
+[[ -n "$urls" ]] || {
+  tmux display-message "no urls in pane history"
+  exit 0
+}
+
+url="$(printf '%s\n' "$urls" | fzf-tmux -p 80%,60% --no-sort --border-label ' urls ' --prompt 'url › ' || true)"
+[[ -n "$url" ]] || exit 0
+
+case "$action" in
+  copy)
+    printf '%s' "$url" | tmux-copy
+    ;;
+  open)
+    if command -v open >/dev/null 2>&1; then
+      open "$url"
+    elif command -v xdg-open >/dev/null 2>&1; then
+      xdg-open "$url" >/dev/null 2>&1 &
+    else
+      printf '%s' "$url" | tmux-copy
+      tmux display-message "no opener; url copied"
+    fi
+    ;;
+  *)
+    tmux display-message "usage: tmux-url-picker [open|copy]"
+    exit 2
+    ;;
+esac

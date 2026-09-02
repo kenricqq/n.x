@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+data="$(cat)"
+[[ -n "$data" ]] || exit 0
+
+copy_osc52() {
+  local b64 esc tty
+  b64="$(printf '%s' "$data" | base64 | tr -d '\n')"
+  esc=$'\033]52;c;'"$b64"$'\a'
+
+  if [[ -n "${TMUX:-}" ]] && command -v tmux >/dev/null 2>&1; then
+    tty="$(tmux display-message -p '#{client_tty}' 2>/dev/null || true)"
+    if [[ -n "$tty" && -w "$tty" ]]; then
+      printf '%s' "$esc" >"$tty"
+      return 0
+    fi
+  fi
+
+  if [[ -w /dev/tty ]]; then
+    printf '%s' "$esc" >/dev/tty
+    return 0
+  fi
+
+  return 1
+}
+
+if command -v pbcopy >/dev/null 2>&1; then
+  printf '%s' "$data" | pbcopy
+elif command -v wl-copy >/dev/null 2>&1; then
+  printf '%s' "$data" | wl-copy
+elif command -v xclip >/dev/null 2>&1; then
+  printf '%s' "$data" | xclip -selection clipboard
+elif command -v xsel >/dev/null 2>&1; then
+  printf '%s' "$data" | xsel --clipboard --input
+elif copy_osc52; then
+  :
+elif [[ -n "${TMUX:-}" ]] && command -v tmux >/dev/null 2>&1; then
+  printf '%s' "$data" | tmux load-buffer -
+else
+  exit 1
+fi
+
+if [[ -n "${TMUX:-}" ]] && command -v tmux >/dev/null 2>&1; then
+  tmux display-message "copied"
+fi

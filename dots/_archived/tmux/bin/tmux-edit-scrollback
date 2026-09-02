@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+file="$(mktemp "${TMPDIR:-/tmp}/tmux-scrollback.XXXXXX")"
+trap 'rm -f "$file"' EXIT
+
+tmux capture-pane -J -p -S - -E - >"$file"
+"${EDITOR:-nvim}" "$file"

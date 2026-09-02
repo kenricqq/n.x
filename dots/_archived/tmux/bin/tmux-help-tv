@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+palette=$(mktemp)
+trap 'rm -f "$palette"' EXIT
+
+cat >"$palette" <<'EOF'
+noop Basics C-a-? Show this command palette
+reload Basics C-a-r Reload tmux config
+detach Basics C-a-d Detach from session
+cycle_layout Basics C-a-Space Cycle pane layout
+
+new_window Windows C-a-c Create named window in current dir
+rename_window Windows C-a-, Rename current window
+rename_session Windows C-a-A Rename current session
+choose_tree Windows C-a-w Pick window/session from tree
+next_window Windows C-a-n Next window
+prev_window Windows C-a-p Previous window
+window_mode Windows C-a-T / C-S-t Zellij-style window mode
+
+split_right Panes C-a-% Split pane right in current dir
+split_down Panes C-a-\" Split pane down in current dir
+kill_pane Panes C-a-x Kill current pane
+zoom_pane Panes C-a-z / C-S-Enter Zoom current pane
+pane_left Panes C-a-h / C-S-h Move focus left
+pane_down Panes C-a-j / C-S-j Move focus down
+pane_up Panes C-a-k / C-S-k Move focus up
+pane_right Panes C-a-l / C-S-l Move focus right
+pane_mode Panes C-S-p Zellij-style pane mode
+resize_mode Panes C-S-r Zellij-style resize mode
+sync_panes Panes C-a-S Toggle synchronized panes
+
+copy_mode Scroll C-a-[ Enter copy/scroll mode
+search_scrollback Scroll C-a-/ Search scrollback, Enter copies line
+edit_scrollback Scroll C-a-E Edit scrollback in $EDITOR
+begin_selection Scroll v Start selection in copy mode
+copy_selection Scroll y Copy selection to clipboard
+quit_copy Scroll q Quit copy mode
+
+sesh_picker Sessions C-a-G Session/project picker
+sesh_root Sessions C-a-R Root session picker
+session_manager Sessions C-a-W Manage tmux sessions
+sessionizer Sessions C-a-f tmux-sessionizer
+
+url_open Tools C-a-u Open URL from pane history
+url_copy Tools C-a-U Copy URL from pane history
+git_popup Tools C-a-g lazygit popup
+shell_popup Tools C-a-e Shell popup
+todo Tools C-a-D TODO window
+
+project_tvui Projects C-a-C tvui session
+project_milo Projects C-a-M milo session
+project_vwm Projects C-a-H vim-with-me session
+project_harpoon Projects C-a-N harpoon session
+project_productivity Projects C-a-P developer-productivity session
+EOF
+
+action=$(
+  tv \
+    --source-command "cat '$palette'" \
+    --source-display '{1}  {2}  {3..}' \
+    --source-output '{0}' \
+    --no-sort \
+    --no-preview \
+    --input-prompt 'tmux › ' \
+    --input-header 'Command palette. C-a is tmux prefix. Select to run. Esc quits.' \
+    || true
+)
+
+[ -n "$action" ] || exit 0
+
+case "$action" in
+  noop) tmux display-message 'tmux command palette' ;;
+  reload) tmux source-file ~/.tmux.conf \; display-message 'tmux config reloaded' ;;
+  detach) tmux detach-client ;;
+  cycle_layout) tmux next-layout ;;
+
+  new_window) tmux new-window -c '#{pane_current_path}' -n '#{b:pane_current_path}' ;;
+  rename_window) tmux command-prompt -I '#W' 'rename-window "%%"' ;;
+  rename_session) tmux command-prompt -I '#S' 'rename-session "%%"' ;;
+  choose_tree) tmux choose-tree -Zw ;;
+  next_window) tmux next-window ;;
+  prev_window) tmux previous-window ;;
+  window_mode) tmux switch-client -T zellij-window \; display-message 'window: h/l prev/next 1-9 jump n new r rename d kill s sync Tab last' ;;
+
+  split_right) tmux split-window -h -c '#{pane_current_path}' ;;
+  split_down) tmux split-window -v -c '#{pane_current_path}' ;;
+  kill_pane) tmux kill-pane ;;
+  zoom_pane) tmux resize-pane -Z ;;
+  pane_left) tmux select-pane -L ;;
+  pane_down) tmux select-pane -D ;;
+  pane_up) tmux select-pane -U ;;
+  pane_right) tmux select-pane -R ;;
+  pane_mode) tmux switch-client -T zellij-pane \; display-message 'pane: h/j/k/l move H/J/K/L resize n/N split d kill f zoom s sync' ;;
+  resize_mode) tmux switch-client -T zellij-resize \; display-message 'resize: h/j/k/l shrink/grow pane' ;;
+  sync_panes) tmux set-window-option synchronize-panes \; display-message 'sync panes toggled' ;;
+
+  copy_mode) tmux copy-mode ;;
+  search_scrollback) tmux display-popup -E -w 82% -h 75% -T 'scrollback search' tmux-scrollback-search ;;
+  edit_scrollback) tmux display-popup -E -w 90% -h 80% -T 'scrollback' tmux-edit-scrollback ;;
+  begin_selection) tmux send-keys -X begin-selection ;;
+  copy_selection) tmux send-keys -X copy-pipe-and-cancel 'tmux-copy' ;;
+  quit_copy) tmux send-keys -X cancel ;;
+
+  sesh_picker) tmux display-popup -E -w 82% -h 75% -T 'sesh' tmux-sesh-tv ;;
+  sesh_root) tmux display-popup -E -w 40% 'sesh connect "$(sesh list -i -H | gum filter --value "$(sesh root)" --limit 1 --fuzzy --no-sort --placeholder "Pick a sesh" --prompt="⚡ ")"' ;;
+  session_manager) tmux display-popup -E -w 82% -h 75% -T 'sessions' tmux-session-manager-tv ;;
+  sessionizer) tmux new-window ~/.local/bin/tmux-sessionizer ;;
+
+  url_open) tmux run-shell 'tmux-url-picker open' ;;
+  url_copy) tmux run-shell 'tmux-url-picker copy' ;;
+  git_popup) tmux display-popup -E -w 90% -h 80% -d '#{pane_current_path}' lazygit ;;
+  shell_popup) tmux display-popup -E -w 90% -h 80% -d '#{pane_current_path}' "$SHELL" ;;
+  todo) tmux new-window -c '#{pane_current_path}' '[[ -e TODO.md ]] && nvim TODO.md || nvim ~/.dotfiles/personal/todo.md' ;;
+
+  project_tvui) tmux run-shell '~/.local/bin/tmux-sessionizer ~/work/tvui' ;;
+  project_milo) tmux run-shell '~/.local/bin/tmux-sessionizer ~/work/milo' ;;
+  project_vwm) tmux run-shell '~/.local/bin/tmux-sessionizer ~/personal/vim-with-me' ;;
+  project_harpoon) tmux run-shell '~/.local/bin/tmux-sessionizer ~/personal/harpoon' ;;
+  project_productivity) tmux run-shell '~/.local/bin/tmux-sessionizer ~/personal/developer-productivity' ;;
+
+  *) tmux display-message "unknown palette action: $action" ;;
+esac

@@ -1,0 +1,3 @@
+run:
+    bunx skills add https://github.com/sveltejs/ai-tools --skill svelte-code-writer
+    bunx skills add https://github.com/sveltejs/ai-tools --skill svelte-core-bestpractices

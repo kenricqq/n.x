@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+selection=$(
+  tv \
+    --source-command 'sesh list' \
+    --no-sort \
+    --preview-command 'sesh preview "{}"' \
+    --preview-size 55 \
+    --preview-word-wrap \
+    --input-prompt 'sesh › ' \
+    --input-header 'Session picker. Type to search. Enter connects. Esc quits.' \
+    || true
+)
+
+[ -n "$selection" ] || exit 0
+sesh connect "$selection"

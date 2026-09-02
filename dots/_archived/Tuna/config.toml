@@ -1,0 +1,82 @@
+schemaVersion = 1
+
+[[comboMode.bindings]]
+key = 't'
+url = 'tuna://run/TunaCore.AllApplicationsCatalog.Ghostty/Open'
+
+[[comboMode.bindings]]
+key = 'b'
+url = 'tuna://run/TunaCore.AllApplicationsCatalog.Twilight/Open'
+
+[[comboMode.bindings]]
+key = 'f'
+url = 'tuna://run/path.%252FSystem%252FLibrary%252FCoreServices%252FFinder.app/Open'
+
+[[comboMode.bindings]]
+key = 'n'
+url = 'tuna://run/path.%252FSystem%252FApplications%252FNotes.app/Open'
+
+[[comboMode.bindings]]
+key = 'c'
+url = 'tuna://run/TunaCore.AllApplicationsCatalog.Codex/Open'
+
+[[comboMode.bindings]]
+key = 'd'
+url = 'tuna://run/path.%252FUsers%252Fkenrictee%252FDownloads/Open'
+
+[[comboMode.bindings]]
+key = 's'
+url = 'tuna://run/TunaCore.AllApplicationsCatalog.Superhuman/Open'
+
+[[comboMode.bindings]]
+key = 'z'
+url = 'tuna://run/TunaCore.AllApplicationsCatalog.Zed%20Preview/Open'
+
+[[comboMode.bindings]]
+key = 'w'
+url = 'tuna://run/TunaCore.AllApplicationsCatalog.superwhisper/Open'
+
+[[comboMode.bindings]]
+key = 'h'
+url = 'tuna://run/TunaCore.AllApplicationsCatalog.Helium/Open'
+
+[hotkeys.app.activate]
+carbonKeyCode = 49
+carbonModifiers = 256
+
+[[hotkeys.custom]]
+id = '1CA07ECB-BD4F-49DD-84CD-4E9B5EEE8F78'
+presentation = 'auto'
+
+[hotkeys.custom.command]
+actionIdentifier = 'TunaCore.CommonActionsCatalog.Run'
+subjectIdentifier = 'Tuna.ModesCatalog.Leader Mode'
+
+[hotkeys.custom.shortcut]
+carbonKeyCode = 49
+carbonModifiers = 768
+
+[[hotkeys.custom]]
+id = '5F3A23EF-8471-4FE7-A507-323BBF2EE555'
+presentation = 'auto'
+
+[hotkeys.custom.command]
+actionIdentifier = 'Tuna.BasicActionsCatalog.Browse'
+subjectIdentifier = 'Tuna.Internal.ClipboardProxyCatalog.Clipboard History'
+
+[hotkeys.custom.shortcut]
+carbonKeyCode = 9
+carbonModifiers = 2304
+
+[settings]
+comboModeCheatsheetDelayMS = 1000
+resultListNavigationBindings = 'macOSStandard'
+switchToTextModeWhenNoResults = true
+themeIdentifier = 'com.brnbw.tuna.themes.default'
+typingTimeoutDuration = 0.94999999999999996
+
+[[catalogSettings]]
+catalogIdentifier = 'com.brnbw.tuna.themes.default'
+
+[catalogSettings.values]
+ThemeTint = 'system'

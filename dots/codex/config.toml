@@ -1,0 +1,151 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+# Model and behavior
+model = "gpt-6-astra"
+model_reasoning_effort = "xhigh"
+model_verbosity = "low"
+personality = "pragmatic"
+service_tier = "priority"
+approvals_reviewer = "auto_review"
+web_search = "live"
+project_root_markers = [".git", ".jj"]
+allow_login_shell = false
+
+[features]
+computer_use = true
+memories = true
+prevent_idle_sleep = true
+
+[features.multi_agent_v2]
+enabled = true
+max_concurrent_threads_per_session = 4
+
+[analytics]
+enabled = false
+
+[feedback]
+enabled = false
+
+# Terminal preferences
+[history]
+max_bytes = 5242880 # 5 MiB of CLI input history
+
+[tui]
+session_picker_view = "dense"
+status_line = [
+  "model-with-reasoning",
+  "current-dir",
+  "branch-changes",
+  "context-used",
+  "weekly-limit",
+  "used-tokens",
+]
+screen_reader_detection_done = true
+
+[tui.keymap.chat]
+decrease_reasoning_effort = "shift-down"
+increase_reasoning_effort = "shift-up"
+
+[tui.model_availability_nux]
+gpt-6-astra = 4
+"gpt-6.1-sol" = 1
+
+# Desktop preferences
+[desktop]
+followUpQueueMode = "queue"
+preventSleepWhileRunning = true
+keepRemoteControlAwakeWhilePluggedIn = true
+git-commit-instructions = "tag it with `<tag>: <commit message>`"
+git-pr-instructions = "Write summary of changes. Cite specific files."
+notifications-turn-mode = "always"
+
+# Existing trust decisions for this Linux machine
+[projects]
+"/home/kenrict/meridian" = { trust_level = "trusted" }
+"/home/kenrict/.config" = { trust_level = "trusted" }
+"/home/kenrict" = { trust_level = "trusted" }
+"/home/kenrict/Documents/Codex/2026-09-02/realtime-voice-chat" = { trust_level = "trusted" }
+"/home/kenrict/Documents/Codex/2026-09-02/realtime-voice-chat-2" = { trust_level = "trusted" }
+"/home/kenrict/Projects/Sandbox/wall-to-life" = { trust_level = "trusted" }
+"/home/kenrict/Projects/Sandbox/ollama-interface" = { trust_level = "trusted" }
+"/home/kenrict/Documents/Codex/2026-09-08/realtime-voice-chat" = { trust_level = "trusted" }
+
+[projects."/Users/kenrictee/m0nix"]
+trust_level = "trusted"
+
+[projects."/home/kenrict/laurentii"]
+trust_level = "trusted"
+
+# Installed plugin registrations (distinct from the default-on plugins feature)
+[plugins]
+"codex-app-tools@openai-bundled" = { enabled = true }
+"sites@openai-bundled" = { enabled = true }
+"browser@openai-bundled" = { enabled = true }
+"visualize@openai-bundled" = { enabled = true }
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."chrome@openai-bundled"]
+enabled = true
+
+[marketplaces.openai-bundled]
+source_type = "local"
+source = "/home/kenrict/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+source_type = "local"
+source = "/Users/kenrictee/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[mcp_servers.node_repl]
+args = []
+command = "/home/kenrict/.nix-profile/opt/codex-desktop/resources/cua_node/bin/node_repl"
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = "/nix/store/yjhvy67bchnwmhy4mjvbhrpcdn9gsx5b-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.901.51231/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/nix/store/yjhvy67bchnwmhy4mjvbhrpcdn9gsx5b-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.901.51231/opt/codex-desktop/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/kenrict/.codex:/nix/store/yjhvy67bchnwmhy4mjvbhrpcdn9gsx5b-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.901.51231/opt/codex-desktop/resources/cua_node/lib/node_modules"
+CODEX_HOME = "/home/kenrict/.codex"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+BROWSER_USE_TINYSKY_ENABLED = "0"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.901.51231"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/kenrict/.codex/plugins/cache/openai-bundled/browser/26.901.51231/scripts/browser-service.mjs"}'
+CODEX_CLI_PATH = "/nix/store/yjhvy67bchnwmhy4mjvbhrpcdn9gsx5b-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.901.51231/opt/codex-desktop/resources/codex"
+
+[mcp_servers.cua_repl]
+command = "/nix/store/yjhvy67bchnwmhy4mjvbhrpcdn9gsx5b-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.901.51231/opt/codex-desktop/ChatGPT"
+enabled = false
+
+[hooks.state]
+
+[hooks.state."/home/kenrict/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:328b120bf00511768c280b0a45367646c11e22997d771b879717e5fdf5519843"
+
+[hooks.state."/home/kenrict/.codex/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:d73e60ccd479a637e3748a31b02231beb5c4d405c7a9f2ab4af86f4d8c88ea20"
+
+[hooks.state."/Users/kenrictee/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:3e5625b276f45215623a7985900546a07e178d7a9a42f783e2a0de601a5aa585"
+
+[hooks.state."/Users/kenrictee/.codex/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:d73e60ccd479a637e3748a31b02231beb5c4d405c7a9f2ab4af86f4d8c88ea20"
+
+[hooks.state."/home/kenrict/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:01eca8a4449adf706d9274b9e1dd3407a393a2a0ec613ab78d7ae99842ae0fe1"

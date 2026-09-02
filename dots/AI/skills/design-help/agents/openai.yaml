@@ -1,0 +1,4 @@
+interface:
+  display_name: Design Help
+  short_description: Shape product design direction through an interview
+  default_prompt: Use $design-help to help me define this product's design direction.

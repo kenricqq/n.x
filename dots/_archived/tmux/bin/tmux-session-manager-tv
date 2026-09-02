@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+session=$(
+  tmux list-sessions -F '#S  #{session_windows}w  #{?session_attached,attached,detached}  #{session_created_string}' \
+    | tv \
+      --no-sort \
+      --no-preview \
+      --source-output '{0}' \
+      --input-prompt 'sessions › ' \
+      --input-header 'Pick a tmux session. Next: connect, kill, rename, or new.' \
+    || true
+)
+
+[ -n "$session" ] || exit 0
+
+action=$(
+  printf '%s\n' \
+    'connect  Attach/switch to session' \
+    'kill     Delete session' \
+    'rename   Rename session' \
+    'new      Create new session' \
+    | tv \
+      --no-sort \
+      --no-preview \
+      --source-output '{0}' \
+      --input-prompt "$session › " \
+      --input-header "Action for tmux session: $session" \
+    || true
+)
+
+[ -n "$action" ] || exit 0
+
+case "$action" in
+  connect)
+    tmux switch-client -t "$session" 2>/dev/null || tmux attach-session -t "$session"
+    ;;
+  kill)
+    if gum confirm "Kill tmux session '$session'?"; then
+      tmux kill-session -t "$session"
+    fi
+    ;;
+  rename)
+    new_name=$(gum input --placeholder "new name" --value "$session" || true)
+    [ -n "$new_name" ] && tmux rename-session -t "$session" "$new_name"
+    ;;
+  new)
+    new_name=$(gum input --placeholder "new session name" || true)
+    [ -n "$new_name" ] && tmux new-session -d -s "$new_name" && tmux switch-client -t "$new_name"
+    ;;
+esac

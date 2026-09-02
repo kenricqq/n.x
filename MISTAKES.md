@@ -1,0 +1,167 @@
+# MISTAKES.md
+
+## zsh/bash/nushell
+
+- Do not probe flake branch aliases with non-existent Nix attrs.
+  - Mistake: used `darwinConfigurations.$host.config.system.name` to decide whether to build the Darwin Home Manager activation package.
+  - Result: the Darwin probe always failed, so the alias fell through to the Linux `homeConfigurations.$USER@$host` path on macOS.
+  - Fix: probe an existing scalar attr such as `darwinConfigurations.$host.config.system.primaryUser`, then build `darwinConfigurations.$host.config.home-manager.users.$USER.home.activationPackage`.
+  - Check: `nix eval --raw .#darwinConfigurations.$host.config.system.primaryUser` succeeds before the alias enters the Darwin branch.
+
+- Do not embed escaped attr quotes in zsh-abbr-managed Nix aliases unless required.
+  - Mistake: wrote flake refs as `.#darwinConfigurations.\"$host\"...` and `.#homeConfigurations.\"$USER@$host\"...` inside an abbreviation.
+  - Result: zsh-abbr expansion preserved protective backslashes, so runtime variables became literal strings like `\$USER` and Nix looked for `homeConfigurations.$USER@...`.
+  - Fix: for this repo's simple host/user names, use unquoted variable-expanded flake refs: `.#darwinConfigurations.$host...` and `.#homeConfigurations.$USER@$host.activationPackage`.
+  - Check: expanding `hms` via zsh-abbr must not contain `\$USER`, `\$host`, or `\.activationPackage`.
+
+- Do not use shell special parameters as local variable names.
+  - Mistake: used `local ... status` and then `status=$?` inside a zsh ZLE widget.
+  - Result: zsh raised `read-only variable: status`, aborting before saved editor contents were read back into `BUFFER`.
+  - Fix: use a non-special name such as `hx_status`.
+  - Check: when writing shell widgets, test suspicious names with `zsh -fc 'f(){ emulate -L zsh; local name; name=0; }; f'`.
+
+- Do not source zsh-async from a relative path in prompt config.
+  - Mistake: used `source ./async.zsh` inside `.p10k.zsh`.
+  - Result: shells started outside the plugin directory raised `no such file or directory: ./async.zsh`, then `async_init: command not found`.
+  - Fix: source zsh-async from a stable Home Manager-managed path such as `$HOME/.config/zsh/async.zsh`, never `./async.zsh`.
+  - Check: start `zsh` from a non-config directory and confirm `.p10k.zsh` emits no async errors.
+
+- Do not assume a prompt's async worker survives for the lifetime of the shell.
+  - Mistake: started `_my_jj_worker` only when `.p10k.zsh` loaded, then submitted jobs without checking the worker.
+  - Result: after the worker and callback were removed, each JJ prompt printed `async_job: no such async worker: _my_jj_worker`.
+  - Fix: check the worker before submitting a job; clear stale state, restart it, and register its callback again. Skip submission if startup fails.
+  - Check: stop `_my_jj_worker` in an isolated shell, render the JJ prompt, and confirm the replacement worker delivers a callback without errors.
+
+## Codex config profiles
+
+- Do not make live out-of-store hooks depend on a new, not-yet-activated Home Manager package.
+  - Mistake: changed `hooks.json` to call a new `codex-agent` profile binary while adding that binary in the same unapplied Home Manager generation.
+  - Result: the hook edit became live immediately through `mkOutOfStoreSymlink`, but the binary did not exist, so every matching hook exited `127`.
+  - Fix: invoke an already-installed runtime directly, or make the hook tolerate a missing executable until activation.
+  - Check: resolve every hook command before activation and execute it once from the live hook environment.
+
+- Do not use transport-less MCP stubs in named profile files.
+  - Mistake: added only `enabled = false` under `[mcp_servers.<id>]` in `agent.config.toml`, expecting the base config's transport to merge first.
+  - Result: Codex rejected the profile with `invalid transport` before applying it over `config.toml`.
+  - Fix: repeat the server's `command`/`args` or `url` in the profile, even when that server is disabled.
+  - Check: copy each profile to a temporary `config.toml` and run `codex app-server --strict-config --listen stdio:// </dev/null`; also load the real overlay with its profile-aware runtime command.
+
+## Nix / Home Manager file sources
+
+- Do not leave Nix path interpolations pointing at old locations after moving repo files.
+  - Mistake: moved `home-manager/services/vite-public-paths` to `home-manager/scripts/vite-public-paths` but left `${./services/vite-public-paths/bin/vite-public-paths.js}` in `home-manager/home.nix`.
+  - Result: `nix build git+file://...` failed during evaluation because the path did not exist in the Git-tracked flake source.
+  - Fix: update the interpolation to the new tracked path.
+  - Check: `jj file list | rg '^home-manager/scripts/vite-public-paths/bin/vite-public-paths.js$'` and evaluate the flake.
+
+## Nix / Rust toolchains
+
+- Do not assume `rust.cachix.org` covers Fenix toolchains.
+  - Mistake: enabling `nix-community/fenix` after adding only the `rust` Cachix cache.
+  - Result: Rust toolchain setup misses Fenix substitutes and can compile or fetch much more during the first switch.
+  - Fix: add `https://fenix.cachix.org` with `fenix.cachix.org-1:ecJhr+RdYEdcVgUkjruiYhjbBloIEGov7bos90cZi0Q=` when using Fenix, and prefer `inputs.fenix.packages.${system}` directly for cache-friendly packages.
+  - Check: generated `nix.custom.conf` lists `fenix.cachix.org`; `nix build .#darwinConfigurations.<host>.system --dry-run --extra-substituters https://fenix.cachix.org --extra-trusted-public-keys 'fenix.cachix.org-1:ecJhr+RdYEdcVgUkjruiYhjbBloIEGov7bos90cZi0Q='` should fetch Fenix Rust paths instead of building Rust Analyzer from source.
+
+## Nix / Bun packages
+
+- Do not put Bun global-bin paths before Home Manager profile paths when adding Home Manager wrappers for the same command.
+  - Mistake: kept `~/.cache/.bun/bin` before `/etc/profiles/per-user/$USER/bin` while adding a Home Manager `pi` wrapper.
+  - Result: the old Bun global shim won `PATH`, so the Nix-managed wrapper never ran.
+  - Fix: put Home Manager profile paths before `~/.bun/bin` / `~/.cache/.bun/bin`, or remove the stale global shim.
+  - Check: `which -a <command>` must show the Home Manager profile path before Bun global-bin paths.
+
+- Do not use plain `bunx <pkg>@latest` for wrappers expected to refresh latest on each run.
+  - Mistake: used `bunx --bun -p <pkg>@latest <bin>`, which can reuse Bun's cached install.
+  - Result: commands may stay on the previously cached package version.
+  - Fix: use `bun --prefer-latest x --bun -p <pkg>@latest <bin>` so Bun checks the registry.
+  - Check: run the wrapper and confirm it resolves/checks when a newer package exists.
+
+- Do not assume a renamed npm package's old scope receives new releases.
+  - Mistake: used `@mariozechner/pi-coding-agent@latest` for Pi after the package moved to `@earendil-works/pi-coding-agent`.
+  - Result: Bun correctly installed npm `latest`, but that old package's `latest` was stale.
+  - Fix: verify the current package name from the upstream package metadata or Nix expression before writing wrapper.
+  - Check: compare `curl https://registry.npmjs.org/<encoded-package>/latest` with upstream release tags.
+
+## Nix / pnpm packages
+
+- Do not put Determinate Nix custom cache settings in generated `/etc/nix/nix.conf` or inert `nix.settings` while `nix.enable = false`.
+  - Mistake: configured Cachix keys/substituters under nix-darwin `nix.settings` even though Determinate Nix owned the daemon and `/etc/nix/nix.conf`.
+  - Result: Helix Cachix was present as a key but not as an active substituter, so Helix source builds compiled instead of fetching binaries.
+  - Fix: keep `nix.enable = false`, manage `/etc/nix/nix.custom.conf` with `environment.etc."nix/nix.custom.conf"`, and let Determinate Nix include it.
+  - Check: `nix config show | rg 'substituters|trusted-public-keys'` must show the cache URL and key; `nix build github:helix-editor/helix --dry-run` should say paths will be fetched, not built.
+
+- Do not keep stale custom pins for npm/pnpm packages when nixpkgs already carries the desired version.
+  - Mistake: pinned `svelte-language-server` to `0.17.29` while locked nixpkgs provided newer `0.18.0`.
+  - Result: Home Manager built the old override and failed inside `pnpmConfigHook` due stale pnpm-deps output layout.
+  - Fix: prefer deleting the override; if a custom override is still needed, align `fetchPnpmDeps.pnpm`, `fetcherVersion`, and hash.
+  - Check: eval the package version and build the package derivation directly.
+
+## Nix / Python packages
+
+- Do not install Python plugin packages beside wrapped Python applications and expect runtime imports to work.
+  - Mistake: installed `dooit-extras` and `dooit` as separate Home Manager packages while `dooit/config.py` imported `dooit_extras`.
+  - Result: `dooit` wrapper ran with its own site-packages and `PYTHONNOUSERSITE=true`, so startup crashed with `ModuleNotFoundError: dooit_extras`.
+  - Fix: pass the plugin package through the app wrapper, e.g. `(dooit.override { extraPackages = [ dooit-extras ]; })`.
+  - Check: inspect the generated wrapped script for the plugin site-packages path or run the app startup/import path.
+
+## nix-darwin Homebrew
+
+- Do not rely on nix-darwin `homebrew.onActivation.cleanup = "uninstall"` after Homebrew deprecates `brew bundle install --cleanup`.
+  - Mistake: let nix-darwin generate `brew bundle ... --cleanup --force-cleanup`.
+  - Result: Homebrew warns `Calling the --cleanup switch is deprecated! There is no replacement.` during activation; older configs without force also abort waiting for cleanup confirmation.
+  - Fix: set `homebrew.onActivation.cleanup = "none"` and keep `homebrew.onActivation.extraFlags = [ "--force-cleanup" ];`; current Homebrew Bundle still treats `--force-cleanup` as a cleanup request.
+  - Check: eval `config.homebrew.onActivation.brewBundleCmd` and confirm `--force-cleanup` is present and `--cleanup` is absent.
+
+- Do not let nix-darwin Homebrew activation depend on shell-only Homebrew/XDG state or bulk upgrades.
+  - Mistake: trusted `hatchet-dev/hatchet` while `$XDG_CONFIG_HOME` was set, writing `~/.config/homebrew/trust.json`; activation runs `sudo --user ... --set-home env brew bundle` without `XDG_CONFIG_HOME`. Also `homebrew.onActivation.autoUpdate = true` and `upgrade = true` made every switch fetch many outdated casks/formulae.
+  - Result: activation still saw the tap as untrusted and/or failed on unrelated cask downloads, aborting the whole Nix switch.
+  - Fix: set `homebrew.onActivation.extraEnv.XDG_CONFIG_HOME = "/Users/kenrictee/.config"` and keep activation upgrades disabled; run `brew update && brew upgrade` manually when desired.
+  - Check: eval `config.homebrew.onActivation.brewBundleCmd` and confirm `XDG_CONFIG_HOME=...`, `HOMEBREW_NO_AUTO_UPDATE=1`, and `--no-upgrade`.
+
+## launchd / Home Manager
+
+- Do not carry stale service flags across package upgrades.
+  - Mistake: kept `memos --mode=prod` after nixpkgs moved to Memos `0.29.0`, whose CLI no longer supports `--mode`.
+  - Result: launchd kept restarting `dev.memos`; `localhost:8082` refused connections while logs repeated `Error: unknown flag: --mode`.
+  - Fix: remove `--mode=prod`; run Memos directly with supported flags like `--data` and `--port`.
+  - Check: `memos --help` must list every configured flag; `curl -I http://127.0.0.1:<port>/` should return `200 OK`.
+
+- Do not use Home Manager `launchd.agents` for macOS Background Items that need distinct names.
+  - Mistake: moved user services to Home Manager `launchd.agents` and expected `ProgramArguments[0]` to remain the service binary.
+  - Result: Home Manager rewrote plists to `/bin/sh -c "/bin/wait4path /nix/store && exec ..."`, so macOS Settings listed many indistinguishable `sh` background items.
+  - Fix: use nix-darwin `launchd.user.agents.<name>.serviceConfig` for those services, or install unmanaged plists yourself.
+  - Check: `plutil -p ~/Library/LaunchAgents/<label>.plist | rg -A8 ProgramArguments` must show the service-specific executable at index `0`, not `/bin/sh`.
+
+## MPD / Home Manager
+
+- Do not let launchd MPD depend on a removable `~/Library/Logs/mpd` directory.
+  - Mistake: started Home Manager's generated Darwin config without `--stderr`, so MPD had to open its hard-coded `log_file` before binding its socket.
+  - Result: when the log directory disappeared, MPD crash-looped with exit code `1` and both `rmpc` and `mpc` reported `Connection refused`.
+  - Fix: pass `--stderr` and route launchd's `StandardErrorPath` to `${services.mpd.dataDir}/log.txt`; retain the `Library/Logs/mpd/.keep` file for plain manual MPD runs.
+  - Check: the evaluated launch agent must contain `--stderr` and a `StandardErrorPath` under `services.mpd.dataDir`; with `~/Library/Logs/mpd` absent, a foreground launch using `--stderr` must get past log initialization.
+
+- Do not expose a minimal manual MPD config without explicit state paths.
+  - Mistake: linked `~/.config/mpd/mpd.conf` with `music_directory` only and no `db_file`, `state_file`, or `sticker_file`.
+  - Result: plain `mpd` defaulted its database to `~/Library/Caches/mpd/db`, which failed when that directory did not exist and diverged from `services.mpd.dataDir = "~/.mpd"`.
+  - Fix: keep manual config state files pointed at `~/.mpd`.
+  - Check: run `mpd --no-daemon /path/to/mpd.conf --stderr --verbose` on an alternate port and confirm it gets past database loading.
+
+## AeroSpace / SketchyBar
+
+- Do not use rounded global SketchyBar corners with zero margin when edge-to-edge coverage is intended.
+  - Mistake: combined `margin = 0` with a large global bar `corner_radius`.
+  - Result: the rounded path left transparent pixels at both display edges, exposing wallpaper behind the bar.
+  - Fix: set the global bar radius to `0`; keep item or frame radii independent when rounded modules are still desired.
+  - Check: in a Retina screenshot, the first and last pixel columns through the bar midpoint must contain bar pixels, not wallpaper.
+
+- Do not use SketchyBar process/query state as the source of truth for paired bar visibility and AeroSpace gaps.
+  - Mistake: used `pgrep` / `sketchybar --query bar` to decide whether the next toggle should show or hide the bar.
+  - Result: query/process-check failures can leave AeroSpace `outer.top` visible while the bar is hidden, creating an empty top gap.
+  - Fix: derive toggle state from the configured `outer.top` gap and send `sketchybar --bar hidden=...` as a best-effort side effect.
+  - Check: run the toggle twice and confirm `outer.top` flips to `0`, then back to the visible gap.
+
+- Do not assume AeroSpace `outer.top` protects floating windows from SketchyBar.
+  - Mistake: left a normal app window in `floating` layout while debugging top gap behavior.
+  - Result: the visible SketchyBar overlays that window because workspace gaps only affect tiled layout.
+  - Fix: force normal app windows to `layout tiling`; keep only intentional PiP/utility windows floating.
+  - Check: `aerospace list-windows --focused --format '%{window-layout}'` should print `tiling` for normal windows.

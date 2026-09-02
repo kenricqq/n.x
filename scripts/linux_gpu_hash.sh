@@ -1,0 +1,1 @@
+v=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader | head -n1 | xargs); a=$(uname -m); nix store prefetch-file --json "https://download.nvidia.com/XFree86/Linux-${a}/${v}/NVIDIA-Linux-${a}-${v}.run" | sed -n 's/.*"hash"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'

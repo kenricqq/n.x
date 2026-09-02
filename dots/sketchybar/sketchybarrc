@@ -1,0 +1,12 @@
+#!/opt/homebrew/bin/lua
+
+local script_path = debug.getinfo(1, "S").source:sub(2)
+local config_dir = script_path:match("(.*/)") or "./"
+
+package.path = table.concat({
+  config_dir .. "?.lua",
+  config_dir .. "?/init.lua",
+  package.path,
+}, ";")
+
+require("init")

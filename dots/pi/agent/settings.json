@@ -1,0 +1,41 @@
+{
+  "lastChangelogVersion": "0.84.1",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.6-sol",
+  "defaultThinkingLevel": "xhigh",
+  "hideThinkingBlock": false,
+  "steeringMode": "one-at-a-time",
+  "transport": "sse",
+  "followUpMode": "one-at-a-time",
+  "doubleEscapeAction": "tree",
+  "packages": [
+    {
+      "source": "git:github.com/tmustier/pi-extensions",
+      "extensions": [
+        "files-widget/index.ts"
+      ]
+    },
+    "git:github.com/nicobailon/visual-explainer",
+    "git:github.com/nicobailon/pi-intercom",
+    "git:github.com/nicobailon/pi-boomerang",
+    "git:github.com/nicobailon/pi-interactive-shell",
+    "git:git@github.com:NikiforovAll/pi-kanban.git",
+    "git:git@github.com:nicobailon/pi-subagents.git",
+    "npm:@juicesharp/rpiv-todo",
+    "npm:@diegopetrucci/pi-openai-fast"
+  ],
+  "npmCommand": [
+    "bun"
+  ],
+  "compaction": {
+    "enabled": false
+  },
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "collapseChangelog": true,
+  "quietStartup": true,
+  "enableInstallTelemetry": false,
+  "treeFilterMode": "default",
+  "theme": "dark"
+}

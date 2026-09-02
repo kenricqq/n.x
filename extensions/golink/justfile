@@ -1,0 +1,9 @@
+db := "golinks.sqlite"
+rows := "golinks_rows.md"
+
+default:
+    @just --list
+
+sync:
+    @sqlite3 -header -markdown "{{ db }}" "SELECT Short AS short, Long AS long FROM Links ORDER BY Short;" > "{{ rows }}"
+    @echo "wrote {{ rows }}"

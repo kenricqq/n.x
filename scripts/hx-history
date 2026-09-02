@@ -1,0 +1,200 @@
+# Packaged as a Bash application by hm/shell-commands.nix.
+
+usage() {
+  printf '%s\n' \
+    'Usage: hx-history <open|last|recent|list> [args...]' \
+    '' \
+    '  open [HX_ARGS...]  Record file arguments, then open Helix' \
+    '  last               Open the most recently recorded file' \
+    '  recent [QUERY]     Pick a recorded file with fzf and open it' \
+    '  list               Print the recorded files'
+}
+
+history_file="${HX_HISTORY_FILE:-${XDG_STATE_HOME:-$HOME/.local/state}/helix/recent-files}"
+
+open_helix() {
+  command -v hx >/dev/null 2>&1 || {
+    printf 'hx-history: hx is not installed\n' >&2
+    return 127
+  }
+  exec hx "$@"
+}
+
+record_files() {
+  local argument candidate location normalized working_dir pending_option
+  local end_options=0
+  local -a entries=()
+
+  working_dir=$PWD
+  pending_option=
+
+  # These modes do not open normal editor buffers.
+  for argument in "$@"; do
+    case "$argument" in
+      -h|--help|-V|--version|--health|-g|--grammar|--tutor)
+        return
+        ;;
+    esac
+  done
+
+  for argument in "$@"; do
+    if [[ $pending_option == skip ]]; then
+      pending_option=
+      continue
+    fi
+    if [[ $pending_option == working-directory ]]; then
+      working_dir=$argument
+      pending_option=
+      continue
+    fi
+
+    if (( ! end_options )); then
+      case "$argument" in
+        --)
+          end_options=1
+          continue
+          ;;
+        -c|--config|--log)
+          pending_option=skip
+          continue
+          ;;
+        -w|--working-dir)
+          pending_option=working-directory
+          continue
+          ;;
+        --config=*|--log=*)
+          continue
+          ;;
+        --working-dir=*)
+          working_dir=${argument#*=}
+          continue
+          ;;
+        --strict|--vsplit|--hsplit|-v|+[0-9]*)
+          continue
+          ;;
+        -* )
+          continue
+          ;;
+      esac
+    fi
+
+    [[ $argument != - && $argument != *://* ]] || continue
+
+    candidate=$argument
+    location=
+    if [[ $candidate =~ ^(.+):([0-9]+)(:([0-9]+))?$ ]]; then
+      candidate=${BASH_REMATCH[1]}
+      location=:${BASH_REMATCH[2]}${BASH_REMATCH[3]}
+    fi
+
+    if [[ $candidate != /* ]]; then
+      candidate=$working_dir/$candidate
+    fi
+    normalized=$(realpath -m -- "$candidate")
+    entries+=("$normalized$location")
+  done
+
+  (( ${#entries[@]} )) || return
+
+  local history_dir max_entries temporary
+  history_dir=$(dirname -- "$history_file")
+  max_entries=${HX_HISTORY_LIMIT:-100}
+  [[ $max_entries =~ ^[1-9][0-9]*$ ]] || max_entries=100
+
+  mkdir -p -- "$history_dir"
+  touch -- "$history_file"
+  temporary=$(mktemp "$history_dir/.recent-files.XXXXXX")
+  trap 'rm -f -- "$temporary"' RETURN
+
+  printf '%s\n' "${entries[@]}" \
+    | awk -v history="$history_file" -v limit="$max_entries" '
+        BEGIN {
+          while ((getline line < history) > 0) old[++old_count] = line
+        }
+        NF && !seen[$0]++ {
+          print
+          if (++count >= limit) exit
+        }
+        END {
+          for (i = 1; i <= old_count && count < limit; i++) {
+            if (old[i] != "" && !seen[old[i]]++) {
+              print old[i]
+              count++
+            }
+          }
+        }
+      ' > "$temporary"
+
+  mv -f -- "$temporary" "$history_file"
+  trap - RETURN
+}
+
+open_last() {
+  local file
+  [[ -s $history_file ]] || {
+    printf 'hx-history: no recent files\n' >&2
+    return 1
+  }
+
+  IFS= read -r file < "$history_file"
+  [[ -n $file ]] || {
+    printf 'hx-history: no recent files\n' >&2
+    return 1
+  }
+  open_helix "$file"
+}
+
+open_recent() {
+  local file query
+  [[ -s $history_file ]] || {
+    printf 'hx-history: no recent files\n' >&2
+    return 1
+  }
+  command -v fzf >/dev/null 2>&1 || {
+    printf 'hx-history: fzf is not installed\n' >&2
+    return 127
+  }
+
+  query=$*
+  file=$(fzf --prompt='hx recent> ' --query="$query" < "$history_file") || return
+  [[ -n $file ]] && open_helix "$file"
+}
+
+action=${1:-}
+[[ -n $action ]] || {
+  usage >&2
+  exit 2
+}
+shift
+
+case "$action" in
+  open)
+    record_files "$@"
+    open_helix "$@"
+    ;;
+  last)
+    [[ $# -eq 0 ]] || {
+      usage >&2
+      exit 2
+    }
+    open_last
+    ;;
+  recent)
+    open_recent "$@"
+    ;;
+  list)
+    [[ $# -eq 0 ]] || {
+      usage >&2
+      exit 2
+    }
+    [[ -f $history_file ]] && cat -- "$history_file"
+    ;;
+  -h|--help|help)
+    usage
+    ;;
+  *)
+    printf 'hx-history: unknown action: %s\n' "$action" >&2
+    usage >&2
+    exit 2
+    ;;
+esac

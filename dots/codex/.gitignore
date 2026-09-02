@@ -1,0 +1,23 @@
+# Ignore everything
+/*
+
+# But these:
+!/prompts/
+!/prompts/**
+
+# !/rules/
+# !/rules/**
+
+!/skills/
+!/skills/**
+/skills/**/.DS_Store
+
+!/AGENTS.md
+!/config.toml
+
+!/.gitignore
+
+!/requirements.toml
+!/agent-policy-hook.mjs
+
+/.cache/

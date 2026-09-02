@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+selection="$({
+  tmux capture-pane -J -p -S - -E - | tv \
+    --no-sort \
+    --no-preview \
+    --input-prompt 'scrollback › ' \
+    --input-header 'Search pane history. Enter copies selected line. Esc quits.'
+} || true)"
+
+[ -n "$selection" ] || exit 0
+printf '%s' "$selection" | tmux-copy

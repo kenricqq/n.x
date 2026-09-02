@@ -1,0 +1,36 @@
+[permissions.agent-workspace]
+description = "Only the assigned agent workspace is writable; unrelated host files and VCS metadata are inaccessible"
+extends = ":workspace"
+
+[permissions.agent-workspace.filesystem]
+":root" = "deny"
+":minimal" = "read"
+":tmpdir" = "write"
+":slash_tmp" = "deny"
+
+"/Applications/Xcode.app/Contents/Developer/usr/bin/git" = "deny"
+"/Library/Developer/CommandLineTools/usr/bin/git" = "deny"
+"/etc/profiles/per-user/kenrictee/bin/git" = "deny"
+"/etc/profiles/per-user/kenrictee/bin/jj" = "deny"
+"/nix/store/*-git-*/bin/git" = "deny"
+"/nix/store/*-jujutsu-*/bin/jj" = "deny"
+"/opt/homebrew/bin/git" = "deny"
+"/opt/homebrew/bin/jj" = "deny"
+"/opt/local/bin/git" = "deny"
+"/opt/local/bin/jj" = "deny"
+"/run/current-system/sw/bin/git" = "deny"
+"/run/current-system/sw/bin/jj" = "deny"
+"/usr/bin/git" = "deny"
+"/usr/bin/jj" = "deny"
+"/usr/local/bin/git" = "deny"
+"/usr/local/bin/jj" = "deny"
+
+[permissions.agent-workspace.filesystem.":workspace_roots"]
+"." = "write"
+".agents" = "read"
+".codex" = "read"
+".git" = "deny"
+".jj" = "deny"
+
+[permissions.agent-workspace.network]
+enabled = false

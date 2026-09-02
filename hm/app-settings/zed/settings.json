@@ -1,0 +1,225 @@
+{
+  "show_edit_predictions": false,
+  "vim": {
+    "cursor_shape": {
+      "insert": "bar",
+      "visual": "underline"
+    }
+  },
+  "vertical_scroll_margin": 7,
+  "mouse_wheel_zoom": false,
+  "agent_ui_font_size": 20.0,
+  "agent_buffer_font_size": 18.0,
+  "terminal": {
+    "font_size": 17.0
+  },
+  "feature_flags": {
+    "tabular-data-preview": "on",
+    "notebooks": "on"
+  },
+  // "project_panel": {
+  //   "dock": "left",
+  // },
+  // "outline_panel": {
+  //   "dock": "left",
+  // },
+  // "collaboration_panel": {
+  //   "dock": "left",
+  // },
+  // "git_panel": {
+  //   "dock": "left",
+  // },
+  "agent": {
+    // "dock": "right",
+    "tool_permissions": {
+      "default": "allow"
+    },
+    "play_sound_when_agent_done": "never",
+    "notify_when_agent_waiting": "never"
+  },
+  "active_pane_modifiers": {
+    "border_size": 2,
+    "inactive_opacity": 0.7
+  },
+  "agent_servers": {
+    "pi-acp": {
+      "type": "registry"
+    },
+    "codex-acp": {
+      "type": "registry"
+    }
+  },
+  "ui_font_weight": 400.0,
+  "buffer_font_weight": 300.0,
+  "buffer_line_height": "comfortable",
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)"
+  },
+  "context_servers": {
+    "svelte": {
+      "command": "bunx",
+      "args": ["-y", "@sveltejs/mcp"]
+    }
+  },
+  "autosave": "on_focus_change",
+  "format_on_save": "on",
+  "soft_wrap": "bounded",
+  "relative_line_numbers": "enabled",
+  "languages": {
+    "Zig": {
+      "code_actions_on_format": {
+        "source.organizeImports": true,
+        "source.fixAll": true
+      },
+      "language_servers": ["zls"]
+    },
+    "Svelte": {
+      "format_on_save": "on",
+      "completions": {
+        "words_min_length": 2
+      },
+      "inlay_hints": {
+        "enabled": true
+      },
+      "prettier": {
+        "allowed": false
+      },
+      "language_servers": ["oxfmt", "svelte-language-server", "tailwindcss-language-server", "scls"]
+    },
+    "Python": {
+      "language_servers": ["ruff", "ty", "scls"]
+    },
+    "HTML": {
+      "prettier": {
+        "allowed": false
+      },
+      "language_servers": [
+        "superhtml",
+        "scls",
+        "emmet-language-server"
+        // "..."
+      ]
+    },
+    "CSS": {
+      "prettier": {
+        "allowed": false
+      },
+      "language_servers": ["oxfmt", "tailwindcss-language-server", "scls"]
+    },
+    "JavaScript": {
+      "prettier": {
+        "allowed": false
+      },
+      "inlay_hints": {
+        "enabled": true
+      },
+      "language_servers": [
+        "oxfmt",
+        "oxlint",
+        // "tsgo",
+        "scls",
+        "vtsls"
+        // "...",
+        //
+      ]
+    },
+    "TypeScript": {
+      "prettier": {
+        "allowed": false
+      },
+      "inlay_hints": {
+        "enabled": true
+      },
+      "language_servers": [
+        "oxfmt",
+        "oxlint",
+        "tsgo",
+        "scls"
+        // "..."
+      ]
+    },
+    "TSX": {
+      "prettier": {
+        "allowed": false
+      },
+      "language_servers": [
+        "oxfmt",
+        "oxlint",
+        "tsgo",
+        "scls"
+        // "..."
+      ]
+    },
+    "JSON": {
+      "language_servers": ["oxfmt", "oxlint", "scls", "..."]
+    },
+    "JSONC": {
+      "language_servers": ["oxfmt", "oxlint", "scls", "..."]
+    }
+  },
+  "lsp": {
+    "scls": {
+      "binary": {
+        "path": "/etc/profiles/per-user/kenrictee/bin/simple-completion-language-server",
+        "env": {
+          "SNIPPETS_PATH": "/Users/kenrictee/KTQQ/m0nix/home-manager/snippets",
+          "RUST_LOG": "info,simple-completion-language-server=info",
+          "LOG_FILE": "/tmp/completion.log"
+        }
+      },
+      "initialization_options": {
+        "max_completion_items": 7,
+        "feature_words": true,
+        "feature_snippets": true,
+        "snippets_first": true,
+        "snippets_inline_by_word_tail": false,
+        "feature_unicode_input": false,
+        "feature_paths": true,
+        "feature_citations": false
+      }
+    }
+  },
+  "base_keymap": "Cursor",
+  "cursor_blink": false,
+  "helix_mode": true,
+  "always_treat_brackets_as_autoclosed": true,
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+  "colorize_brackets": true,
+  "hide_mouse": "on_typing_and_action",
+  // "hide_mouse": "never",
+  "theme": {
+    "mode": "dark",
+    "light": "GitHub Light",
+    "dark": "One Dark Pro"
+  },
+  "inlay_hints": {
+    "enabled": true,
+    "show_background": true
+  },
+  "theme_overrides": {
+    "Kanagawa": {
+      "hint.background": "#333355"
+      // "hint.background": "#242933",
+    },
+    "Tailwind Syntax": {
+      "hint.background": "#333355"
+      // "hint.background": "#242933",
+    }
+  },
+  // "buffer_font_family": "VictorMono Nerd Font Mono",
+  // "buffer_font_family": "SpaceMono Nerd Font Mono",
+  "buffer_font_family": "Maple Mono NF CN",
+  // "buffer_font_family": "Monaspace Neon",
+  "buffer_font_size": 17.0,
+  "buffer_font_features": {
+    "calt": true,
+    "liga": true
+  },
+  "ui_font_family": "Maple Mono NF CN",
+  "ui_font_size": 19.0
+}

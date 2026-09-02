@@ -1,0 +1,14 @@
+{
+  "trustedcasks": ["hatchet-dev/hatchet/hatchet"],
+  "trustedtaps": [
+    "ariga/tap",
+    "barutsrb/tap",
+    "christo-auer/eilmeldung",
+    "felixkratz/formulae",
+    "franvy/gtab",
+    "hatchet-dev/hatchet",
+    "manaflow-ai/cmux",
+    "mikker/tap",
+    "neurosnap/tap"
+  ]
+}

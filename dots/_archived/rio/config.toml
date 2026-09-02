@@ -1,0 +1,109 @@
+
+hide-cursor-when-typing = true
+padding = [20, 20, 0, 20]
+option-as-alt = 'left'
+confirm-before-quit = false
+
+line-height = 1.05
+
+[editor]
+program = "/etc/profiles/per-user/$USER/bin/hx"
+args = []
+
+[window]
+width = 600
+height = 400
+mode = "Windowed"
+opacity = 0.95
+blur = true
+decorations = "Buttonless"
+
+[cursor]
+blinking = false
+blinking-interval = 530
+
+[fonts]
+size = 16
+
+[fonts.regular]
+# family = "JetBrains Mono"
+# family = "0xProto Nerd Font Mono"
+family = "Maple Mono NF CN"
+style = "Regular"
+
+[fonts.bold]
+family = "Maple Mono NF CN"
+style = "Bold"
+
+[fonts.italic]
+family = "Maple Mono NF CN"
+style = "Medium Italic"
+
+[fonts.bold-italic]
+family = "Maple Mono NF CN"
+style = "Bold Italic"
+
+[navigation]
+mode = "Tab"
+unfocused-split-opacity = 0.8
+
+[colors]
+# cursor = '#00af87'
+# background = '#171717'
+# foreground = '#C5C8C6'
+# cursor = '#F38BA3'
+# tabs = '#443d40'
+# tabs-active = '#F38BA3'
+# green = '#0BA95B'
+# red = '#ED203D'
+# blue = '#12B5E5'
+# yellow = '#FCBA28'
+
+### Dracula ###
+background = '#1e1f29'
+foreground = '#f8f8f2'
+selection-background = '#44475a'
+selection-foreground = '#ffffff'
+cursor = '#bbbbbb'
+black = '#000000'
+red = '#ff5555'
+green = '#50fa7b'
+yellow = '#f1fa8c'
+blue = '#bd93f9'
+magenta = '#ff79c6'
+cyan = '#8be9fd'
+white = '#bbbbbb'
+light_black = '#555555'
+light_red = '#ff5555'
+light_green = '#50fa7b'
+light_yellow = '#f1fa8c'
+light_blue = '#bd93f9'
+light_magenta = '#ff79c6'
+light_cyan = '#8be9fd'
+light_white = '#ffffff'
+### --- ###
+
+
+[bindings]
+# super is basically mac's command
+keys = [
+	{ key = "return", with = "super", action = "ToggleFullscreen" },
+	{ key = "\\", with = "super | shift", action = "SplitDown" },
+	{ key = "\\", with = "super", action = "SplitRight" },
+
+	# Keyboard scroll, matching Ghostty direction.
+	{ key = "u", with = "super | shift", action = "Scroll(15)" },
+	{ key = "d", with = "super | shift", action = "Scroll(-15)" },
+
+	# Resize splits. Rio has no directional split focus, so keep hjkl for resize only.
+	{ key = "h", with = "super | control", action = "MoveDividerLeft" },
+	{ key = "j", with = "super | control", action = "MoveDividerDown" },
+	{ key = "k", with = "super | control", action = "MoveDividerUp" },
+	{ key = "l", with = "super | control", action = "MoveDividerRight" },
+
+	# EXAMPLES
+	# Bytes[27, 91, 53, 126] is equivalent to "\x1b[5~"
+	{ key = "home", with = "super | shift", bytes = [27, 91, 53, 126] },
+	# Remove existing keybind
+	{ key = "v", with = "control | shift", action = "none" },
+]

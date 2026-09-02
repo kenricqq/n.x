@@ -1,0 +1,554 @@
+# Packaged as a Bash application by hm/shell-commands.nix.
+
+usage() {
+  printf '%s\n' \
+    'Usage:' \
+    '  jjw                              select a workspace; shell integration enters it' \
+    '  jjw new <name> [base] [options]  create a workspace; shell integration enters it' \
+    '  jjw cd [name]                    select a workspace; pick if omitted' \
+    '  jjw ls [--json]                  list workspaces' \
+    '  jjw root [name]                  print a workspace path' \
+    '  jjw run [name] -- <command...>   run a command inside a workspace' \
+    '  jjw pi [name] [-- prompt]        open or create a workspace and launch pi' \
+    '  jjw rm <name> [--delete]         forget a workspace; optionally delete it' \
+    '  jjw stale                        update the current stale workspace' \
+    '  jjw doctor                       check the jjw environment' \
+    '' \
+    'New-workspace options:' \
+    '  --base REV                       revision used as the new commit parent' \
+    '  --force                          allow an existing empty destination' \
+    '  --empty-sparse                   check out no paths initially' \
+    '  --full-sparse                    check out all paths initially' \
+    '  --copy-sparse                    copy current sparse patterns (default)' \
+    '' \
+    'Environment:' \
+    '  JJW_BASE=main@origin             default base revision' \
+    '  JJW_DIR=.ws                      workspace directory template' \
+    '  JJW_PATH_TEMPLATE={workspace}    path below the workspace directory'
+}
+
+fail() {
+  printf 'jjw: %s\n' "$*" >&2
+  return 1
+}
+
+current_root() {
+  jj root 2>/dev/null
+}
+
+workspace_repo_root() {
+  local root=${1:-}
+  if [[ $root == */.ws/* ]]; then
+    printf '%s\n' "${root%%/.ws/*}"
+  else
+    printf '%s\n' "$root"
+  fi
+}
+
+workspace_table() {
+  local raw root repo_root current_name line_count name workspace_path expected
+  if ! raw=$(jj --ignore-working-copy workspace list --color never \
+    -T 'name ++ "\t" ++ root ++ "\n"' 2>/dev/null); then
+    fail 'not inside a Jujutsu repository'
+    return
+  fi
+
+  root=$(current_root 2>/dev/null || true)
+  repo_root=$(workspace_repo_root "$root")
+  current_name=$(awk -F '\t' -v root="$root" '$2 == root { print $1; exit }' <<< "$raw")
+  line_count=$(awk 'NF { count++ } END { print count + 0 }' <<< "$raw")
+
+  while IFS=$'\t' read -r name workspace_path; do
+    [[ -n $name ]] || continue
+    if [[ $workspace_path == '<Error:'* && -n $root ]]; then
+      if [[ $name == default ]]; then
+        workspace_path=$repo_root
+      elif [[ $name == "$current_name" || $line_count == 1 ]]; then
+        workspace_path=$root
+      elif [[ ${JJW_DIR:-.ws} == .ws ]]; then
+        expected=$repo_root/.ws/$name
+        [[ -d $expected ]] && workspace_path=$expected
+      fi
+    fi
+    printf '%s\t%s\n' "$name" "$workspace_path"
+  done <<< "$raw"
+}
+
+workspace_names() {
+  jj --ignore-working-copy workspace list --color never -T 'name ++ "\n"' 2>/dev/null
+}
+
+pick_workspace() {
+  local query=${1:-} selected
+  current_root >/dev/null || {
+    fail 'not inside a Jujutsu repository'
+    return
+  }
+  command -v fzf >/dev/null 2>&1 || {
+    fail 'fzf is not installed'
+    return 127
+  }
+
+  selected=$(workspace_names | fzf \
+    --query "$query" \
+    --height=40% \
+    --reverse \
+    --prompt='jjw> ') || return
+  [[ -n $selected ]] || return 130
+  printf '%s\n' "$selected"
+}
+
+workspace_path() {
+  local name=$1 table
+  table=$(workspace_table) || return
+  awk -F '\t' -v name="$name" '$1 == name { print $2; exit }' <<< "$table"
+}
+
+workspace_root() {
+  local name=${1:-} path
+  if [[ -z $name ]]; then
+    current_root || fail 'not inside a Jujutsu repository'
+    return
+  fi
+
+  path=$(workspace_path "$name") || return
+  if [[ -z $path ]]; then
+    fail "workspace not found: $name"
+    printf 'Try: jjw ls\n' >&2
+    return 1
+  fi
+  if [[ $path == '<Error:'* ]]; then
+    fail "workspace root unavailable: $name"
+    printf '%s\n' "$path" >&2
+    printf 'The record is probably stale; try: jj workspace forget %q\n' "$name" >&2
+    return 1
+  fi
+  printf '%s\n' "$path"
+}
+
+primary_root() {
+  local table primary root
+  table=$(workspace_table) || return
+  primary=$(awk -F '\t' '$1 == "default" { print $2; exit }' <<< "$table")
+  if [[ -n $primary && $primary != '<Error:'* ]]; then
+    workspace_repo_root "$primary"
+    return
+  fi
+
+  root=$(current_root) || {
+    fail 'not inside a Jujutsu repository'
+    return
+  }
+  workspace_repo_root "$root"
+}
+
+expand_template() {
+  local template=$1 workspace=${2:-} primary repo result
+  primary=$(primary_root) || return
+  repo=$(basename -- "$primary")
+  result=${template//\{repo\}/$repo}
+  result=${result//\{workspace\}/$workspace}
+  printf '%s\n' "$result"
+}
+
+absolute_from_primary() {
+  local input=$1 primary output
+  primary=$(primary_root) || return
+  case "$input" in
+    \~) output=$HOME ;;
+    \~/*) output=$HOME/${input#\~/} ;;
+    /*) output=$input ;;
+    *) output=$primary/$input ;;
+  esac
+  realpath -m -- "$output"
+}
+
+workspace_directory() {
+  local template expanded
+  template=${JJW_DIR:-.ws}
+  expanded=$(expand_template "$template") || return
+  absolute_from_primary "$expanded"
+}
+
+workspace_destination() {
+  local name=$1 directory template relative
+  directory=$(workspace_directory) || return
+  template=${JJW_PATH_TEMPLATE:-\{workspace\}}
+  relative=$(expand_template "$template" "$name") || return
+  realpath -m -- "$directory/$relative"
+}
+
+validate_name() {
+  local name=$1
+  [[ -n $name ]] || {
+    fail 'workspace name is required'
+    return
+  }
+  if [[ ! $name =~ ^[A-Za-z0-9._-]+$ || $name == .* || $name == *..* ]]; then
+    fail "invalid workspace name: $name"
+    printf 'Use a simple name such as: api-refactor\n' >&2
+    return 1
+  fi
+}
+
+directory_is_empty() {
+  [[ -d $1 && -z $(find "$1" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null) ]]
+}
+
+base_exists() {
+  jj --ignore-working-copy log -r "$1" --limit 1 --no-graph >/dev/null 2>&1
+}
+
+new_workspace() {
+  local name='' base force=0 sparse=copy argument destination existing base_set=0
+  base=${JJW_BASE:-main@origin}
+
+  while (( $# )); do
+    argument=$1
+    case "$argument" in
+      --base)
+        [[ $# -ge 2 ]] || {
+          fail '--base requires a revision'
+          return 2
+        }
+        base=$2
+        base_set=1
+        shift 2
+        ;;
+      --force|-f)
+        force=1
+        shift
+        ;;
+      --empty-sparse)
+        sparse=empty
+        shift
+        ;;
+      --full-sparse)
+        sparse=full
+        shift
+        ;;
+      --copy-sparse)
+        sparse=copy
+        shift
+        ;;
+      -h|--help)
+        printf 'Usage: jjw new <name> [base] [--base REV] [--force] [--empty-sparse|--full-sparse|--copy-sparse]\n'
+        return
+        ;;
+      --*)
+        fail "unknown option: $argument"
+        return 2
+        ;;
+      *)
+        if [[ -z $name ]]; then
+          name=$argument
+        elif (( ! base_set )); then
+          base=$argument
+          base_set=1
+        else
+          fail "unexpected argument: $argument"
+          return 2
+        fi
+        shift
+        ;;
+    esac
+  done
+
+  validate_name "$name" || return
+  existing=$(workspace_path "$name") || return
+  if [[ -n $existing ]]; then
+    fail "workspace already exists: $name"
+    printf 'Try: jjw cd %q\n' "$name" >&2
+    return 1
+  fi
+
+  destination=$(workspace_destination "$name") || return
+  if [[ -e $destination ]]; then
+    if (( ! force )) || ! directory_is_empty "$destination"; then
+      fail "destination exists: $destination"
+      printf 'Use --force only for an existing empty directory.\n' >&2
+      return 1
+    fi
+  fi
+
+  if ! base_exists "$base"; then
+    fail "base revision not found: $base"
+    printf 'Set JJW_BASE or pass: jjw new %q --base REV\n' "$name" >&2
+    return 1
+  fi
+
+  mkdir -p -- "$(dirname -- "$destination")"
+  jj workspace add \
+    --name "$name" \
+    --revision "$base" \
+    --sparse-patterns "$sparse" \
+    "$destination" >/dev/null
+  printf '%s\n' "$destination"
+}
+
+list_workspaces() {
+  local format=${1:-} root table name path current stale
+  root=$(current_root) || {
+    fail 'not inside a Jujutsu repository'
+    return
+  }
+  table=$(workspace_table) || return
+
+  if [[ $format == --json ]]; then
+    jq --raw-input --slurp --arg current "$root" '
+      split("\n")
+      | map(
+          select(length > 0)
+          | split("\t") as $fields
+          | {
+              name: $fields[0],
+              path: ($fields[1:] | join("\t"))
+            }
+          | . + {
+              current: ((.path | startswith("<Error:")) | not) and (.path == $current),
+              stale: (.path | startswith("<Error:"))
+            }
+        )
+    ' <<< "$table"
+    return
+  fi
+
+  [[ -z $format ]] || {
+    fail "unknown list option: $format"
+    return 2
+  }
+
+  printf '%-24s  %-60s  %-7s  %s\n' NAME PATH CURRENT STALE
+  while IFS=$'\t' read -r name path; do
+    [[ -n $name ]] || continue
+    current=no
+    stale=no
+    [[ $path == '<Error:'* ]] && stale=yes
+    if [[ $stale == no && $(realpath -m -- "$path") == $(realpath -m -- "$root") ]]; then
+      current='*'
+    fi
+    printf '%-24s  %-60s  %-7s  %s\n' "$name" "$path" "$current" "$stale"
+  done <<< "$table"
+}
+
+run_in_workspace() {
+  local name path
+  if (( ! $# )) || [[ $1 == -- ]]; then
+    [[ ${1:-} == -- ]] && shift
+    name=$(pick_workspace) || return
+  else
+    name=$1
+    shift
+    [[ ${1:-} == -- ]] && shift
+  fi
+
+  (( $# )) || {
+    fail 'usage: jjw run [name] -- <command...>'
+    return 2
+  }
+  path=$(workspace_root "$name") || return
+  (cd -- "$path" && "$@")
+}
+
+validate_delete_path() {
+  local name=$1 path=$2 force=${3:-0}
+  local real home_real primary primary_real parent_real root root_real directory directory_real
+
+  [[ -n $path ]] || {
+    fail 'refusing to delete an empty path'
+    return
+  }
+  [[ -d $path ]] || {
+    fail "refusing to delete a missing or non-directory path: $path"
+    return
+  }
+
+  real=$(realpath -m -- "$path")
+  home_real=$(realpath -m -- "$HOME")
+  primary=$(primary_root 2>/dev/null || true)
+  primary_real=$(realpath -m -- "${primary:-/}")
+  parent_real=$(dirname -- "$primary_real")
+
+  case "$real" in
+    /|"$home_real"|"$primary_real"|"$parent_real")
+      fail "refusing dangerous delete path: $real"
+      return 1
+      ;;
+  esac
+
+  root=$(current_root 2>/dev/null || true)
+  root_real=$(realpath -m -- "${root:-/}")
+  if [[ -n $root && $root_real == "$real" ]]; then
+    fail "refusing to delete the current workspace: $name"
+    printf 'Change to another workspace first.\n' >&2
+    return 1
+  fi
+
+  if (( ! force )); then
+    case "$name" in
+      default|main|master)
+        fail "refusing to delete the main/default workspace: $name"
+        printf 'Use --force only if you know this is safe.\n' >&2
+        return 1
+        ;;
+    esac
+
+    directory=$(workspace_directory) || return
+    directory_real=$(realpath -m -- "$directory")
+    if [[ $real != "$directory_real"/* ]]; then
+      fail "refusing to delete outside the workspace directory: $real"
+      printf 'Workspace directory: %s\n' "$directory_real" >&2
+      printf 'Use --force only if you know this is safe.\n' >&2
+      return 1
+    fi
+  fi
+}
+
+remove_workspace() {
+  local delete=0 force=0 name='' argument path
+  while (( $# )); do
+    argument=$1
+    case "$argument" in
+      --delete|-d) delete=1 ;;
+      --force|-f) force=1 ;;
+      --*)
+        fail "unknown option: $argument"
+        return 2
+        ;;
+      *)
+        [[ -z $name ]] || {
+          fail "unexpected argument: $argument"
+          return 2
+        }
+        name=$argument
+        ;;
+    esac
+    shift
+  done
+
+  [[ -n $name ]] || {
+    fail 'usage: jjw rm <name> [--delete] [--force]'
+    return 2
+  }
+
+  path=$(workspace_root "$name") || return
+  printf 'Workspace: %s\nPath: %s\n' "$name" "$path"
+  (( ! delete )) || validate_delete_path "$name" "$path" "$force" || return
+
+  jj workspace forget "$name"
+  if (( delete )); then
+    rm -rf -- "$path"
+    printf 'Deleted: %s\n' "$path"
+  else
+    printf 'Left on disk: %s\n' "$path"
+  fi
+}
+
+launch_pi() {
+  local name='' prompt path
+  if (( ! $# )) || [[ $1 == -- ]]; then
+    [[ ${1:-} == -- ]] && shift
+    prompt=$*
+    name=$(pick_workspace) || return
+  else
+    name=$1
+    shift
+    [[ ${1:-} == -- ]] && shift
+    prompt=$*
+  fi
+
+  path=$(workspace_path "$name") || return
+  [[ -n $path && $path != '<Error:'* ]] || path=$(new_workspace "$name") || return
+  command -v pi >/dev/null 2>&1 || {
+    fail 'pi is not installed'
+    return 127
+  }
+
+  if [[ -n $prompt ]]; then
+    (cd -- "$path" && pi "$prompt")
+  else
+    (cd -- "$path" && pi)
+  fi
+}
+
+doctor() {
+  local root directory base
+  printf 'jj: %s\n' "$(command -v jj || printf missing)"
+  jj --version 2>/dev/null || true
+  if root=$(current_root 2>/dev/null); then
+    printf 'Inside jj repo: yes\nRoot: %s\n' "$root"
+  else
+    printf 'Inside jj repo: no\n'
+  fi
+  directory=$(workspace_directory 2>/dev/null || printf unavailable)
+  base=${JJW_BASE:-main@origin}
+  printf 'Workspace directory: %s\nBase: %s\n' "$directory" "$base"
+  if base_exists "$base"; then
+    printf 'Base exists: yes\n'
+  else
+    printf 'Base exists: no\n'
+  fi
+}
+
+subcommand=${1:-cd}
+(( $# == 0 )) || shift
+
+case "$subcommand" in
+  -h|--help|help)
+    usage
+    ;;
+  cd)
+    if (( $# > 1 )); then
+      fail 'usage: jjw cd [name]'
+      exit 2
+    fi
+    name=${1:-}
+    [[ -n $name ]] || name=$(pick_workspace) || exit
+    workspace_root "$name"
+    ;;
+  new)
+    new_workspace "$@"
+    ;;
+  ls|list)
+    (( $# <= 1 )) || {
+      fail 'usage: jjw ls [--json]'
+      exit 2
+    }
+    list_workspaces "${1:-}"
+    ;;
+  root)
+    (( $# <= 1 )) || {
+      fail 'usage: jjw root [name]'
+      exit 2
+    }
+    workspace_root "${1:-}"
+    ;;
+  run)
+    run_in_workspace "$@"
+    ;;
+  pi)
+    launch_pi "$@"
+    ;;
+  rm|remove)
+    remove_workspace "$@"
+    ;;
+  stale)
+    (( $# == 0 )) || {
+      fail 'usage: jjw stale'
+      exit 2
+    }
+    jj workspace update-stale
+    ;;
+  doctor)
+    (( $# == 0 )) || {
+      fail 'usage: jjw doctor'
+      exit 2
+    }
+    doctor
+    ;;
+  *)
+    fail "unknown command: $subcommand"
+    printf 'Try: jjw help\n' >&2
+    exit 2
+    ;;
+esac

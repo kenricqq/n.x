@@ -1,0 +1,157 @@
+{
+	"migrationVersion": 1,
+	"interpreter_settings": {
+		"interpreterModel": "1777828497917",
+		"models": [
+			{
+				"id": "1777828497917",
+				"providerId": "1777828239444",
+				"providerModelId": "pi-cloud",
+				"name": "pi-cloud",
+				"enabled": true
+			}
+		],
+		"providers": [
+			{
+				"id": "1777828239444",
+				"name": "OpenAI",
+				"baseUrl": "http://127.0.0.1:4891/v1/chat/completions",
+				"apiKey": "anything",
+				"apiKeyRequired": true
+			}
+		],
+		"interpreterEnabled": true,
+		"interpreterAutoRun": true,
+		"defaultPromptContext": ""
+	},
+	"property_types": [
+		{
+			"name": "title",
+			"type": "text",
+			"defaultValue": "{{title}}"
+		},
+		{
+			"name": "source",
+			"type": "text",
+			"defaultValue": "{{url}}"
+		},
+		{
+			"name": "author",
+			"type": "multitext",
+			"defaultValue": "{{author|split:\", \"|wikilink|join}}"
+		},
+		{
+			"name": "published",
+			"type": "date",
+			"defaultValue": "{{published}}"
+		},
+		{
+			"name": "created",
+			"type": "date",
+			"defaultValue": "{{date}}"
+		},
+		{
+			"name": "description",
+			"type": "text",
+			"defaultValue": "{{description}}"
+		},
+		{
+			"name": "tags",
+			"type": "multitext",
+			"defaultValue": "clippings"
+		}
+	],
+	"vaults": [],
+	"highlighter_settings": {
+		"highlighterEnabled": true,
+		"alwaysShowHighlights": true,
+		"highlightBehavior": "highlight-inline"
+	},
+	"general_settings": {
+		"showMoreActionsButton": false,
+		"betaFeatures": false,
+		"legacyMode": false,
+		"silentOpen": false,
+		"openBehavior": "popup",
+		"saveBehavior": "addToObsidian"
+	},
+	"template_list": ["1777824330088qx4bmvpz1"],
+	"template_1777824330088qx4bmvpz1": {
+		"id": "1777824330088qx4bmvpz1",
+		"name": "Default",
+		"behavior": "create",
+		"noteNameFormat": "{{title}}",
+		"path": "raw",
+		"noteContentFormat": "# tldr;\n{{\"Read source below. Output fastest-scan TL;DR.\n\nFormat exactly:\n- **Gist:** <one sentence, max 25 words>\n- **Core:** <main claim or idea>\n- **Key:** <most important supporting detail(s)>\n- **So what:** <practical implication, consequence, or why it matters>\n\nRules: ≤90 words total. No intro phrase. No generic phrasing like 'this page discusses'. Use concrete nouns from source.\nNo unsupported claims.\"}}\n\n---\n\n{{content}}",
+		"context": "",
+		"properties": [
+			{
+				"id": "1777824330088h2ch3ag7l",
+				"name": "title",
+				"value": "{{title}}",
+				"type": "text"
+			},
+			{
+				"id": "1777824330088gj1fas9gz",
+				"name": "source",
+				"value": "{{url}}",
+				"type": "text"
+			},
+			{
+				"id": "1777824330088f5c0gxfv6",
+				"name": "author",
+				"value": "{{author|split:\\\", \\\"|wikilink|join}}",
+				"type": "multitext"
+			},
+			{
+				"id": "1777824330088ipm6hc0dy",
+				"name": "published",
+				"value": "{{published}}",
+				"type": "date"
+			},
+			{
+				"id": "1777824330088jpavz0yfs",
+				"name": "created",
+				"value": "{{date}}",
+				"type": "date"
+			},
+			{
+				"id": "1777824330088ywtt8wc85",
+				"name": "description",
+				"value": "{{description}}",
+				"type": "text"
+			},
+			{
+				"id": "1777824330088pzuufejmh",
+				"name": "tags",
+				"value": "clippings",
+				"type": "multitext"
+			}
+		],
+		"triggers": [],
+		"vault": "LLM Wiki"
+	},
+	"reader_settings": {
+		"fontSize": 16,
+		"lineHeight": 1.6,
+		"maxWidth": 38,
+		"lightTheme": "rose-pine",
+		"darkTheme": "everforest",
+		"appearance": "auto",
+		"fonts": [],
+		"defaultFont": "",
+		"blendImages": true,
+		"colorLinks": false,
+		"followLinks": true,
+		"pinPlayer": true,
+		"autoScroll": true,
+		"highlightActiveLine": true,
+		"customCss": ""
+	},
+	"stats": {
+		"addToObsidian": 2,
+		"saveFile": 0,
+		"copyToClipboard": 0,
+		"share": 0
+	}
+}

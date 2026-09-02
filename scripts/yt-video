@@ -1,0 +1,75 @@
+# Packaged as a Bash application by hm/shell-commands.nix.
+
+usage() {
+  printf '%s\n' \
+    'Usage: yt-video [-s|--subtitles] [-o DIRECTORY] URL' \
+    '' \
+    'The default directory is YT_VIDEO_DIR or' \
+    'XDG_VIDEOS_DIR/watch-later, falling back to ~/Videos/watch-later.'
+}
+
+output_dir=
+want_subtitles=0
+
+while (( $# )); do
+  case "$1" in
+    -s|--subtitles)
+      want_subtitles=1
+      shift
+      ;;
+    -o|--output)
+      [[ $# -ge 2 ]] || {
+        usage >&2
+        exit 2
+      }
+      output_dir=$2
+      shift 2
+      ;;
+    --output=*)
+      output_dir=${1#*=}
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      printf 'yt-video: unknown option: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+[[ $# -eq 1 ]] || {
+  usage >&2
+  exit 2
+}
+
+url=$1
+output_dir=${output_dir:-${YT_VIDEO_DIR:-${XDG_VIDEOS_DIR:-$HOME/Videos}/watch-later}}
+mkdir -p -- "$output_dir"
+
+args=(
+  --format 'bestvideo*+bestaudio/best'
+  --output "$output_dir/%(title)s.%(ext)s"
+  --sponsorblock-remove 'sponsor,selfpromo,interaction'
+)
+
+if (( want_subtitles )); then
+  args+=(
+    --write-subs
+    --write-auto-subs
+    --sub-langs en
+    --convert-subs srt
+  )
+fi
+
+exec yt-dlp "${args[@]}" -- "$url"

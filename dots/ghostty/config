@@ -1,0 +1,151 @@
+# theme = Kanso Ink
+# theme = Kanso Zen
+# theme = TokyoNight Storm
+# theme = Rose Pine Moon
+# theme = dark:Kanso Zen, light:Kanagawabones
+# theme = dark:Kanso Zen, light:Farmhouse Light
+# theme = dark:Gruvbox Material Dark, light:Kanagawabones
+# theme = Kanagawabones
+# theme = Dracula
+# theme = Gruvbox Dark
+# theme = Github Light Default
+# theme = Atelier Sulphurpool
+# theme = Atom One Dark
+# theme = Kanagawa Dragon
+theme = Kanagawa Wave
+
+# background = 282c34
+# foreground = ffffff
+
+# background-image = "~/Images/deer.png"
+# background-image-opacity = 0.5
+# background-image-position = center
+# background-image-fit = contain
+
+# custom-shader = shaders/starfield-colors.glsl
+# custom-shader = shaders/cursor_smear_fade.glsl
+# custom-shader = shaders/cursor_blaze.glsl
+custom-shader-animation = always
+
+shell-integration = nushell
+# shell-integration = zsh
+shell-integration-features = ssh-env,ssh-terminfo
+
+env = XDG_CONFIG_HOME=/Users/kenrictee/.config
+# env = SHELL=/bin/fish
+# initial-command = "/etc/profiles/per-user/$USER/bin/fish -lc 'exec zellij attach -c home'"
+# command = "/etc/profiles/per-user/$USER/bin/nu -l -c 'zesh cn (^zesh l | fzf | str trim)'"
+# initial-command = "/etc/profiles/per-user/$USER/bin/fish -il"
+# command = "/etc/profiles/per-user/$USER/bin/fish -il"
+# command = /home/kenrict/.nix-profile/bin/nu
+command = /etc/profiles/per-user/$USER/bin/nu --login
+# command = zsh -ic 'if command -v zmx >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1 && [ -z "${ZMX_SESSION:-}" ]; then zmx-select && exit; fi; exec zsh -il'
+
+# contain (def), cover, stretch, none
+background-image-fit = cover
+background-opacity = 1.0
+background-blur = true
+unfocused-split-opacity = 0.7
+# unfocused-split-fill = #000000
+# split-divider-color = #F0F00F
+
+scrollback-limit = 5000000
+
+# cursor
+cursor-style-blink = false
+mouse-hide-while-typing = true
+
+macos-titlebar-style = hidden
+# macos-titlebar-style = tabs
+macos-window-buttons = hidden
+# macos-non-native-fullscreen = true
+# fullscreen = non-native
+# window-save-state = never
+window-save-state = always
+macos-titlebar-proxy-icon = hidden
+# official (default), blueprint, chalkboard, microchip, glass, holographic, paper, retro, xray
+macos-icon = chalkboard
+# aluminum (default), beige, plastic, chrome
+# macos-icon-frame = beige
+
+# start window in maximized state
+# maximize = true
+
+window-padding-x = 20,0
+window-padding-y = 20,0
+# window-padding-color = extend
+
+window-inherit-working-directory = true
+
+# Empty values reset the configuration to the default value
+# font-family = "0xProto Nerd Font Mono"
+# font-family = "IosevkaTermSlab NFM"
+# @
+# font-family = "Maple Mono Normal NF CN"
+font-family = "Maple Mono NF CN"
+# font-thicken = true
+
+# font-family = "CommitMono Nerd Font Mono"
+# font-family = "IosevkaTerm NFM"
+
+font-size = 13
+
+adjust-cell-height = 5%
+minimum-contrast = 1.25
+
+quick-terminal-position = center
+quick-terminal-size = 60%,700px
+quick-terminal-animation-duration = 0
+
+right-click-action = copy-or-paste
+copy-on-select = clipboard
+confirm-close-surface = false
+# disable to have dropdown term
+quit-after-last-window-closed = false
+
+# keybind = global:super+shift+grave_accent=toggle_quick_terminal
+keybind = global:super+ctrl+enter=toggle_quick_terminal
+keybind = super+\=new_split:right
+keybind = super+shift+\=new_split:down
+
+keybind = super+shift+f=write_scrollback_file:open
+
+# keyboard scroll
+keybind = super+shift+u=scroll_page_lines:-15
+keybind = super+shift+d=scroll_page_lines:15
+# keybind = super+shift+d=scroll_page_down
+# keybind = super+shift+u=scroll_page_up
+
+# goto split
+keybind = super+shift+h=goto_split:left
+keybind = super+shift+l=goto_split:right
+keybind = super+shift+j=goto_split:bottom
+keybind = super+shift+k=goto_split:top
+
+# resize split
+keybind = super+ctrl+h=resize_split:left,50
+keybind = super+ctrl+l=resize_split:right,50
+keybind = super+ctrl+k=resize_split:up,50
+keybind = super+ctrl+j=resize_split:down,50
+
+keybind = super+ctrl+r=equalize_splits
+keybind = super+alt+f=toggle_window_float_on_top
+
+# Let shell/Zellij handle Ctrl+L.
+
+# disable for zellij (conflicts with ghostty)
+# keybind = super+d=unbind
+# keybind = ctrl+h=unbind
+# keybind = ctrl+j=unbind
+# keybind = ctrl+k=unbind
+keybind = ctrl+l=unbind
+# keybind = ctrl+shift+h=unbind
+# keybind = ctrl+shift+l=unbind
+# keybind = ctrl+tab=unbind
+
+# # for zellij
+# keybind = super+w=unbind
+# keybind = super+t=unbind
+
+# match niri theme
+theme = ii-auto

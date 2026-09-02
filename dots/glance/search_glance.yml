@@ -1,0 +1,20 @@
+pages:
+  - name: Start
+    width: slim
+    columns:
+      - size: full
+        widgets:
+          - type: search
+            search-engine: google
+            autofocus: true
+
+          - type: bookmarks
+            groups:
+              - title: Daily
+                links:
+                  - title: GitHub
+                    url: https://github.com
+                  - title: Calendar
+                    url: https://calendar.google.com
+                  - title: Gmail
+                    url: https://mail.google.com
