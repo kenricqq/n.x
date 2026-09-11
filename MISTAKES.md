@@ -146,6 +146,14 @@
   - Fix: keep manual config state files pointed at `~/.mpd`.
   - Check: run `mpd --no-daemon /path/to/mpd.conf --stderr --verbose` on an alternate port and confirm it gets past database loading.
 
+## BetterDisplay
+
+- Do not infer mirror direction from a single display selector or guess CLI flags.
+  - Mistake: simplified mirroring to `--namelike=LG --mirror=on` without an explicit target, then tried `--help` instead of the app's `help` command.
+  - Result: mirror direction was unspecified and the help probe hung instead of verifying the command.
+  - Fix: use `BetterDisplay help`, verify names with `get --identifier=name`, and provide source and target selectors explicitly when enabling mirroring.
+  - Check: inspect emitted arguments for both mirror directions; the selected source is mirrored onto `--targetNameLike`.
+
 ## AeroSpace / SketchyBar
 
 - Do not use rounded global SketchyBar corners with zero margin when edge-to-edge coverage is intended.

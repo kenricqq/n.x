@@ -45,26 +45,37 @@ let
     '';
   };
 
-  lgMode = pkgs.writeShellApplication {
-    name = "lg-mode";
+  lapMode = pkgs.writeShellApplication {
+    name = "lap-mode";
 
     text = ''
-      if (( $# < 2 || $# > 3 )); then
-        echo 'usage: lg-mode {mirror|extend} SOURCE_NAME [TARGET_NAME_LIKE=LG]' >&2
+      usage() {
+        echo 'usage: lap-mode mirror [lap|lg] | lap-mode extend' >&2
         exit 1
-      fi
+      }
+      (( $# >= 1 && $# <= 2 )) || usage
 
+      # BetterDisplay must be running. The target mirrors the source.
       case "$1" in
-        mirror) mirror=on ;;
-        extend) mirror=off ;;
-        *) echo "unknown display mode: $1" >&2; exit 1 ;;
+        mirror)
+          case "''${2-lap}" in
+            lap) source="Built-in"; target=LG ;;
+            lg) source=LG; target="Built-in" ;;
+            *) usage ;;
+          esac
+          exec "${betterDisplay}" set \
+            --namelike="$source" \
+            --targetNameLike="$target" \
+            --mirror=on
+          ;;
+        extend)
+          (( $# == 1 )) || usage
+          exec "${betterDisplay}" set \
+            --namelike=LG \
+            --mirror=off
+          ;;
+        *) usage ;;
       esac
-
-      # BetterDisplay must be running. The target mirrors the source display.
-      exec "${betterDisplay}" set \
-        --name="$2" \
-        --targetNameLike="''${3:-LG}" \
-        --mirror="$mirror"
     '';
   };
 in
@@ -74,7 +85,7 @@ in
   ]
   ++ lib.optionals host.isDarwin [
     pkgs.betterdisplay
-    lgMode
+    lapMode
   ];
 
   programs.nushell.extraConfig = ''
@@ -82,7 +93,8 @@ in
     extern "lg-input" [input: string@"nu-complete lg-input"]
   ''
   + lib.optionalString host.isDarwin ''
-    def "nu-complete display-mode" [] { [ mirror extend ] }
-    extern "display-mode" [mode: string@"nu-complete display-mode", source: string, target?: string]
+    def "nu-complete lap-mode" [] { [ mirror extend ] }
+    def "nu-complete lap-mode-display" [] { [ lap lg ] }
+    extern "lap-mode" [mode: string@"nu-complete lap-mode", display?: string@"nu-complete lap-mode-display"]
   '';
 }
