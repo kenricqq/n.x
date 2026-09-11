@@ -1,4 +1,9 @@
-{ pkgs, ... }:
+{
+  inputs,
+  machine,
+  pkgs,
+  ...
+}:
 {
   home.packages = with pkgs; [
     # fenix.stable if want stable
@@ -10,6 +15,7 @@
       "rustfmt"
       "llvm-tools-preview"
     ])
-    rust-analyzer-nightly
+    inputs.fenix.packages.${machine.system}.rust-analyzer
+    # rust-analyzer-nightly
   ];
 }

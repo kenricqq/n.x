@@ -1,19 +1,12 @@
 {
   lib,
   machine,
+  paths,
   pkgs,
 }:
 
 let
   inherit (lib) concatMapStringsSep concatStringsSep;
-
-  dpath = rec {
-    home = "/Users/${machine.user}";
-    repo = "${home}/${machine.name}";
-    hm = "${repo}/hm";
-    dot = "${hm}/dots";
-    darwin = "${repo}/os/darwin";
-  };
 
   dlaunch = rec {
     script = name: text: "${pkgs.writeShellScriptBin name text}/bin/${name}";
@@ -21,8 +14,8 @@ let
     bun = "${pkgs.bun}/bin/bun";
     bunPath = concatStringsSep ":" [
       "${pkgs.bun}/bin"
-      "${dpath.home}/.cache/.bun/bin"
-      "${dpath.home}/.bun/bin"
+      "${paths.home}/.cache/.bun/bin"
+      "${paths.home}/.bun/bin"
       "/run/current-system/sw/bin"
       "/etc/profiles/per-user/${machine.user}/bin"
       "/nix/var/nix/profiles/default/bin"
@@ -35,11 +28,11 @@ let
     ];
 
     bunEnv = {
-      BUN_INSTALL = "${dpath.home}/.cache/.bun";
+      BUN_INSTALL = "${paths.home}/.cache/.bun";
       PATH = bunPath;
     };
 
-    logDir = name: "${dpath.home}/Library/Logs/${name}";
+    logDir = name: "${paths.home}/Library/Logs/${name}";
     logBase = name: flat: if flat then logDir name else "${logDir name}/${name}";
 
     mkLogDirs =
@@ -53,7 +46,7 @@ let
         label,
         args,
         logName,
-        workingDirectory ? dpath.hm,
+        workingDirectory ? paths.hm,
         env ? { },
         flatLog ? false,
         runAtLoad ? true,
@@ -72,7 +65,7 @@ let
         StandardOutPath = "${base}.out.log";
         StandardErrorPath = "${base}.err.log";
         EnvironmentVariables = {
-          HOME = dpath.home;
+          HOME = paths.home;
         }
         // env;
       }
@@ -80,5 +73,5 @@ let
   };
 in
 {
-  inherit dpath dlaunch;
+  inherit dlaunch;
 }

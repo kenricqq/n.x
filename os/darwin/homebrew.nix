@@ -1,13 +1,5 @@
-{
-  lib,
-  paths,
-  pkgs,
-  ...
-}:
+{ paths, ... }:
 
-let
-  inherit (import ./helpers.nix { inherit lib pkgs; }) dpath;
-in
 {
   homebrew = {
     enable = true;
@@ -19,7 +11,7 @@ in
       # cleanup = "none";
       cleanup = "zap";
       extraEnv = {
-        XDG_CONFIG_HOME = "${dpath.home}/.config";
+        XDG_CONFIG_HOME = paths.configHome;
       };
       # extraFlags = [ "--force-cleanup" ];
       upgrade = false;
@@ -145,7 +137,7 @@ in
     ];
     casks = [
       # "betterdisplay"
-      "lunar" # brightness
+      # "lunar" # brightness
 
       "moonlight"
 

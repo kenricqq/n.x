@@ -22,3 +22,5 @@ node_modules
 /dots/AI/skills/impeccable/scripts/bin
 
 *.rayconfig
+
+__pycache__

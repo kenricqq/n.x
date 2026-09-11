@@ -1,24 +1,28 @@
-{ lib, pkgs, ... }:
+{
+  dlaunch,
+  lib,
+  paths,
+  pkgs,
+  ...
+}:
 
 let
-  inherit (import ./helpers.nix { inherit lib pkgs; }) dpath dlaunch;
-
-  # piShim = import ./services/pi-shim { inherit lib pkgs; };
-  # atlasSrcWatch = import ./services/atlas_src_watch { inherit lib pkgs; };
+  # piShim = import ./services/pi-shim { inherit dlaunch paths; };
+  # atlasSrcWatch = import ./services/atlas_src_watch { inherit dlaunch paths; };
 
   glance = dlaunch.script "glance-launch" ''
     set -euo pipefail
     source "$HOME/.cache/zsh/secrets.env"
-    exec '${pkgs.glance}/bin/glance' -config '${dpath.dot}/glance/glance.yml'
+    exec '${pkgs.glance}/bin/glance' -config '${paths.dots}/glance/glance.yml'
   '';
 
   miniflux = dlaunch.script "miniflux-launch" ''
     set -euo pipefail
     until '${pkgs.postgresql_18}/bin/pg_isready' -h 127.0.0.1 -p 5433 >/dev/null 2>&1; do sleep 1; done
-    exec '${pkgs.miniflux}/bin/miniflux' -c '${dpath.dot}/miniflux/config.env'
+    exec '${pkgs.miniflux}/bin/miniflux' -c '${paths.dots}/miniflux/config.env'
   '';
 
-  golinkDir = "${dpath.repo}/extensions/golink";
+  golinkDir = "${paths.nixrt}/extensions/golink";
   logDirs = [
     "glance"
     "miniflux"
@@ -44,7 +48,7 @@ in
       label = "dev.memos";
       args = [
         "${pkgs.memos}/bin/memos"
-        "--data=${dpath.home}/KTQQ/docs/notes/memos"
+        "--data=${paths.home}/KTQQ/docs/notes/memos"
         "--port=8082"
       ];
       logName = "memos";

@@ -26,15 +26,7 @@
     };
 
     zig.url = "github:mitchellh/zig-overlay";
-    # zig = {
-    #   url = "github:silversquirl/zig-flake/compat";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-    zls = {
-      url = "github:zigtools/zls";
-      inputs.nixpkgs.follows = "nixpkgs";
-      # inputs.zig-flake.follows = "zig";
-    };
+    zls.url = "github:zigtools/zls";
 
     dooit.url = "github:dooit-org/dooit";
     dooit-extras = {

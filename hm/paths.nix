@@ -5,26 +5,20 @@
 }:
 
 let
-  paths = rec {
-    home = config.home.homeDirectory;
+  paths =
+    (import ../lib/paths.nix {
+      home = config.home.homeDirectory;
+      inherit (machine) name;
+    })
+    // {
+      configHome = config.xdg.configHome;
+      cache = config.xdg.cacheHome;
+      share = "${paths.home}/.local/state/nix/profiles/home-manager/home-path/share";
 
-    nixrt = "${home}/${machine.name}";
-    hm = "${nixrt}/hm";
-    os = "${nixrt}/os";
-
-    cache = config.xdg.cacheHome;
-
-    dots = "${nixrt}/dots";
-    darwin = "${nixrt}/os/darwin";
-    scripts = "${nixrt}/scripts";
-    snippets = "${hm}/snippets";
-
-    share = "${home}/.local/state/nix/profiles/home-manager/home-path/share";
-
-    mkDotFile = subpath: {
-      source = config.lib.file.mkOutOfStoreSymlink "${dots}/${subpath}";
+      mkDotFile = subpath: {
+        source = config.lib.file.mkOutOfStoreSymlink "${paths.dots}/${subpath}";
+      };
     };
-  };
 in
 {
   _module.args = {

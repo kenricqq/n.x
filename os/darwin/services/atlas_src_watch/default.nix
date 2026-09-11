@@ -1,10 +1,8 @@
-{ lib, pkgs, ... }:
+{ dlaunch, paths, ... }:
 
 let
-  inherit (import ../../paths.nix { inherit lib pkgs; }) dpath dlaunch;
-
-  atlasRoot = "${dpath.home}/KTQQ/docs/Ideaverse/Atlas";
-  piCli = "${dpath.home}/.cache/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/dist/cli.js";
+  atlasRoot = "${paths.home}/KTQQ/docs/Ideaverse/Atlas";
+  piCli = "${paths.home}/.cache/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/dist/cli.js";
 
   atlasWatch = dlaunch.script "atlas-src-watch" ''
     exec '${dlaunch.bun}' '${./atlas_src_watch.ts}'

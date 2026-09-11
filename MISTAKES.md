@@ -56,6 +56,12 @@
 
 ## Nix / Home Manager module wiring
 
+- Do not assume explicit imports inherit Nix module arguments or Home Manager's argument scope.
+  - Mistake: Darwin Homebrew and launchd imported `helpers.nix` with only `lib` and `pkgs`, although the helper required `machine`; Homebrew also declared `paths`, whose provider existed only inside Home Manager.
+  - Result: Darwin activation evaluation failed with `called without required argument 'machine'`; syntax checks and tests selecting only Home Manager outputs passed.
+  - Fix: construct shared paths and launch helpers once in the Darwin machine module, pass required dependencies explicitly, and expose resolved values through that evaluation's `_module.args`. Keep Home Manager's XDG and symlink adapter separate.
+  - Check: run `bun test tests/machine-paths.test.ts` and `nix eval --raw .#darwinConfigurations.m0nix.system.drvPath`; the tests must force Homebrew and launchd activation plus generated launch-script paths.
+
 - Gate platform-specific packages and completions at their registration sites.
   - Mistake: removed the Darwin implementation of `lg-input` but kept it in unconditional `home.packages`.
   - Result: Darwin system evaluation forced its unsupported-platform branch and failed.
@@ -79,6 +85,14 @@
   - Result: the file supplied no Markdown tools and would repeat the JS/TS configuration if imported.
   - Fix: give the Markdown module its own packages, remove their old declarations, and import it once.
   - Check: evaluate both profiles and confirm each moved package appears exactly once.
+
+## Nix / derivation inspection
+
+- Do not assume `nix derivation show` keys are absolute store paths across Nix versions.
+  - Mistake: indexed the returned derivations by the full `.drv` path supplied to the command.
+  - Result: the regression test crashed because versioned output nests entries under `derivations` and keys them by basename.
+  - Fix: normalize the versioned and legacy JSON shapes; for a single requested derivation, assert exactly one entry and inspect its value.
+  - Check: run `bun test tests/machine-paths.test.ts`; generated script inspection must succeed without building or running the programs.
 
 ## Nix / Rust toolchains
 
