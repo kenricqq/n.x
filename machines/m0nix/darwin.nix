@@ -26,7 +26,7 @@ in
     "homebrew.nix"
     "fonts.nix"
     "sshd.nix"
-    # "launchd.nix"
+    "launchd.nix"
   ]);
 
   environment = {

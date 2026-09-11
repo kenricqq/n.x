@@ -23,5 +23,8 @@ in
   };
 
   programs.home-manager.enable = true;
+
+  targets.darwin.copyApps.enableChecks = false;
+
   xdg.enable = true;
 }

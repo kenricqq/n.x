@@ -202,6 +202,12 @@
 
 ## AeroSpace / SketchyBar
 
+- Resolve command paths from AeroSpace's own execution environment before diagnosing moved scripts.
+  - Mistake: assumed `$SCRIPTS` came from the current Home Manager configuration and reported a broken toggle because its script was absent from the new checkout.
+  - Result: the audit missed `[exec.env-vars]`, which still pointed to a working script in the old checkout.
+  - Fix: inspect the loaded binding and AeroSpace's effective environment, then check the resolved target. Distinguish a legacy-checkout dependency from a runtime failure.
+  - Check: query `aerospace config --get mode.main.binding.alt-ctrl-shift-b` and `aerospace list-exec-env-vars`; verify the resulting script or command path without toggling the desktop.
+
 - Do not use rounded global SketchyBar corners with zero margin when edge-to-edge coverage is intended.
   - Mistake: combined `margin = 0` with a large global bar `corner_radius`.
   - Result: the rounded path left transparent pixels at both display edges, exposing wallpaper behind the bar.
