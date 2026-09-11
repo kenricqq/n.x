@@ -185,6 +185,7 @@ in
     _7zz # 7-zip
 
     ouch # (de)compression
+    glow
 
     python314Packages.curl-cffi
   ];

@@ -4,7 +4,11 @@
   home.packages = with pkgs; [
     cachix
 
+    nix-converter # yaml <-> nix <-> toml
     nurl # nix fetcher generator
+
+    nixd # Nix
+    nixfmt # nix official
 
     (pkgs.writeShellApplication {
       name = "ns";

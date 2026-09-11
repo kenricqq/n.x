@@ -1,0 +1,9 @@
+{
+	"name": "vite-public-paths-lsp",
+	"version": "0.1.0",
+	"type": "module",
+	"bin": {
+		"vite-public-paths": "./bin/vite-public-paths.js"
+	},
+	"files": ["bin"]
+}

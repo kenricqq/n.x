@@ -65,6 +65,8 @@
     };
 
     blender-cuda.url = "github:adithyagenie/blender-cuda-nixos";
+
+    nixcord.url = "github:4evy/nixcord";
   };
 
   outputs =

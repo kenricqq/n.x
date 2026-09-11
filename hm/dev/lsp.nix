@@ -31,8 +31,6 @@ in
     zk
 
     ## Markup & Config
-    tinymist # typst
-    typstyle
     markdown-oxide
     mpls # markdown live preview
     iwe
@@ -55,9 +53,6 @@ in
     ## Systems Lang
     gopls
     zlint
-
-    nixd # Nix
-    nixfmt # nix official
 
     lua-language-server
     sqls # SQL

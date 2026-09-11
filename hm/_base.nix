@@ -47,6 +47,8 @@ in
     ./media.nix
     ./security.nix # age/sops/gpg
     ./ssh.nix
+
+    inputs.nixcord.homeModules.nixcord
   ]
   ++ lib.optionals isDarwin [
     ./macos/sketchybar.nix
@@ -62,14 +64,122 @@ in
         curlie
         dnsutils # dig
         fastfetch
-        just
-        glow
+
+        #### TO SORT ###
+        # # qui # qBittorrent
+        # # signal-cli
+        # # telegram-bot-api
+
+        # ghostscript # pdf utility (ex. merge)
+        # clipboard-jh
+
+        # # esp
+        # espflash
+
+        # coreutils-full # gnu core utils
+
+        # curlie # curl
+        # procs # ps
+        # sd # sed
+        # mprocs # run multiple commands in parallel
+        # toolong # log files
+        # # ck
+        # gum # shell script ui
+        # entr # run command on file change
+        # scooter # interactive search and replace
+        # kondo # clean deps and build artifacts from proj
+
+        # # tldr # community man
+        # cht-sh # cli for cheat.sh (comprehensive cheatsheets)
+        # # tlrc # tldr client in rs
+
+        # # gping # ping with a graph
+        # dnscrypt-proxy
+        # # openapi-tui
+        # # sshs
+
+        # ## data manipulation
+        # jnv # interactive JSON viewer + jq filter (rs)
+        # fx # JSON viewer with vim bindings
+        # jql # query json from cli
+        # gojq
+        # yq-go # YAML, TOML, JSON and XML processor
+        # dasel # select/put/delete data from files
+        # hexyl # hex viewer
+        # sttr # text transformation
+
+        # # Rust Dev
+        # # cargo-watch
+        # cargo-make
+        # cargo-update
+        # cargo-binstall
+        # crates-tui # explore crates.io
+        # # dioxus-cli
+
+        # # other
+        # mdbook # create book from md files
+        # mdbook-linkcheck2 # check links
+        # # ttyper # terminal typing test
+        # # lychee # broken links checker
+        # # puffin # personal finance dashboard
+        # # bagels # tui expense tracker
+        # # calcure # tui calendar + task manager
+        # # ticker # cli stock ticker
+        # # sc-im # spreadsheet calculator
+        # # presenterm # md cli slideshow
+
+        # wget
+        # unzip
+        # tree
+        # jq
+
+        # # Modern CLI tools
+        # procs # Better ps
+
+        # # to get greetd working
+        # meson
+        # gcc
+
+        # greetd
+        # dbus
+
+        # wayland
+        # wayland-protocols
+        # wlroots_0_20
+
+        # libglvnd
+        # freetype
+        # fontconfig
+
+        # cairo
+        # pango
+        # harfbuzz
+
+        # libxkbcommon
+        # glib
+
+        # tomlplusplus
+        # nlohmann_json
+        # stb
+
+        # libwebp
+        # librsvg
+
+        # (pkgs.writeShellApplication {
+        #   name = "vite-public-paths";
+        #   text = ''
+        #     exec ${pkgs.bun}/bin/bun ${./scripts/vite-public-paths/bin/vite-public-paths.js} "$@"
+        #   '';
+        # })
       ]
       ++ lib.optionals isLinux [
         handy
         wtype # needed for handy
 
         comfyui
+      ]
+      ++ lib.optionals isDarwin [
+        m-cli # useful macOS CLI commands
       ];
 
     sessionPath =
@@ -80,6 +190,7 @@ in
         "go/bin"
         ".bun/bin"
         ".cache/.bun/bin"
+        # ".rustup/toolchains/esp/xtensa-esp-elf/esp-15.2.0_20250920/xtensa-esp-elf/bin"
       ])
       ++ lib.optionals isDarwin [
         "/opt/homebrew/bin"
@@ -98,7 +209,7 @@ in
       DW = paths.darwin;
       DOT = paths.dots;
       SCRIPTS = paths.scripts;
-      # SNIPPETS_PATH = path.snippets; # for scls
+      SNIPPETS_PATH = paths.snippets; # for scls
       # SHARE = path.share;
 
       # NODE_PATH = "${home}/.cache/.bun/install/global/node_modules";
@@ -111,6 +222,7 @@ in
       # }
       # // lib.optionalAttrs isDarwin {
       # DARWIN_HOST = hostName;
+      # LIBCLANG_PATH = "${home}/.rustup/toolchains/esp/xtensa-esp32-elf-clang/esp-20.1.1_20250829/esp-clang/lib";
       # DYLD_FALLBACK_LIBRARY_PATH = "/opt/homebrew/lib";
     };
 
@@ -129,6 +241,7 @@ in
             // lib.optionalAttrs isDarwin {
               "aerospace" = "aerospace";
               "sketchybar" = "sketchybar";
+              # "rio/config.toml" = "rio/config.toml";
             }
             // lib.optionalAttrs isLinux {
               "ghostty" = "ghostty";
@@ -146,7 +259,9 @@ in
             ".codex/keybindings.json" = "codex/keybindings.json";
             ".codex/hooks.json" = "codex/hooks.json";
 
-            #   ".agent-of-empires/config.toml" = "agent-of-empires/config.toml";
+            ".pi/agent/settings.json" = "pi/agent/settings.json";
+
+            # ".agent-of-empires/config.toml" = "agent-of-empires/config.toml";
           })
           ++ lib.optionals isDarwin (
             lib.mapAttrsToList (k: v: lib.nameValuePair "Library/Application Support/${k}" v) {

@@ -49,6 +49,8 @@ let
     "@earendil-works/pi-coding-agent"
     "@openai/codex"
     "opencode-ai@latest"
+
+    "svelte-language-server"
   ];
 
   skills = [

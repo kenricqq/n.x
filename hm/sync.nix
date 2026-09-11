@@ -92,7 +92,7 @@ in
   home.packages = with pkgs; [
     localsend # open source airdrop
 
-    rsync
+    rsync # backup & two-way sync
 
     # borg # Deduplicating archiver with compression and authenticated encryption.
     # The main goal of Borg is to provide an efficient and secure way to back up data. The data deduplication technique used makes Borg suitable for daily backups since only changes are stored. The authenticated encryption technique makes it suitable for backups to targets not fully trusted.

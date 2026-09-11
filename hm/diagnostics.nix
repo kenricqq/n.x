@@ -34,11 +34,12 @@ in
       dust
       dysk
       duf
+      # dua # disk usage manager tui
 
       watch
 
       hyperfine # cli benchmarking tool
-      tokei # count lines of code
+      tokei # code stats
     ])
     ++ lib.optionals isDarwin (
       with pkgs;
