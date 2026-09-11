@@ -43,6 +43,11 @@ in
     # };
   };
 
+  # Keep the live Ghostty directory symlink; generate only its startup include.
+  xdg.configFile."ghostty-nix.conf".text = ''
+    command = ${lib.getExe config.programs.nushell.package} --login --config-home "${config.xdg.configHome}/nushell"
+  '';
+
   programs.nushell = {
     enable = true;
     shellAliases = aliases.nushell;

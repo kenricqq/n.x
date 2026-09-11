@@ -141,7 +141,6 @@ in
               # "rio/config.toml" = "rio/config.toml";
             }
             // lib.optionalAttrs isLinux {
-              "ghostty" = "ghostty";
               "quickshell" = "quickshell";
             }
           ))
@@ -162,7 +161,6 @@ in
           })
           ++ lib.optionals isDarwin (
             lib.mapAttrsToList (k: v: lib.nameValuePair "Library/Application Support/${k}" v) {
-              "com.mitchellh.ghostty" = "ghostty";
               "dooit/config.py" = "dooit/config.py";
             }
           )

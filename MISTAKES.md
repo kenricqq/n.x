@@ -6,7 +6,7 @@
   - Mistake: used `darwinConfigurations.$host.config.system.name` to decide whether to build the Darwin Home Manager activation package.
   - Result: the Darwin probe always failed, so the alias fell through to the Linux `homeConfigurations.$USER@$host` path on macOS.
   - Fix: probe an existing scalar attr such as `darwinConfigurations.$host.config.system.primaryUser`, then build `darwinConfigurations.$host.config.home-manager.users.$USER.home.activationPackage`.
-  - Check: `nix eval --raw .#darwinConfigurations.$host.config.system.primaryUser` succeeds before the alias enters the Darwin branch.
+  - Check: `nix eval --raw .#darwinConfigurations.$host.config.system.primaryUser` succeeds before the alias enters the Darwin branch. Use explicit output attrs in evaluation probes: `nix eval .# --apply ...` selects the default package, not the root output set.
 
 - Do not embed escaped attr quotes in zsh-abbr-managed Nix aliases unless required.
   - Mistake: wrote flake refs as `.#darwinConfigurations.\"$host\"...` and `.#homeConfigurations.\"$USER@$host\"...` inside an abbreviation.
@@ -171,6 +171,26 @@
   - Result: plain `mpd` defaulted its database to `~/Library/Caches/mpd/db`, which failed when that directory did not exist and diverged from `services.mpd.dataDir = "~/.mpd"`.
   - Fix: keep manual config state files pointed at `~/.mpd`.
   - Check: run `mpd --no-daemon /path/to/mpd.conf --stderr --verbose` on an alternate port and confirm it gets past database loading.
+
+## Ghostty / Nushell
+
+- Generate Ghostty's Nushell startup paths with Home Manager, rather than relying on GUI session PATH or one host's profile layout.
+  - Mistake: shared Ghostty config used `/etc/profiles/per-user/$USER/bin/nu` and `/Users/kenrictee/.config`, which do not match standalone Linux Home Manager; plain `nu --login` also fails when GUI PATH lacks Nix binaries.
+  - Result: startup could not find Nu or used the wrong configuration directory. `home.sessionPath` inside Nu cannot help find the initial executable.
+  - Fix: generate `~/.config/ghostty-nix.conf` with `lib.getExe config.programs.nushell.package` and explicit `--config-home`. Keep it outside the live Ghostty directory symlink. Include it optionally so an unapplied generation adds no missing-file error; it overrides the existing fallback after activation. Keep Nu first: Ghostty inserts its `--execute` integration argument immediately after the executable.
+  - Check: run `bun test tests/ghostty-startup.test.ts` to evaluate both profiles and test generated commands with minimal PATH, then validate Ghostty's config with and without the include. Test real login startup in a PTY: this profile's `GPG_TTY = (tty)` initialization exits in a non-TTY probe.
+
+- Load the shared Ghostty config from only one default location on macOS.
+  - Mistake: linked both `~/.config/ghostty` and `~/Library/Application Support/com.mitchellh.ghostty` to the same directory, then added a `config-file` include.
+  - Result: the GUI loaded the include twice and reported `cycle detected`. Validating each config path separately missed the duplicate load.
+  - Fix: keep the XDG directory symlink and remove the redundant Application Support mapping. Home Manager removes the obsolete link on the next switch; the repository directory stays intact.
+  - Check: `bun test tests/ghostty-startup.test.ts` must load all evaluated config paths together through Ghostty, not validate each in isolation.
+
+- Validate temporary macOS Ghostty configs using an explicit file path.
+  - Mistake: used a temporary `HOME` with `+show-config` to check edits through a fixture symlink.
+  - Result: macOS Application Support discovery still found the real user's config, which overrode fixture settings.
+  - Fix: use `+validate-config --config-file=<fixture>` for isolated loader checks; `HOME` alone does not isolate macOS default config discovery.
+  - Check: an invalid setting added to the fixture must fail validation through each symlink, then pass after correction.
 
 ## BetterDisplay
 

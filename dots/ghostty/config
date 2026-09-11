@@ -31,14 +31,15 @@ shell-integration = nushell
 # shell-integration = zsh
 shell-integration-features = ssh-env,ssh-terminfo
 
-env = XDG_CONFIG_HOME=/Users/kenrictee/.config
+# Home Manager's include overrides the fallback command after activation.
 # env = SHELL=/bin/fish
 # initial-command = "/etc/profiles/per-user/$USER/bin/fish -lc 'exec zellij attach -c home'"
 # command = "/etc/profiles/per-user/$USER/bin/nu -l -c 'zesh cn (^zesh l | fzf | str trim)'"
 # initial-command = "/etc/profiles/per-user/$USER/bin/fish -il"
 # command = "/etc/profiles/per-user/$USER/bin/fish -il"
 # command = /home/kenrict/.nix-profile/bin/nu
-command = /etc/profiles/per-user/$USER/bin/nu --login
+command = nu --login
+config-file = ?~/.config/ghostty-nix.conf
 # command = zsh -ic 'if command -v zmx >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1 && [ -z "${ZMX_SESSION:-}" ]; then zmx-select && exit; fi; exec zsh -il'
 
 # contain (def), cover, stretch, none
