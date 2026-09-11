@@ -13,7 +13,9 @@ in
     ./dev/lang/go.nix
     ./dev/lang/python.nix
     ./dev/lang/js_ts.nix
+    ./dev/lang/markdown.nix
     ./dev/lang/rust.nix
+    ./dev/lang/typst.nix
     ./dev/lang/zig.nix
 
     ./dev/lsp.nix
@@ -44,8 +46,6 @@ in
       # minikube
       clang-tools
       lldb_19
-
-      markdownlint-cli
 
       docker-sbx
 

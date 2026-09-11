@@ -54,6 +54,32 @@
   - Fix: update the interpolation to the new tracked path.
   - Check: `jj file list | rg '^home-manager/scripts/vite-public-paths/bin/vite-public-paths.js$'` and evaluate the flake.
 
+## Nix / Home Manager module wiring
+
+- Gate platform-specific packages and completions at their registration sites.
+  - Mistake: removed the Darwin implementation of `lg-input` but kept it in unconditional `home.packages`.
+  - Result: Darwin system evaluation forced its unsupported-platform branch and failed.
+  - Fix: use `lib.optionals host.isLinux` for the package and `lib.optionalString host.isLinux` for its Nushell completion.
+  - Check: evaluate the Darwin system derivation and confirm `lg-input` is absent on Darwin and present on Linux.
+
+- Declare every flake input reference in the module's function arguments.
+  - Mistake: `_base.nix` imported `inputs.nixcord.homeModules.nixcord` without accepting an `inputs` argument.
+  - Result: Nix rejected the module with `undefined variable 'inputs'`, before package evaluation.
+  - Fix: accept `inputs` in the module arguments; the host already supplies it through `extraSpecialArgs`.
+  - Check: run `nix-instantiate --parse hm/_base.nix` from the repo root before evaluating either host profile.
+
+- Terminate package-list assignments with `];`.
+  - Mistake: `hm/dev/lang/go.nix` ended `home.packages` with `]` only.
+  - Result: profile evaluation failed at the following `programs.go` assignment.
+  - Fix: restore the terminating semicolon.
+  - Check: run `nix-instantiate --parse` on edited Nix modules before evaluating profiles.
+
+- Replace copied language-module content before importing the module.
+  - Mistake: `markdown.nix` was an unused copy of `js_ts.nix`, including Bun settings and JS/TS packages.
+  - Result: the file supplied no Markdown tools and would repeat the JS/TS configuration if imported.
+  - Fix: give the Markdown module its own packages, remove their old declarations, and import it once.
+  - Check: evaluate both profiles and confirm each moved package appears exactly once.
+
 ## Nix / Rust toolchains
 
 - Do not assume `rust.cachix.org` covers Fenix toolchains.

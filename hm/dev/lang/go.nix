@@ -20,7 +20,7 @@
     # haskellPackages.cabal-install
 
     # elixir_1_18
-  ]
+  ];
 
   programs.go = {
     enable = true;

@@ -213,6 +213,22 @@ binds {
     Mod+End {
         focus-column-last
     }
+    // Jump to column #.
+    Alt+Shift+1 {
+        focus-column 1
+    }
+    Alt+Shift+2 {
+        focus-column 2
+    }
+    Alt+Shift+3 {
+        focus-column 3
+    }
+    Alt+Shift+4 {
+        focus-column 4
+    }
+    Alt+Shift+5 {
+        focus-column 5
+    }
     // ═══════════════════════════════════════════════════════════════════════
     // Move windows (arrows + Vim keys)
     // ═══════════════════════════════════════════════════════════════════════

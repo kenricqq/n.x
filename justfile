@@ -13,13 +13,3 @@ linux:
 
     # → HDMI 2
     ddcutil -d 1 setvcp xF4 x0091 --i2c-source-addr=x50 --noverify
-
-macos:
-    # → DisplayPort
-    betterdisplaycli set --namelike=LG --ddcAlt=0xD0 --vcp=inputSelectAlt
-
-    # → HDMI 1
-    betterdisplaycli set --namelike=LG --ddcAlt=0x90 --vcp=inputSelectAlt
-
-    # → HDMI 2
-    betterdisplaycli set --namelike=LG --ddcAlt=0x91 --vcp=inputSelectAlt

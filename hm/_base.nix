@@ -1,5 +1,6 @@
 {
   host,
+  inputs,
   lib,
   paths,
   pkgs,

@@ -31,8 +31,6 @@ in
     zk
 
     ## Markup & Config
-    markdown-oxide
-    mpls # markdown live preview
     iwe
     # marksman               # Markdown LSP
     taplo # TOML

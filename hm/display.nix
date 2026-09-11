@@ -32,13 +32,6 @@ let
               --i2c-source-addr=x50 \
               --noverify
           ''
-        else if host.isDarwin then
-          ''
-            exec "${betterDisplay}" set \
-              --namelike=LG \
-              --ddcAlt="0x$input" \
-              --vcp=inputSelectAlt
-          ''
         else
           throw "lg-input: unsupported platform ${machine.system}"
       }
@@ -80,21 +73,23 @@ let
   };
 in
 {
-  home.packages = [
-    lgInput
-  ]
-  ++ lib.optionals host.isDarwin [
-    pkgs.betterdisplay
-    lapMode
-  ];
+  home.packages =
+    lib.optionals host.isLinux [
+      lgInput
+    ]
+    ++ lib.optionals host.isDarwin [
+      pkgs.betterdisplay
+      lapMode
+    ];
 
-  programs.nushell.extraConfig = ''
-    def "nu-complete lg-input" [] { [ dp hdmi1 hdmi2 ] }
-    extern "lg-input" [input: string@"nu-complete lg-input"]
-  ''
-  + lib.optionalString host.isDarwin ''
-    def "nu-complete lap-mode" [] { [ mirror extend ] }
-    def "nu-complete lap-mode-display" [] { [ lap lg ] }
-    extern "lap-mode" [mode: string@"nu-complete lap-mode", display?: string@"nu-complete lap-mode-display"]
-  '';
+  programs.nushell.extraConfig =
+    lib.optionalString host.isLinux ''
+      def "nu-complete lg-input" [] { [ dp hdmi1 hdmi2 ] }
+      extern "lg-input" [input: string@"nu-complete lg-input"]
+    ''
+    + lib.optionalString host.isDarwin ''
+      def "nu-complete lap-mode" [] { [ mirror extend ] }
+      def "nu-complete lap-mode-display" [] { [ lap lg ] }
+      extern "lap-mode" [mode: string@"nu-complete lap-mode", display?: string@"nu-complete lap-mode-display"]
+    '';
 }

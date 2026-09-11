@@ -5,10 +5,10 @@ let
 in
 {
   programs.ssh = {
-    enable = true;
+    enable = false;
     enableDefaultConfig = false;
     includes = [
-      "~/.ssh/config"
+      "~/.ssh/config.local"
     ];
   };
 }
