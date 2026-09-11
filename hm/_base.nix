@@ -1,4 +1,5 @@
 {
+  config,
   host,
   inputs,
   lib,
@@ -116,6 +117,8 @@ in
       PAGER = "less -R";
       LANG = "en_US.UTF-8";
 
+      PI_CODING_AGENT_DIR = "${config.xdg.configHome}/pi/agent";
+
       # }
       # // lib.optionalAttrs isDarwin {
       # DARWIN_HOST = hostName;
@@ -154,8 +157,6 @@ in
             ".codex/deep-review.config.toml" = "codex/deep-review.config.toml";
             ".codex/keybindings.json" = "codex/keybindings.json";
             ".codex/hooks.json" = "codex/hooks.json";
-
-            ".pi/agent/settings.json" = "pi/agent/settings.json";
 
             # ".agent-of-empires/config.toml" = "agent-of-empires/config.toml";
           })

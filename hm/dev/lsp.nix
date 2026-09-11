@@ -49,7 +49,6 @@ in
     protols
 
     ## Systems Lang
-    gopls
     zlint
 
     lua-language-server

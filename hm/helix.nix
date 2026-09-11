@@ -1179,7 +1179,7 @@ in
           # util fn
           ret = {
             a = "align_view_center";
-            c = ":o ${nixrt}/home-manager/helix.nix";
+            c = ":o ${nixrt}/hm/helix.nix";
             d = ":yank-diagnostic";
             l = ":lsp-stop";
             r = ":lsp-restart";

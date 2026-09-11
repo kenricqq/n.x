@@ -2,6 +2,8 @@
 
 {
   home.packages = with pkgs; [
+    gopls
+
     # go
     # go-swag # API docs
     # delve # go debugger

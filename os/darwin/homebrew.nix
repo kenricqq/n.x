@@ -3,9 +3,6 @@
   ...
 }:
 
-let
-  userHome = "/Users/${machine.user}";
-in
 {
   homebrew = {
     enable = true;
@@ -14,11 +11,12 @@ in
     onActivation = {
       autoUpdate = false;
       # Homebrew deprecated `--cleanup`; `--force-cleanup` still triggers cleanup.
-      cleanup = "none";
+      # cleanup = "none";
+      cleanup = "zap";
       extraEnv = {
-        XDG_CONFIG_HOME = "${userHome}/.config";
+        XDG_CONFIG_HOME = "${machine.home}/.config";
       };
-      extraFlags = [ "--force-cleanup" ];
+      # extraFlags = [ "--force-cleanup" ];
       upgrade = false;
     };
     global.brewfile = true;

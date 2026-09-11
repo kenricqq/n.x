@@ -1,8 +1,15 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  paths,
+  ...
+}:
 
 {
+  xdg.configFile."pi/agent/settings.json" = paths.mkDotFile "pi/agent/settings.json";
+
   programs.pi-coding-agent = {
-    enable = true;
+    enable = false;
     configDir = "${config.xdg.configHome}/pi/agent";
 
     # context = ./pi-context.md # default: ~/.pi/agent/AGENTS.md
