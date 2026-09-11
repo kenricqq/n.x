@@ -32,6 +32,7 @@ in
       protobuf_33
 
       process-compose
+      entr # run commands when files change
 
       # Fast, Declarative, Reproducible, and Composable Developer Environments using Nix
       devenv

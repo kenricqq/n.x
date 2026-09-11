@@ -45,6 +45,7 @@ in
     ./display.nix
     ./navigation.nix
     ./media.nix
+    ./misc/extras.nix
     ./security.nix # age/sops/gpg
     ./ssh.nix
 
@@ -64,113 +65,6 @@ in
         curlie
         dnsutils # dig
         fastfetch
-
-        #### TO SORT ###
-        # # qui # qBittorrent
-        # # signal-cli
-        # # telegram-bot-api
-
-        # ghostscript # pdf utility (ex. merge)
-        # clipboard-jh
-
-        # # esp
-        # espflash
-
-        # coreutils-full # gnu core utils
-
-        # curlie # curl
-        # procs # ps
-        # sd # sed
-        # mprocs # run multiple commands in parallel
-        # toolong # log files
-        # # ck
-        # gum # shell script ui
-        # entr # run command on file change
-        # scooter # interactive search and replace
-        # kondo # clean deps and build artifacts from proj
-
-        # # tldr # community man
-        # cht-sh # cli for cheat.sh (comprehensive cheatsheets)
-        # # tlrc # tldr client in rs
-
-        # # gping # ping with a graph
-        # dnscrypt-proxy
-        # # openapi-tui
-        # # sshs
-
-        # ## data manipulation
-        # jnv # interactive JSON viewer + jq filter (rs)
-        # fx # JSON viewer with vim bindings
-        # jql # query json from cli
-        # gojq
-        # yq-go # YAML, TOML, JSON and XML processor
-        # dasel # select/put/delete data from files
-        # hexyl # hex viewer
-        # sttr # text transformation
-
-        # # Rust Dev
-        # # cargo-watch
-        # cargo-make
-        # cargo-update
-        # cargo-binstall
-        # crates-tui # explore crates.io
-        # # dioxus-cli
-
-        # # other
-        # mdbook # create book from md files
-        # mdbook-linkcheck2 # check links
-        # # ttyper # terminal typing test
-        # # lychee # broken links checker
-        # # puffin # personal finance dashboard
-        # # bagels # tui expense tracker
-        # # calcure # tui calendar + task manager
-        # # ticker # cli stock ticker
-        # # sc-im # spreadsheet calculator
-        # # presenterm # md cli slideshow
-
-        # wget
-        # unzip
-        # tree
-        # jq
-
-        # # Modern CLI tools
-        # procs # Better ps
-
-        # # to get greetd working
-        # meson
-        # gcc
-
-        # greetd
-        # dbus
-
-        # wayland
-        # wayland-protocols
-        # wlroots_0_20
-
-        # libglvnd
-        # freetype
-        # fontconfig
-
-        # cairo
-        # pango
-        # harfbuzz
-
-        # libxkbcommon
-        # glib
-
-        # tomlplusplus
-        # nlohmann_json
-        # stb
-
-        # libwebp
-        # librsvg
-
-        # (pkgs.writeShellApplication {
-        #   name = "vite-public-paths";
-        #   text = ''
-        #     exec ${pkgs.bun}/bin/bun ${./scripts/vite-public-paths/bin/vite-public-paths.js} "$@"
-        #   '';
-        # })
       ]
       ++ lib.optionals isLinux [
         handy
@@ -198,6 +92,8 @@ in
         "/run/current-system/sw/bin"
         "/nix/var/nix/profiles/default/bin"
         "/etc/profiles/per-user/${machine.user}/bin"
+
+        "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin"
       ]
       ++ lib.optionals isLinux [
         "${paths.home}/.nix-profile/opt/codex-desktop/resources/cua_node/bin"

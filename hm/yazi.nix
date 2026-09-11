@@ -24,6 +24,7 @@ in
     enableNushellIntegration = true;
     enableZshIntegration = true;
     shellWrapperName = "y";
+    extraPackages = [ pkgs.hexyl ];
     plugins = with pkgs.yaziPlugins; {
       piper = piper;
       faster-piper = pkgs.fetchFromGitHub {

@@ -79,19 +79,9 @@ in
 
     # find files by fuzzy filename
     # json processor
-    # jq = {
-    #   enable = true;
-    #   colors = {
-    #     null = "1;30";
-    #     false = "0;31";
-    #     true = "0;32";
-    #     numbers = "0;36";
-    #     strings = "0;33";
-    #     arrays = "1;35";
-    #     objects = "1;37";
-    #     objectKeys = "1;34";
-    #   };
-    # };
+    jq = {
+      enable = true;
+    };
     # # jq playground
     # jqp = {
     #   enable = true;
@@ -186,6 +176,11 @@ in
 
     ouch # (de)compression
     glow
+
+    sd # scripted find and replace
+    scooter # interactive project-wide find and replace
+    jnv # interactive jq filtering
+    yq-go # query and edit YAML and other structured formats
 
     python314Packages.curl-cffi
   ];

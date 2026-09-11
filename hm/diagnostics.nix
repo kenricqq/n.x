@@ -37,6 +37,7 @@ in
       # dua # disk usage manager tui
 
       watch
+      toolong # view, tail, merge, and search logs (tl)
 
       hyperfine # cli benchmarking tool
       tokei # code stats
