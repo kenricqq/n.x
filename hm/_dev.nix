@@ -18,6 +18,7 @@ in
     ./dev/lang/typst.nix
     ./dev/lang/zig.nix
 
+    ./dev/devenv.nix
     ./dev/lsp.nix
     ./dev/pi.nix
     ./dev/vcs.nix
@@ -35,9 +36,6 @@ in
 
       process-compose
       entr # run commands when files change
-
-      # Fast, Declarative, Reproducible, and Composable Developer Environments using Nix
-      devenv
 
       dep-tree # visualize complexities of a codebase
       just # project-level command runner
@@ -131,8 +129,9 @@ in
 
     # environment switcher
     direnv = {
-      # enable = true;
+      enable = true;
       enableZshIntegration = true;
+      enableNushellIntegration = true;
       # mise.enable = true;
       nix-direnv.enable = true;
       silent = true;
