@@ -1,7 +1,6 @@
 {
   config,
   host,
-  inputs,
   lib,
   paths,
   pkgs,
@@ -50,8 +49,6 @@ in
     ./misc/extras.nix
     ./security.nix # age/sops/gpg
     ./ssh.nix
-
-    inputs.nixcord.homeModules.nixcord
   ]
   ++ lib.optionals isDarwin [
     ./macos/sketchybar.nix

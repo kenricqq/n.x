@@ -14,6 +14,7 @@ in
     "paths.nix"
     "_base.nix"
     "_dev.nix"
+    "nixcord.nix"
   ]);
 
   home = {

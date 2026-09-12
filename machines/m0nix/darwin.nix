@@ -1,8 +1,9 @@
 {
   config,
+  inputs,
   lib,
-  pkgs,
   machine,
+  pkgs,
   ...
 }:
 
@@ -46,13 +47,14 @@ in
   };
 
   imports = [
+    inputs.nixcord.darwinModules.nixcord
   ]
-  ++ (map (file: darwinPath + "/${file}") [
+  ++ map (file: darwinPath + "/${file}") [
     "homebrew.nix"
     "fonts.nix"
     "sshd.nix"
     "launchd.nix"
-  ]);
+  ];
 
   environment = {
     systemPackages = with pkgs; [

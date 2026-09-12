@@ -40,6 +40,9 @@ in
 systemFunc rec {
   inherit system;
 
+  # Inputs must be available while resolving machine module imports.
+  specialArgs = { inherit inputs; };
+
   modules = [
     # Apply our overlays. Overlays are keyed by system type so we have
     # to go through and apply our system type. We do this first so
@@ -54,8 +57,6 @@ systemFunc rec {
   ]
   ++ optionals host.isLinux [
     # inputs.nix-snapd.nixosModules.default
-  ]
-  ++ optionals host.isDarwin [
   ]
   ++ [
     machineOSConfig
@@ -82,7 +83,7 @@ systemFunc rec {
     # better based on these values.
     {
       config._module.args = {
-        inherit inputs machine host;
+        inherit machine host;
 
         currentSystem = system;
         currentSystemName = name;

@@ -15,6 +15,7 @@ in
     "_base.nix"
     "_dev.nix"
     "_linux-desktop.nix"
+    "nixcord.nix"
   ]);
 
   home = {
