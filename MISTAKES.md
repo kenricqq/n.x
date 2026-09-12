@@ -33,11 +33,17 @@
 
 ## Packages and caches
 
+- Pass one repository per `skills add` invocation; additional positional repositories are not processed. Keep Impeccable under one installer and its matching update command.
+  - Check the generated setup commands with stubbed `bun`/`bunx`: each skill repository must be installed once, and Impeccable must use the requested scope without a duplicate skills entry.
+
 - Determinate Nix owns `/etc/nix/nix.conf`. With `nix.enable = false`, manage caches through `environment.etc."nix/nix.custom.conf"` in `machines/m0nix/darwin.nix`.
   - Check: `nix config show` includes each cache URL and key. Fenix uses `fenix.cachix.org`; inspect a dry run of the actual toolchain derivation before assuming cache coverage.
 
 - Install Python plugins through the application's wrapper, not as separate Home Manager packages. Keep `dooit-extras` in `dooit`'s `extraPackages`, as in `hm/knowledge-tools.nix`.
   - Check the generated wrapper includes the plugin's site-packages or verify the app's startup import path.
+
+- Do not install `fcitx5-configtool` separately when Home Manager's `i18n.inputMethod.fcitx5` already produces `fcitx5-with-addons`; it can conflict on `bin/fcitx5-config-qt` across package scopes/versions.
+  - Check `home-manager-path` build logs for duplicate `fcitx5-config-qt`, then keep the config tool only via the fcitx wrapper/addons.
 
 ## Homebrew / launchd
 

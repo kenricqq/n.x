@@ -76,7 +76,7 @@ in
     };
     jjui = {
       enable = true;
-      configDir = "${config.home.homeDirectory}/.jjui";
+      configDir = "${paths.configHome}/.jjui";
       settings = {
         revisions = {
           revset = "";

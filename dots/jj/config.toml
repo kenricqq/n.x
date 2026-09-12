@@ -11,7 +11,7 @@ layout-percent = 30
 [signing]
 backend = "ssh"
 behavior = "own"
-key = "~/.ssh/id_kenricqq.pub"
+key = "~/.ssh/id_kenricqq_gh.pub"
 
 [signing.backends.ssh]
 allowed-signers = "~/.ssh/allowed_signers"

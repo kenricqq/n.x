@@ -2,7 +2,7 @@
   "lastChangelogVersion": "0.85.1",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-6-astra",
-  "defaultThinkingLevel": "xhigh",
+  "defaultThinkingLevel": "high",
   "hideThinkingBlock": false,
   "steeringMode": "one-at-a-time",
   "transport": "sse",
@@ -19,12 +19,11 @@
     "git:github.com/nicobailon/pi-interactive-shell",
     "git:git@github.com:NikiforovAll/pi-kanban.git",
     "git:git@github.com:nicobailon/pi-subagents.git",
-    "npm:@juicesharp/rpiv-todo",
-    "npm:@diegopetrucci/pi-openai-fast"
+    "npm:@juicesharp/rpiv-todo"
   ],
   "npmCommand": ["bun"],
   "compaction": {
-    "enabled": false
+    "enabled": true
   },
   "terminal": {
     "showTerminalProgress": true

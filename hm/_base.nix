@@ -76,6 +76,7 @@ in
       ]
       ++ lib.optionals isDarwin [
         m-cli # useful macOS CLI commands
+        nightlight # night shift cli
       ];
 
     sessionPath =

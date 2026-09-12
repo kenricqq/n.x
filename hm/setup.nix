@@ -59,7 +59,6 @@ let
   skills = [
     "mattpocock/skills"
     "emilkowalski/skills"
-    "pbakaus/impeccable"
 
     # "huntabyte/shadcn-svelte"
     # "sveltejs/ai-tools"
@@ -74,7 +73,11 @@ let
     text = ''
       bun add -g ${lib.escapeShellArgs bun-packages}
 
-      bunx skills@latest add ${lib.escapeShellArgs skills}
+      bunx impeccable@latest install --scope=global
+
+      for skill_repo in ${lib.escapeShellArgs skills}; do
+        bunx skills@latest add "$skill_repo"
+      done
     '';
   };
 
@@ -105,6 +108,7 @@ let
     text = ''
       echo "Updating Bun packages"
       bun update -g --latest
+      bunx impeccable@latest update --user
       bunx skills@latest update -g -y
     '';
   };

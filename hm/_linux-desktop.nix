@@ -26,6 +26,7 @@
       zathura # pdf viewer
       obsidian
       vlc
+      jellyfin-desktop
 
       # browser
       inputs.helium.packages.${machine.system}.default
