@@ -51,6 +51,9 @@ let
     "opencode-ai@latest"
 
     "svelte-language-server"
+
+    "oxlint-tsgolint@latest"
+    "oxfmt@latest"
   ];
 
   skills = [

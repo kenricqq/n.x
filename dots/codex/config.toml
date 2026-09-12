@@ -2,7 +2,7 @@
 
 # Model and behavior
 model = "gpt-6-astra"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 model_verbosity = "low"
 default_permissions = ":workspace"
 personality = "pragmatic"

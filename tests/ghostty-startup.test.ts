@@ -26,13 +26,16 @@ for (const [platform, attribute] of Object.entries({
       "--no-write-lock-file",
       `${new URL("../", import.meta.url).pathname}#${attribute}`,
       "--apply",
-      `c: {
+      `c:
+      let files = builtins.attrValues c.home.file;
+      in {
         text = c.xdg.configFile."ghostty-nix.conf".text;
         target = c.xdg.configFile."ghostty-nix.conf".target;
         executable = "\${c.programs.nushell.package}/bin/nu";
         configHome = c.xdg.configHome;
-        symlinkSource = toString c.home.file.".config/ghostty".source;
-        configDirs = builtins.filter (path: builtins.hasAttr path c.home.file) [
+        symlinkSource = toString (builtins.head (builtins.filter
+          (file: file.target == ".config/ghostty") files)).source;
+        configDirs = builtins.filter (path: builtins.any (file: file.target == path) files) [
           ".config/ghostty"
           "Library/Application Support/com.mitchellh.ghostty"
         ];

@@ -127,50 +127,38 @@ in
     };
 
     file =
-      let
-        dotfiles = builtins.listToAttrs (
-          (lib.mapAttrsToList (k: v: lib.nameValuePair ".config/${k}" v) (
-            {
-              "yazi/flavors" = "yazi/flavors";
-              "hunk" = "hunk";
-              "jj/config.toml" = "jj/config.toml";
-              "niri" = "niri";
-              "nushell/modules" = "nushell/modules";
-              "ghostty" = "ghostty";
-            }
-            // lib.optionalAttrs isDarwin {
-              "aerospace" = "aerospace";
-              "sketchybar" = "sketchybar";
-              # "rio/config.toml" = "rio/config.toml";
-            }
-            // lib.optionalAttrs isLinux {
-              "quickshell" = "quickshell";
-            }
-          ))
-          ++ (lib.mapAttrsToList lib.nameValuePair {
-            # agents
-            ".codex/prompts" = "codex/prompts";
-            ".codex/skills" = "codex/skills";
-            ".codex/automations" = "codex/automations";
-            ".codex/config.toml" = "codex/config.toml";
-            ".codex/agent.config.toml" = "codex/agent.config.toml";
-            ".codex/deep-review.config.toml" = "codex/deep-review.config.toml";
-            ".codex/keybindings.json" = "codex/keybindings.json";
-            ".codex/hooks.json" = "codex/hooks.json";
-
-            # ".agent-of-empires/config.toml" = "agent-of-empires/config.toml";
-          })
-          ++ lib.optionals isDarwin (
-            lib.mapAttrsToList (k: v: lib.nameValuePair "Library/Application Support/${k}" v) {
-              "dooit/config.py" = "dooit/config.py";
-            }
-          )
-        );
-      in
-      (lib.mapAttrs (_: paths.mkDotFile) dotfiles)
+      lib.mapAttrs (_: paths.mkDotFile) {
+        ".codex/prompts" = "codex/prompts";
+        ".codex/skills" = "codex/skills";
+        ".codex/automations" = "codex/automations";
+        ".codex/config.toml" = "codex/config.toml";
+        ".codex/agent.config.toml" = "codex/agent.config.toml";
+        ".codex/deep-review.config.toml" = "codex/deep-review.config.toml";
+        ".codex/keybindings.json" = "codex/keybindings.json";
+        ".codex/hooks.json" = "codex/hooks.json";
+      }
       // lib.optionalAttrs isDarwin {
+        "Library/Application Support/dooit/config.py" = paths.mkDotFile "dooit/config.py";
         # ensure launchd log directory exists so glance can start at login
         "Library/Logs/glance/.keep".text = "";
       };
   };
+
+  xdg.configFile = lib.mapAttrs (_: paths.mkDotFile) (
+    {
+      "yazi/flavors" = "yazi/flavors";
+      "hunk" = "hunk";
+      "jj/config.toml" = "jj/config.toml";
+      "niri" = "niri";
+      "nushell/modules" = "nushell/modules";
+      "ghostty" = "ghostty";
+    }
+    // lib.optionalAttrs isDarwin {
+      "aerospace" = "aerospace";
+      "sketchybar" = "sketchybar";
+    }
+    // lib.optionalAttrs isLinux {
+      "quickshell" = "quickshell";
+    }
+  );
 }

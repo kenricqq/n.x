@@ -59,9 +59,6 @@
       "ols"
       "odinfmt"
 
-      "oxfmt"
-      "oxlint"
-
       "switchaudio-osx"
       "gtab"
       "clamav"
