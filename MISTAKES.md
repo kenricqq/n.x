@@ -48,6 +48,12 @@
 
 ## Nix / Home Manager file sources
 
+- Verify which checkout the installed activation command actually uses.
+  - Mistake: validated `~/KTQQ/m0nix` and recommended `hms`, but installed `home-profile` rebuilt `~/m0nix`, whose rmpc config still contained the bug.
+  - Result: activation regenerated the same invalid config, so the runtime error persisted.
+  - Fix: inspect the live alias, activation command's repository path, and resolved config symlink before choosing a source to patch.
+  - Check: after applying the change, run the app against its default live config, not only a fixture from the current checkout.
+
 - Do not leave Nix path interpolations pointing at old locations after moving repo files.
   - Mistake: moved `home-manager/services/vite-public-paths` to `home-manager/scripts/vite-public-paths` but left `${./services/vite-public-paths/bin/vite-public-paths.js}` in `home-manager/home.nix`.
   - Result: `nix build git+file://...` failed during evaluation because the path did not exist in the Git-tracked flake source.
@@ -179,6 +185,12 @@
   - Check: `plutil -p ~/Library/LaunchAgents/<label>.plist | rg -A8 ProgramArguments` must show the service-specific executable at index `0`, not `/bin/sh`.
 
 ## MPD / Home Manager
+
+- Use explicit RON option syntax unless the config enables `implicit_some`.
+  - Mistake: configured `status_update_interval_ms: 1000` without `#![enable(implicit_some)]`.
+  - Result: rmpc 0.11 rejected the config with `status_update_interval_ms: Expected option` and silently fell back to defaults despite exiting successfully.
+  - Fix: use `status_update_interval_ms: Some(1000)`.
+  - Check: run `bun test tests/rmpc-config.test.ts`, then check live `rmpc debuginfo` for a populated config path and no fallback warning; exit status alone is insufficient.
 
 - Do not let launchd MPD depend on a removable `~/Library/Logs/mpd` directory.
   - Mistake: started Home Manager's generated Darwin config without `--stderr`, so MPD had to open its hard-coded `log_file` before binding its socket.
