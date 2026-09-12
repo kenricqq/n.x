@@ -9,6 +9,8 @@
   imports = [
     inputs.codex-desktop-linux.homeManagerModules.default
 
+    ./linux/chinese.nix
+
     ./linux/codex-desktop.nix
     ./linux/ghostty.nix
     ./linux/niri.nix
