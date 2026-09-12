@@ -174,7 +174,8 @@ let
       jbs = "bookmark set";
       jbt = "bookmark track";
       jc = "commit -m";
-      jd = "describe -m";
+      jd = "desc";
+      jdm = "describe -m";
       jdf = "diff";
       je = "edit";
       jeu = "config edit --user";
