@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, paths, ... }:
 
 let
   yaziRsPlugin =
@@ -129,6 +129,14 @@ in
             ];
             run = "shell -- ya emit cd \"$(git rev-parse --show-toplevel)\"";
             desc = "Go to git root";
+          }
+          {
+            on = [
+              "g"
+              "m"
+            ];
+            run = "cd \"${paths.nixrt}\"";
+            desc = "Go to Nix config";
           }
           {
             on = "<C-g>";
