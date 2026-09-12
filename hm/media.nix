@@ -65,6 +65,7 @@ in
 
   home.file = {
     ".mpd/.keep".text = "";
+  } // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
     "Library/Logs/mpd/.keep".text = "";
   };
 
