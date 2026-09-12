@@ -32,6 +32,12 @@
   - Fix: check the worker before submitting a job; clear stale state, restart it, and register its callback again. Skip submission if startup fails.
   - Check: stop `_my_jj_worker` in an isolated shell, render the JJ prompt, and confirm the replacement worker delivers a callback without errors.
 
+- Do not assume a bundled ZLE widget preserves custom selection semantics.
+  - Mistake: replaced the custom external-editor widget with `edit-command-line` without first checking the `x` full-line selection contract.
+  - Result: in `vicmd`, the custom selection's cursor is clamped before the end of the buffer; the native widget sends all but the final character to the editor, leaving that character untouched in the shell buffer.
+  - Fix: test selection behavior before adopting the replacement. Retain the custom widget if whole-buffer editing after `x` is required, or explicitly approve the native selection behavior.
+  - Check: in a PTY, invoke the configured external-editor shortcut (currently Ctrl-O) after `x` on a multiline buffer and inspect both the editor input and the restored buffer; also test insert mode, command mode, partial selections, and the row/column passed to Helix.
+
 ## Codex config profiles
 
 - Do not make live out-of-store hooks depend on a new, not-yet-activated Home Manager package.

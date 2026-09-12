@@ -269,7 +269,7 @@ in
 
         bindkey '^F' autosuggest-accept
 
-        # Edit the current prompt buffer in Helix.
+        # Edit the whole prompt in Helix at the current cursor position.
         function hx-zle-edit-command-line() {
           emulate -L zsh
 
@@ -304,9 +304,9 @@ in
         }
 
         zle -N hx-zle-edit-command-line
-        bindkey '^G' hx-zle-edit-command-line
-        bindkey -M viins '^G' hx-zle-edit-command-line
-        bindkey -M vicmd '^G' hx-zle-edit-command-line
+        bindkey '^O' hx-zle-edit-command-line
+        bindkey -M viins '^O' hx-zle-edit-command-line
+        bindkey -M vicmd '^O' hx-zle-edit-command-line
       '')
     ];
   };
