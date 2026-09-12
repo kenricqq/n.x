@@ -1,0 +1,44 @@
+flake := "path:" + justfile_directory() + "/env"
+keyboard := "crkbd/rev4_1/standard"
+keymap := "miryoku_callum"
+uf2 := "crkbd_rev4_1_standard_miryoku_callum.uf2"
+
+# Show available recipes. Running just alone never builds or flashes.
+default:
+    @just --justfile {{ quote(justfile()) }} --list
+
+# Fetch pinned QMK if missing, initialize libraries, and symlink our keymap.
+setup:
+    nix develop {{ quote(flake) }} --command python3 scripts/setup.py
+
+# Enter the temporary Nix environment in the QMK checkout.
+shell: setup
+    cd firmware && nix develop {{ quote(flake) }}
+
+# Compile the shared Corne v4.1 firmware using the pinned flake tools.
+build: setup
+    cd firmware && nix develop {{ quote(flake) }} --command qmk compile -kb {{ quote(keyboard) }} -km {{ quote(keymap) }} -j 4
+
+# Build first (generates the Corne layout header), then run our host tests.
+test: build
+    cd firmware && nix develop {{ quote(flake) }} --command make test:all TEST_LIST=keyboards/crkbd/keymaps/{{ keymap }}/tests -j4
+
+# List USB devices and disks; look for RP2 Boot / RPI-RP2.
+devices:
+    lsusb
+    lsblk -o NAME,TRAN,LABEL,FSTYPE,SIZE,MOUNTPOINTS
+
+# Mount the bootloader partition you identified, e.g. just mount /dev/sdb1.
+mount device:
+    udisksctl mount -b {{ quote(device) }}
+
+# Show the current UF2 path and checksum.
+artifact:
+    @realpath {{ quote("firmware/" + uf2) }}
+    sha256sum {{ quote("firmware/" + uf2) }}
+
+# Manually deploy the existing UF2 to one mounted half; run separately per half.
+# Enter Bootmagic first, with TRRS disconnected. This does not rebuild.
+flash:
+    test -f {{ quote("firmware/" + uf2) }}
+    cd firmware && nix develop {{ quote(flake) }} --command python3 util/uf2conv.py --wait --deploy {{ quote(uf2) }}

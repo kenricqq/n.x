@@ -97,3 +97,20 @@
 
 - AeroSpace gaps affect tiled windows, not floating ones. Keep normal app windows tiled when they need clearance from SketchyBar.
   - Check `aerospace list-windows --focused --format '%{window-layout}'` reports `tiling` for those windows.
+
+## QMK / Corne
+
+- Keep custom keymaps outside the ignored firmware checkout. Meridian's broad `**/*key*` ignore rule also hides `keymaps/` and `keymap.c` unless explicitly excepted.
+  - Check `git check-ignore -v` and `git status --short --untracked-files=all` after moving sources; verify setup can recreate the checkout and relative symlink.
+
+- Resolve keyboard targets from the checkout, not only its README: current Corne documentation still mentions `crkbd/rev4`, while definitions use `crkbd/rev4_0/standard` and `crkbd/rev4_1/standard` with different split wiring.
+  - Check the physical PCB revision and QMK's target definitions before choosing an artifact; use the same revision-specific firmware on both halves.
+
+- Compare explicit alpha diagrams against Miryoku source. Its current default `COLEMAKDH` and alternative `COLEMAKDHK` swap K and M; the name alone is insufficient.
+  - Check all 30 positions against the requested diagram before implementing.
+
+- RP2040 QMK builds also require LUFA's shared USB descriptor headers, even though the MCU is not AVR.
+  - Initialize `lib/lufa` alongside ChibiOS, ChibiOS-Contrib, pico-sdk, and printf before compiling.
+
+- Miryoku's upstream branch can use keycodes removed from current QMK (for example `KC_MS_L`, `KC_BTN1`).
+  - Check imported feature keycodes against `quantum/keycodes.h`; current mouse codes use `MS_LEFT`, `MS_BTN1`, etc. Do not assume upstream Miryoku targets the installed QMK API.

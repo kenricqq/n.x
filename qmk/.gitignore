@@ -1,0 +1,6 @@
+/firmware/
+
+# The parent repo ignores names containing "key"; these are keyboard sources.
+!/keymaps/
+!/keymaps/miryoku_callum/
+!/keymaps/miryoku_callum/**
