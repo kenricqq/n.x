@@ -2,6 +2,7 @@
 {
   config,
   inputs,
+  paths,
   pkgs,
   ...
 }:
@@ -28,7 +29,8 @@
 
   sops = {
     defaultSopsFile = ../secrets/secrets.yaml;
-    age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
+    # Runtime string path: never copy the private identity into the Nix store.
+    age.keyFile = "${paths.nixrt}/secrets/keys.txt";
 
     secrets = {
       FLAKEHUB_TOKEN = { };

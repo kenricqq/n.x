@@ -1,6 +1,8 @@
 {
+  config,
   dlaunch,
   lib,
+  machine,
   paths,
   pkgs,
   ...
@@ -12,7 +14,14 @@ let
 
   glance = dlaunch.script "glance-launch" ''
     set -euo pipefail
-    source "$HOME/.cache/zsh/secrets.env"
+    raindrop_token_file=${lib.escapeShellArg config.home-manager.users.${machine.user}.sops.secrets.RAINDROP_TOKEN.path}
+    # launchd KeepAlive retries if sops-nix has not installed the secret yet.
+    if [[ ! -r "$raindrop_token_file" ]]; then
+      echo "Missing readable RAINDROP_TOKEN secret at $raindrop_token_file" >&2
+      exit 1
+    fi
+    RAINDROP_TOKEN="$(< "$raindrop_token_file")"
+    export RAINDROP_TOKEN
     exec '${pkgs.glance}/bin/glance' -config '${paths.dots}/glance/glance.yml'
   '';
 

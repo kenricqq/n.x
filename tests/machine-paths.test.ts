@@ -1,4 +1,7 @@
 import { expect, test } from "bun:test";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repo = fileURLToPath(new URL("../", import.meta.url));
@@ -32,6 +35,9 @@ const darwinPaths = `c:
     home = c.users.users.kenrictee.home;
     hmHome = hm.home.homeDirectory;
     configHome = hm.xdg.configHome;
+    ageKeyFile = hm.sops.age.keyFile;
+    shellAgeKeyFile = hm.home.sessionVariables.SOPS_AGE_KEY_FILE;
+    raindropTokenPath = hm.sops.secrets.RAINDROP_TOKEN.path;
     repo = hm.home.sessionVariables.NX;
     dots = hm.home.sessionVariables.DOT;
     brewConfigHome = c.homebrew.onActivation.extraEnv.XDG_CONFIG_HOME;
@@ -47,6 +53,8 @@ function expectDarwinPaths(config: ReturnType<typeof evaluate>) {
   expect(config.hmHome).toBe(config.home);
   expect(config.repo).toBe(`${config.home}/m0nix`);
   expect(config.dots).toBe(`${config.repo}/dots`);
+  expect(config.ageKeyFile).toBe(`${config.repo}/secrets/keys.txt`);
+  expect(config.shellAgeKeyFile).toBe(config.ageKeyFile);
   expect(config.brewConfigHome).toBe(config.configHome);
   expect(config.brewActivation).toContain(`XDG_CONFIG_HOME=${config.configHome}`);
   expect(config.brewActivation).toContain("HOMEBREW_NO_AUTO_UPDATE=1");
@@ -73,6 +81,38 @@ function expectDarwinPaths(config: ReturnType<typeof evaluate>) {
     const file = name === "glance" ? "glance/glance.yml" : "miniflux/config.env";
     expect(script).toContain(`${config.dots}/${file}`);
     expect(script).not.toContain(`${config.repo}/hm/dots/`);
+    if (name === "glance") {
+      expect(script).not.toContain(".cache/zsh/secrets.env");
+      expect(script).toContain(config.raindropTokenPath);
+      expect(config.agents.glance.KeepAlive).toBe(true);
+      expectGlanceSecretLoading(script, config.raindropTokenPath);
+    }
+  }
+}
+
+function expectGlanceSecretLoading(script: string, secretPath: string) {
+  const dir = mkdtempSync(join(tmpdir(), "glance-secrets-"));
+  try {
+    const tokenPath = join(dir, "token");
+    // Exercise the generated loader; replace only its input path and final app.
+    const fixture = script.replaceAll(secretPath, tokenPath).replace(
+      /^\s*exec .*\/bin\/glance.*$/m,
+      `exec /bin/bash -c '[[ "$RAINDROP_TOKEN" == "$EXPECTED_TOKEN" ]]'`,
+    );
+    expect(fixture).not.toBe(script);
+    const run = () => Bun.spawnSync(["/bin/bash", "-c", fixture], {
+      env: { HOME: dir, PATH: "/usr/bin:/bin", EXPECTED_TOKEN: "fixture $value 'quoted'" },
+      timeout: 5_000,
+    });
+    // launchd may start Glance before sops-nix. Fail cleanly so KeepAlive retries.
+    const missing = run();
+    expect(missing.exitCode).toBe(1);
+    expect(missing.stderr.toString()).toContain("RAINDROP_TOKEN");
+    writeFileSync(tokenPath, "fixture $value 'quoted'\n", { mode: 0o600 });
+    const ready = run();
+    expect(ready.exitCode, ready.stderr.toString()).toBe(0);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 }
 
@@ -91,6 +131,7 @@ test("Darwin paths follow configured home and Home Manager XDG overrides", () =>
             home-manager.users.kenrictee = {
               home.homeDirectory = lib.mkForce "/Users/path-check";
               xdg.configHome = lib.mkForce "/Users/path-check/custom-config";
+              sops.secrets.RAINDROP_TOKEN.path = lib.mkForce "/Users/path-check/custom-secrets/raindrop";
             };
           }) ];
         };
@@ -106,11 +147,14 @@ test("standalone Linux Home Manager retains its machine layout", () => {
     "homeConfigurations.meridian.config",
     `c: {
       home = c.home.homeDirectory;
-      inherit (c.home.sessionVariables) NX HM DW DOT SCRIPTS SNIPPETS_PATH;
+      inherit (c.home.sessionVariables) NX HM DW DOT SCRIPTS SNIPPETS_PATH SOPS_AGE_KEY_FILE;
+      ageKeyFile = c.sops.age.keyFile;
     }`,
   );
   const root = `${config.home}/meridian`;
   expect(config.NX).toBe(root);
+  expect(config.ageKeyFile).toBe(`${root}/secrets/keys.txt`);
+  expect(config.SOPS_AGE_KEY_FILE).toBe(config.ageKeyFile);
   expect(config.HM).toBe(`${root}/hm`);
   expect(config.DW).toBe(`${root}/os/darwin`);
   expect(config.DOT).toBe(`${root}/dots`);

@@ -160,6 +160,12 @@
 
 ## launchd / Home Manager
 
+- Update service secret consumers when migrating to sops-nix, and verify the configured identity can decrypt.
+  - Mistake: Glance still sourced removed `~/.cache/zsh/secrets.env`, while sops-nix pointed at an older age identity that did not match the encrypted file.
+  - Result: sops-nix failed decryption and Glance exited before binding port 8080.
+  - Fix: reference the existing matching identity with a runtime string path and read `RAINDROP_TOKEN` from the evaluated Home Manager `sops.secrets.RAINDROP_TOKEN.path`. Keep private keys untracked and out of Nix file sources; let launchd KeepAlive retry until the secret is readable.
+  - Check: decrypt with the evaluated `sops.age.keyFile` to `/dev/null`, run `bun test tests/machine-paths.test.ts` (including missing-secret and custom-path cases), and check `curl -I http://127.0.0.1:8080/` after switching.
+
 - Do not carry stale service flags across package upgrades.
   - Mistake: kept `memos --mode=prod` after nixpkgs moved to Memos `0.29.0`, whose CLI no longer supports `--mode`.
   - Result: launchd kept restarting `dev.memos`; `localhost:8082` refused connections while logs repeated `Error: unknown flag: --mode`.
