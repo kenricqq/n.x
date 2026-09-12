@@ -51,10 +51,7 @@ in
   programs.nushell = {
     enable = true;
     shellAliases = aliases.nushell;
-    environmentVariables = {
-      EDITOR = "hx";
-      VISUAL = "hx";
-    };
+    environmentVariables = builtins.removeAttrs config.home.sessionVariables [ "TERMINFO_DIRS" ];
     settings = {
       edit_mode = "vi";
       keybindings = [
