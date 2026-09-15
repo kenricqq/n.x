@@ -126,6 +126,8 @@ in
 
     file =
       lib.mapAttrs (_: paths.mkDotFile) {
+        ".agents/skills" = "AI/skills";
+        ".codex/AGENTS.md" = "AI/AGENTS.md";
         ".codex/prompts" = "codex/prompts";
         ".codex/skills" = "codex/skills";
         ".codex/automations" = "codex/automations";

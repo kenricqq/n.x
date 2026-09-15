@@ -68,8 +68,8 @@ in
 
       "codex/hooks/agent-policy-hook.mjs".source = ../../dots/codex/agent-policy-hook.mjs;
 
-      # Immutable copy of the Impeccable hook used by PostToolUse.
-      "codex/hooks/impeccable".source = ../../dots/AI/skills/impeccable;
+      # Preserve the JavaScript hook expected by agent-policy-hook.mjs.
+      "codex/hooks/impeccable".source = ../../dots/codex/hooks/impeccable;
 
       # Stable interpreter path usable from requirements.toml.
       "codex/bin/node".source = "${pkgs.nodejs_22}/bin/node";

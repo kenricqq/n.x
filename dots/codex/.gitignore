@@ -12,6 +12,9 @@
 !/skills/**
 /skills/**/.DS_Store
 
+!/hooks/
+!/hooks/**
+
 !/AGENTS.md
 !/config.toml
 

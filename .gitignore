@@ -24,3 +24,6 @@ node_modules
 *.rayconfig
 
 __pycache__
+
+# Impeccable installs platform engines; its tracked launcher can fetch the pinned version.
+/dots/AI/skills/impeccable/scripts/bin/
