@@ -7,7 +7,7 @@
     "audio_feedback_volume": 1.0,
     "auto_submit": true,
     "auto_submit_key": "enter",
-    "autostart_enabled": true,
+    "autostart_enabled": false,
     "bindings": {
       "cancel": {
         "current_binding": "escape",

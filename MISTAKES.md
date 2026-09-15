@@ -42,6 +42,9 @@
 
 ## Packages and caches
 
+- Handy's built-in autostart records `.handy-wrapped`, bypassing the Nix wrapper and its required `ALSA_PLUGIN_DIR`. Keep built-in autostart disabled and use the separately named Home Manager-managed `autostart/handy.desktop` to launch `handy`.
+  - Check: after restarting Handy, only the managed autostart entry remains, the process has `ALSA_PLUGIN_DIR`, and its ALSA library can open the default capture device.
+
 - Do not target Nix-wrapped applications by an assumed process name; the runtime name may be prefixed or otherwise rewritten. Prefer the application's supported control CLI.
   - Check the live process name and exercise the configured command against the running application before relying on a compositor binding.
 

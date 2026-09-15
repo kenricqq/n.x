@@ -159,6 +159,7 @@ in
       "sketchybar" = "sketchybar";
     }
     // lib.optionalAttrs isLinux {
+      "autostart/handy.desktop" = "handy/handy.desktop";
       "quickshell" = "quickshell";
     }
   );

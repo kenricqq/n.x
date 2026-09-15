@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Handy
+Exec=handy --start-hidden
+Icon=handy
+Terminal=false
