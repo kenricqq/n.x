@@ -76,7 +76,17 @@ gpu:
 
 # get nix hash for nvidia driver
 nvidia-hash:
-    v=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader | head -n1 | xargs); a=$(uname -m); nix store prefetch-file --json "https://download.nvidia.com/XFree86/Linux-${a}/${v}/NVIDIA-Linux-${a}-${v}.run" | sed -n 's/.*"hash"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'
+    @v=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader | head -n1 | xargs); a=$(uname -m); h=$(nix store prefetch-file --json "https://download.nvidia.com/XFree86/Linux-${a}/${v}/NVIDIA-Linux-${a}-${v}.run" | jq -r '.hash'); printf '%s\n%s\n' "$v" "$h"
+
+    # #!/usr/bin/env bash
+    # set -euo pipefail
+
+    # v=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader | head -n1 | xargs)
+    # a=$(uname -m)
+    # url="https://download.nvidia.com/XFree86/Linux-${a}/${v}/NVIDIA-Linux-${a}-${v}.run"
+    # hash=$(nix store prefetch-file --json "$url" | jq -r '.hash')
+
+    # printf '%s\n%s\n' "$v" "$hash"
 
 # reclaim iNiR memory
 qs-reset:
