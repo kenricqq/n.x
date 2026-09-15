@@ -70,6 +70,9 @@ in
         wtype # needed for handy
 
         comfyui
+
+        loupe
+        swayimg
       ]
       ++ lib.optionals isDarwin [
         m-cli # useful macOS CLI commands
