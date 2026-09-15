@@ -76,7 +76,7 @@ let
       bunx impeccable@latest install --scope=global
 
       for skill_repo in ${lib.escapeShellArgs skills}; do
-        bunx skills@latest add "$skill_repo"
+        bunx skills@latest add "$skill_repo" --global
       done
     '';
   };

@@ -139,6 +139,9 @@ in
         "Library/Application Support/dooit/config.py" = paths.mkDotFile "dooit/config.py";
         # ensure launchd log directory exists so glance can start at login
         "Library/Logs/glance/.keep".text = "";
+      }
+      // lib.optionalAttrs isLinux {
+        ".local/share/com.pais.handy/settings_store.json" = paths.mkDotFile "handy/settings_store.json";
       };
   };
 

@@ -13,6 +13,12 @@
 
 ## Nix / Home Manager sources and modules
 
+- Do not commit Codex Desktop's generated `node_repl` or `cua_repl` runtime paths. They contain platform- and release-specific application paths and Desktop rewrites them during runtime reconciliation.
+  - Check: keep the shared config's launcher as `command = "node_repl"`, omit generated runtime environment fields, and verify a minimal MCP initialization after ensuring the bundled runtime directory is present in each platform's `home.sessionPath`.
+
+- Resolve flake-input imports in the system builder or through `specialArgs`, not `_module.args`, which is evaluated after imports and can cause infinite recursion.
+  - Check: evaluate the full affected system output after adding an input-backed module import.
+
 - Verify the checkout used by the installed activation command and resolved config symlink before patching. `hms` calls `home-profile activate`; its repository path comes from `paths.nixrt` in `hm/shell-commands.nix`.
   - Check the installed command's path, then test the app against its default live config after activation.
 
@@ -35,6 +41,9 @@
   - Check: `bun test tests/machine-paths.test.ts` must inspect generated scripts without building or running them.
 
 ## Packages and caches
+
+- Do not target Nix-wrapped applications by an assumed process name; the runtime name may be prefixed or otherwise rewritten. Prefer the application's supported control CLI.
+  - Check the live process name and exercise the configured command against the running application before relying on a compositor binding.
 
 - Pass one repository per `skills add` invocation; additional positional repositories are not processed. Keep Impeccable under one installer and its matching update command.
   - Check the generated setup commands with stubbed `bun`/`bunx`: each skill repository must be installed once, and Impeccable must use the requested scope without a duplicate skills entry.
@@ -67,8 +76,9 @@
 - Use explicit RON options unless `implicit_some` is enabled: `status_update_interval_ms: Some(1000)`. rmpc can reject config and fall back to defaults despite exiting successfully.
   - Check: `bun test tests/rmpc-config.test.ts`; after activation, `rmpc debuginfo` must show a populated config path without fallback warnings.
 
-- Keep MPD's `--stderr` flag and route launchd `StandardErrorPath` under `services.mpd.dataDir`; otherwise a missing `~/Library/Logs/mpd` can prevent socket startup. Retain its `.keep` for manual runs.
+- Keep MPD's `--stderr` flag and route launchd `StandardErrorPath` under `services.mpd.dataDir`; otherwise a missing `~/Library/Logs/mpd` can prevent socket startup. Retain its `.keep` for manual runs, guarded with `lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin` so Home Manager does not create `~/Library` on Linux.
   - Check the evaluated launch agent and confirm foreground startup with `--stderr` gets past log initialization even without that log directory.
+  - Check `home.file` excludes `Library/Logs/mpd/.keep` on Linux and includes it on Darwin.
 
 - Share `services.mpd.generatedConfig` with manual MPD runs, as in `hm/media.nix`; a minimal standalone config can fall back to missing cache paths.
   - Check manual config uses the evaluated service state paths, not a hard-coded `~/.mpd`.

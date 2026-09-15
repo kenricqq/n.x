@@ -41,6 +41,10 @@ binds {
     Mod+Space repeat=false {
         spawn "inir" "overview" "toggle"
     }
+    // Top bar visibility.
+    Mod+Alt+B {
+        spawn "inir" "bar" "toggle"
+    }
     // Clipboard history overlay.
     Mod+V {
         spawn "inir" "clipboard" "toggle"
@@ -83,10 +87,6 @@ binds {
     // Session / power dialog.
     Mod+Shift+Q {
         spawn "inir" "session" "toggle"
-    }
-    // STT
-    Mod+O repeat=false {
-        spawn-sh "pkill -USR2 -x handy"
     }
     // ═══════════════════════════════════════════════════════════════════════
     // App launchers
@@ -188,9 +188,9 @@ binds {
     Alt+Right {
         focus-column-right
     }
-    Alt+Up {
-        focus-window-up
-    }
+    // Alt+Up {
+    //     focus-window-up
+    // }
     Alt+Down {
         focus-window-down
     }
