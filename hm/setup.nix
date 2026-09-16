@@ -110,6 +110,8 @@ let
       bun update -g --latest
       bunx impeccable@latest update --user
       bunx skills@latest update -g -y
+
+      pi update --extensions
     '';
   };
 in

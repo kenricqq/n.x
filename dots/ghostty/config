@@ -45,7 +45,7 @@ config-file = ?~/.config/ghostty-nix.conf
 # contain (def), cover, stretch, none
 background-image-fit = cover
 # background-opacity = 1.0
-background-opacity = 0.7
+background-opacity = 0.8
 background-blur = true
 unfocused-split-opacity = 0.7
 # unfocused-split-fill = #000000
