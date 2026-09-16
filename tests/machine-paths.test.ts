@@ -149,6 +149,10 @@ test("standalone Linux Home Manager retains its machine layout", () => {
       home = c.home.homeDirectory;
       inherit (c.home.sessionVariables) NX HM DW DOT SCRIPTS SNIPPETS_PATH SOPS_AGE_KEY_FILE;
       ageKeyFile = c.sops.age.keyFile;
+      nvidiaSyncPackages = builtins.filter (path: builtins.match ".*-nvidia-sync$" (toString path) != null) c.home.packages;
+      nvidiaSyncCondition = c.systemd.user.services.nvidia-home-manager-reminder.Unit.ConditionPathExists;
+      nvidiaSyncNotification = builtins.head c.systemd.user.services.nvidia-home-manager-reminder.Service.ExecStart;
+      nvidiaSyncTimer = c.systemd.user.timers.nvidia-home-manager-reminder.Timer.OnCalendar;
     }`,
   );
   const root = `${config.home}/meridian`;
@@ -160,4 +164,9 @@ test("standalone Linux Home Manager retains its machine layout", () => {
   expect(config.DOT).toBe(`${root}/dots`);
   expect(config.SCRIPTS).toBe(`${root}/scripts`);
   expect(config.SNIPPETS_PATH).toBe(`${root}/hm/snippets`);
+  expect(config.nvidiaSyncPackages).toHaveLength(1);
+  expect(config.nvidiaSyncCondition).toContain("/var/lib/nvidia-home-manager-sync-required");
+  expect(config.nvidiaSyncNotification).toContain("notify-send");
+  expect(config.nvidiaSyncNotification).toContain("nvidia-sync");
+  expect(config.nvidiaSyncTimer).toBe("*:0/30");
 }, 120_000);

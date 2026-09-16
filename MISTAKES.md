@@ -42,6 +42,9 @@
 
 ## Packages and caches
 
+- Keep non-NixOS NVIDIA driver synchronization callable outside the repository and persistent across missed pacman output. Install `nvidia-sync` through Home Manager, have the pacman hook create its reminder marker, and clear the marker only after synchronization succeeds.
+  - Check: `bun test --test-name-pattern "standalone Linux" tests/machine-paths.test.ts`; run `nvidia-sync` outside the checkout after activation and confirm the reminder timer stops notifying after success.
+
 - Handy's built-in autostart records `.handy-wrapped`, bypassing the Nix wrapper and its required `ALSA_PLUGIN_DIR`. Keep built-in autostart disabled and use the separately named Home Manager-managed `autostart/handy.desktop` to launch `handy`.
   - Check: after restarting Handy, only the managed autostart entry remains, the process has `ALSA_PLUGIN_DIR`, and its ALSA library can open the default capture device.
 

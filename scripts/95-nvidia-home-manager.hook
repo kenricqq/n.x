@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = nvidia-utils
+
+[Action]
+Description = NVIDIA driver changed - run nvidia-sync, then reboot before restarting Niri
+When = PostTransaction
+Exec = /usr/bin/touch /var/lib/nvidia-home-manager-sync-required

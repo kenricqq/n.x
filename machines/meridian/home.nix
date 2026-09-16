@@ -1,11 +1,26 @@
 {
   inputs,
+  lib,
   machine,
+  paths,
+  pkgs,
   ...
 }:
 
 let
-  gpuVersion = "610.57.04";
+  nvidia = builtins.fromJSON (builtins.readFile ./nvidia-driver.json);
+  syncMarker = "/var/lib/nvidia-home-manager-sync-required";
+  nvidiaSync = pkgs.writeShellApplication {
+    name = "nvidia-sync";
+    runtimeInputs = with pkgs; [
+      gawk
+      jq
+      nix
+    ];
+    text = ''
+      exec ${lib.getExe pkgs.bash} ${lib.escapeShellArg (toString ../../scripts/nvidia-sync.sh)} ${lib.escapeShellArg paths.nixrt}
+    '';
+  };
 in
 {
   imports = [
@@ -25,6 +40,7 @@ in
 
     packages = [
       inputs.blender-cuda.packages.${machine.system}.blender-with-cuda-unstable
+      nvidiaSync
     ];
   };
 
@@ -41,10 +57,33 @@ in
       enable = true;
       nvidia = {
         enable = true;
-        version = "615.71.09";
-        sha256 = "sha256-zc7tIrvrYSSNGm3qvCWWZz46ZQFpjucayNL9wo87cP4=";
+        inherit (nvidia) version sha256;
       };
     };
   };
+
+  systemd.user = {
+    services.nvidia-home-manager-reminder = {
+      Unit = {
+        Description = "Remind about pending NVIDIA Home Manager synchronization";
+        ConditionPathExists = syncMarker;
+      };
+      Service = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.libnotify}/bin/notify-send --urgency=critical --expire-time=0 'NVIDIA driver update requires synchronization' 'Run nvidia-sync, then reboot before restarting Niri.'";
+      };
+    };
+
+    timers.nvidia-home-manager-reminder = {
+      Unit.Description = "Periodically check for pending NVIDIA Home Manager synchronization";
+      Timer = {
+        OnBootSec = "1m";
+        OnCalendar = "*:0/30";
+        Persistent = true;
+      };
+      Install.WantedBy = [ "timers.target" ];
+    };
+  };
+
   xdg.enable = true;
 }
