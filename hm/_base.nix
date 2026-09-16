@@ -64,6 +64,9 @@ in
         curlie
         dnsutils # dig
         fastfetch
+
+        python314Packages.kokoro
+        signal-cli
       ]
       ++ lib.optionals isLinux [
         handy
@@ -139,6 +142,8 @@ in
         ".codex/deep-review.config.toml" = "codex/deep-review.config.toml";
         ".codex/keybindings.json" = "codex/keybindings.json";
         ".codex/hooks.json" = "codex/hooks.json";
+
+        ".hermes/SOUL.md" = "hermes/SOUL.md";
       }
       // lib.optionalAttrs isDarwin {
         "Library/Application Support/dooit/config.py" = paths.mkDotFile "dooit/config.py";

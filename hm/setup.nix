@@ -36,10 +36,8 @@ let
       # activate tailscale
       sudo systemctl enable --now tailscaled
 
-      ## append to end?
-      # trusted-users = root kenrict
-      # extra-substituters = https://devenv.cachix.org https://helix.cachix.org https://fenix.cachix.org
-      # extra-trusted-public-keys = devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw= helix.cachix.or g-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs= fenix.cachix.org-1:ecJhr+RdYEdcVgUkjruiYhjbBloIEGov7bos90cZ i0Q=
+      # hermes desktop
+      curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
     '';
   };
 
@@ -59,6 +57,7 @@ let
   skills = [
     "mattpocock/skills"
     "emilkowalski/skills"
+    "jakubkrehel/skills"
 
     # "huntabyte/shadcn-svelte"
     # "sveltejs/ai-tools"

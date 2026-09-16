@@ -13,6 +13,9 @@
 
 ## Nix / Home Manager sources and modules
 
+- Before managing an existing user daemon, inspect its active unit name and enablement. Reuse or explicitly retire that unit; a second name can start duplicate processes against the same state or port. When taking over an unmanaged unit, force both the unit file and its target-wants link.
+  - Check a verbose Home Manager activation dry-run, then inspect `systemctl --user list-unit-files` and the service's listening sockets after switching.
+
 - Do not commit Codex Desktop's generated `node_repl` or `cua_repl` runtime paths. They contain platform- and release-specific application paths and Desktop rewrites them during runtime reconciliation.
   - Check: keep the shared config's launcher as `command = "node_repl"`, omit generated runtime environment fields, and verify a minimal MCP initialization after ensuring the bundled runtime directory is present in each platform's `home.sessionPath`.
 

@@ -179,3 +179,6 @@ trusted_hash = "sha256:01eca8a4449adf706d9274b9e1dd3407a393a2a0ec613ab78d7ae9984
 
 [notice]
 hide_rate_limit_model_nudge = true
+
+[hooks.state."/home/kenrict/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:01eca8a4449adf706d9274b9e1dd3407a393a2a0ec613ab78d7ae99842ae0fe1"

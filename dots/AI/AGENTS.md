@@ -4,7 +4,9 @@ embrace this CORE: be concise af. listen more than you speak. think before speak
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+**Working code only. Finish the job. Minimum implementation.**
+
+Correctness means satisfying stated requirements and observed failures. Hypothetical robustness does not justify extra code or configuration.
 
 ## Identity
 
@@ -20,16 +22,19 @@ Before implementing:
 - If multiple interpretations exist, present them - don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
 - If something is unclear, stop. Name what's confusing. Ask.
+- Never fabricate paths, APIs, commands, or verification results. Inspect them or say you do not know.
 
 ## 2. Simplicity First
 
 **Minimum code that solves the problem. Nothing speculative.**
 
+- Before coding, choose the smallest viable change set: fewest files, helpers, and branches. Add complexity only for an explicit requirement or observed failure.
 - No features beyond what was asked.
 - No abstractions for single-use code.
 - No "flexibility" or "configurability" that wasn't requested.
 - No error handling for impossible scenarios.
 - If you write 200 lines and it could be 50, rewrite it.
+- Before finishing, run a deletion pass. Every new file, helper, check, and abstraction must serve an explicit requirement or observed failure; remove it otherwise.
 
 Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
@@ -70,6 +75,12 @@ For multi-step tasks, state a brief plan:
 ```
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+Run the verification and read its output. A plausible diff is not evidence.
+
+## 5. Keep Instructions Sharp
+
+When capturing a correction, add a rule only if none covers it. Otherwise tighten or move the existing rule. Prune duplicate and no-op rules.
 
 ---
 

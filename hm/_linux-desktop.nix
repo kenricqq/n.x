@@ -13,6 +13,7 @@
 
     ./linux/codex-desktop.nix
     ./linux/ghostty.nix
+    ./linux/hermes.nix
     ./linux/niri.nix
     ./linux/obsidian.nix
     ./linux/zed.nix
