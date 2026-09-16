@@ -53,4 +53,13 @@
       librepods
     ];
   };
+
+  xdg.configFile."autostart/OpenRGB.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=OpenRGB
+    Exec=${pkgs.openrgb}/bin/openrgb --profile default
+    Icon=org.openrgb.OpenRGB
+    Terminal=false
+  '';
 }

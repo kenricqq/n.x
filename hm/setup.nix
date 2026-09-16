@@ -25,6 +25,8 @@ let
 
     "python-ytmusicapi"
     # "pacman-contrib"
+
+    "freecad"
   ];
 
   arch-install = pkgs.writeShellApplication {

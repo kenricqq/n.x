@@ -31,6 +31,10 @@ openrgb-setup:
     sudo udevadm control --reload-rules &&
     sudo udevadm trigger
 
+# save current RGB state as the startup profile
+openrgb-save:
+    openrgb --save-profile default
+
 mobo-off:
     openrgb --device 1 --mode off
 

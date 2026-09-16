@@ -89,6 +89,9 @@ trust_level = "trusted"
 [projects."/home/kenrict/laurentii"]
 trust_level = "trusted"
 
+[projects."/home/kenrict/Projects/Sandbox"]
+trust_level = "trusted"
+
 # Installed plugin registrations (distinct from the default-on plugins feature)
 [plugins]
 "codex-app-tools@openai-bundled" = { enabled = true }

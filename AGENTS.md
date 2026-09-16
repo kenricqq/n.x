@@ -6,3 +6,5 @@ Before making code or config changes in this repo:
 2. Check whether the planned change touches an existing mistake category.
 3. If it does, apply the listed check before patching.
 4. Keep changes surgical. Update `MISTAKES.md` only for a new, repo-specific, generalizable mistake not already covered.
+
+Never run a command that may compile or build without first asking the user and receiving explicit approval. This includes verification builds and Nix/Home Manager build or activation commands.
