@@ -33,6 +33,9 @@ const darwinPaths = `c:
     }) [ "glance" "memos" "miniflux" "golink" ]);
   in {
     home = c.users.users.kenrictee.home;
+    stateVersion = c.system.stateVersion;
+    primaryUser = c.system.primaryUser;
+    touchId = c.security.pam.services.sudo_local.touchIdAuth;
     hmHome = hm.home.homeDirectory;
     configHome = hm.xdg.configHome;
     ageKeyFile = hm.sops.age.keyFile;
@@ -49,9 +52,12 @@ const darwinPaths = `c:
     ) { inherit (agents) glance miniflux; };
   }`;
 
-function expectDarwinPaths(config: ReturnType<typeof evaluate>) {
+function expectDarwinPaths(config: ReturnType<typeof evaluate>, checkout = "m0nix") {
+  expect(config.stateVersion).toBe(6);
+  expect(config.primaryUser).toBe("kenrictee");
+  expect(config.touchId).toBe(true);
   expect(config.hmHome).toBe(config.home);
-  expect(config.repo).toBe(`${config.home}/m0nix`);
+  expect(config.repo).toBe(`${config.home}/${checkout}`);
   expect(config.dots).toBe(`${config.repo}/dots`);
   expect(config.ageKeyFile).toBe(`${config.repo}/secrets/keys.txt`);
   expect(config.shellAgeKeyFile).toBe(config.ageKeyFile);
@@ -75,9 +81,13 @@ function expectDarwinPaths(config: ReturnType<typeof evaluate>) {
     expect(paths).toHaveLength(1);
     const result = runJSON(["nix", "derivation", "show", ...paths]);
     // Nix versions use either absolute paths or basenames as derivation keys.
-    const derivations: Record<string, { env: { text: string } }> = result.derivations ?? result;
+    const derivations: Record<string, {
+      env: { text: string };
+      structuredAttrs?: { text: string };
+    }> = result.derivations ?? result;
     expect(Object.keys(derivations)).toHaveLength(1);
-    const script = Object.values(derivations)[0].env.text;
+    const derivation = Object.values(derivations)[0];
+    const script = (derivation.structuredAttrs ?? derivation.env).text;
     const file = name === "glance" ? "glance/glance.yml" : "miniflux/config.env";
     expect(script).toContain(`${config.dots}/${file}`);
     expect(script).not.toContain(`${config.repo}/hm/dots/`);
@@ -92,15 +102,16 @@ function expectDarwinPaths(config: ReturnType<typeof evaluate>) {
 
 function expectGlanceSecretLoading(script: string, secretPath: string) {
   const dir = mkdtempSync(join(tmpdir(), "glance-secrets-"));
+  const bash = Bun.which("bash")!;
   try {
     const tokenPath = join(dir, "token");
     // Exercise the generated loader; replace only its input path and final app.
     const fixture = script.replaceAll(secretPath, tokenPath).replace(
       /^\s*exec .*\/bin\/glance.*$/m,
-      `exec /bin/bash -c '[[ "$RAINDROP_TOKEN" == "$EXPECTED_TOKEN" ]]'`,
+      `exec ${bash} -c '[[ "$RAINDROP_TOKEN" == "$EXPECTED_TOKEN" ]]'`,
     );
     expect(fixture).not.toBe(script);
-    const run = () => Bun.spawnSync(["/bin/bash", "-c", fixture], {
+    const run = () => Bun.spawnSync([bash, "-c", fixture], {
       env: { HOME: dir, PATH: "/usr/bin:/bin", EXPECTED_TOKEN: "fixture $value 'quoted'" },
       timeout: 5_000,
     });
@@ -140,6 +151,27 @@ test("Darwin paths follow configured home and Home Manager XDG overrides", () =>
   expect(config.home).toBe("/Users/path-check");
   expect(config.configHome).toBe("/Users/path-check/custom-config");
   expectDarwinPaths(config);
+}, 120_000);
+
+test("Darwin system and Home Manager paths share a custom checkout", () => {
+  const config = evaluate(
+    "darwinConfigurations.m0nix",
+    `d:
+      let
+        machine = d.config.home-manager.extraSpecialArgs.machine // {
+          repo = "custom/checkout";
+        };
+        changed = d.extendModules {
+          modules = [ ({ lib, ... }: {
+            _module.args.machine = lib.mkForce machine;
+            home-manager.extraSpecialArgs = lib.mkForce (
+              d.config.home-manager.extraSpecialArgs // { inherit machine; }
+            );
+          }) ];
+        };
+      in (${darwinPaths}) changed.config`,
+  );
+  expectDarwinPaths(config, "custom/checkout");
 }, 120_000);
 
 test("standalone Linux Home Manager retains its machine layout", () => {

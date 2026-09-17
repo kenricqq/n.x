@@ -1,4 +1,5 @@
 {
+  host,
   lib,
   machine,
   paths,
@@ -67,6 +68,8 @@ let
     runtimeInputs = youtubeRuntimeInputs;
   };
 
+  # One interface for standalone Home Manager, NixOS, and nix-darwin.
+  # The configured profile determines routing, including when inspected on another OS.
   homeProfile = pkgs.writeShellApplication {
     name = "home-profile";
     runtimeInputs = with pkgs; [
@@ -78,14 +81,24 @@ let
       repo=${lib.escapeShellArg paths.nixrt}
       profile=${lib.escapeShellArg machine.name}
       user=${lib.escapeShellArg machine.user}
-      flake="path:$repo"
+      profile_kind=${
+        lib.escapeShellArg (
+          if host.isNixos then
+            "nixos"
+          else if host.isDarwin then
+            "darwin"
+          else
+            "home"
+        )
+      }
+      flake="$repo"
 
       usage() {
         printf '%s\n' \
           'Usage: home-profile <activate|switch|update|clean|shell|secrets> [args...]' \
           "" \
-          '  activate  Build and activate only the Home Manager profile' \
-          '  switch    Switch the full Darwin profile, or the standalone Home profile' \
+          '  activate  Activate Home Manager (switch the full system on NixOS)' \
+          '  switch    Switch the full system or standalone Home Manager profile' \
           '  update    Update flake inputs, switch, and update platform tools' \
           '  clean     Clean old Home Manager/Nix generations' \
           '  shell     Open nixpkgs packages (for example: home-profile shell ripgrep)' \
@@ -105,7 +118,15 @@ let
         local activation
         cd "$repo"
 
-        if [[ $(uname -s) == Darwin ]]; then
+        # NixOS owns user packages through its system generation, so activate
+        # must switch that generation too. Standalone HM and nix-darwin retain
+        # their Home Manager-only activation paths below.
+        if [[ $profile_kind == nixos ]]; then
+          switch_profile
+          return
+        fi
+
+        if [[ $profile_kind == darwin ]]; then
           activation=$(nix build --no-link --print-out-paths \
             "$flake#darwinConfigurations.$profile.config.home-manager.users.$user.home.activationPackage")
         else
@@ -118,7 +139,10 @@ let
 
       switch_profile() {
         cd "$repo"
-        if [[ $(uname -s) == Darwin ]]; then
+        # Each output keeps its own backend: NixOS, nix-darwin, or standalone HM.
+        if [[ $profile_kind == nixos ]]; then
+          nh os switch "$flake#$profile"
+        elif [[ $profile_kind == darwin ]]; then
           nh darwin switch "$flake#$profile"
         else
           nh home switch "$flake" --configuration "$profile"
@@ -157,11 +181,11 @@ let
           cd "$repo"
           nix flake update
           switch_profile
-          if [[ $(uname -s) == Darwin ]] && command -v brew >/dev/null 2>&1; then
+          if [[ $profile_kind == darwin ]] && command -v brew >/dev/null 2>&1; then
             brew update
             brew upgrade
           fi
-          if [[ $(uname -s) == Darwin ]] && command -v determinate-nixd >/dev/null 2>&1; then
+          if [[ $profile_kind == darwin ]] && command -v determinate-nixd >/dev/null 2>&1; then
             sudo determinate-nixd upgrade || true
           fi
           notify "System inputs updated"

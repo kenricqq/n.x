@@ -16,7 +16,9 @@
         fzf
         nix-search-tv
       ];
-      text = builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh";
+      text = ''
+        exec ${pkgs.bash}/bin/bash ${pkgs.nix-search-tv.src}/nixpkgs.sh "$@"
+      '';
     })
   ];
 
