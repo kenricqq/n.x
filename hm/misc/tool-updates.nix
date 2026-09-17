@@ -1,10 +1,9 @@
-{ config, lib, pkgs, ... }:
+{ config, host, lib, pkgs, ... }:
 
 let
   home = config.home.homeDirectory;
 
-  isLinux = pkgs.stdenv.hostPlatform.isLinux;
-  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
+  inherit (host) isDarwin isLinux isNixos;
 
   # Put globally installed Bun executables somewhere generic.
   #
@@ -96,7 +95,7 @@ lib.mkMerge [
   # Linux: NixOS + CachyOS
   # ─────────────────────────────────────────────
 
-  (lib.mkIf isLinux {
+  (lib.mkIf (isLinux || isNixos) {
     systemd.user.services.update-codex = {
       Unit = {
         Description = "Update OpenAI Codex CLI";

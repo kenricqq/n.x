@@ -21,6 +21,7 @@ let
   inherit (host)
     isDarwin
     isLinux
+    isNixos
     ;
 
 in
@@ -68,7 +69,7 @@ in
         python314Packages.kokoro
         signal-cli
       ]
-      ++ lib.optionals isLinux [
+      ++ lib.optionals (isLinux || isNixos) [
         handy
         wtype # needed for handy
 
@@ -101,8 +102,9 @@ in
 
         "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin"
       ]
-      ++ lib.optionals isLinux [
-        "${paths.home}/.nix-profile/opt/codex-desktop/resources/cua_node/bin"
+      ++ lib.optionals (isLinux || isNixos) [
+        # Follow HM's profile directory for standalone and OS-managed packages.
+        "${config.home.profileDirectory}/opt/codex-desktop/resources/cua_node/bin"
       ];
 
     sessionVariables = {
@@ -150,7 +152,7 @@ in
         # ensure launchd log directory exists so glance can start at login
         "Library/Logs/glance/.keep".text = "";
       }
-      // lib.optionalAttrs isLinux {
+      // lib.optionalAttrs (isLinux || isNixos) {
         ".local/share/com.pais.handy/settings_store.json" = paths.mkDotFile "handy/settings_store.json";
       };
   };
@@ -168,7 +170,7 @@ in
       "aerospace" = "aerospace";
       "sketchybar" = "sketchybar";
     }
-    // lib.optionalAttrs isLinux {
+    // lib.optionalAttrs (isLinux || isNixos) {
       "autostart/handy.desktop" = "handy/handy.desktop";
       "quickshell" = "quickshell";
     }

@@ -1,3 +1,6 @@
+# nixos or nix-darwin with home-manager
+# standalone hm use mkhome.nix
+
 {
   nixpkgs,
   overlays,
@@ -15,13 +18,9 @@ let
     user
     ;
 
-  _platform = nixpkgs.lib.systems.elaborate system;
-
-  host = {
-    isDarwin = _platform.isDarwin;
-    isLinux = _platform.isLinux && !machine.nixos;
-    isNixos = machine.nixos or false;
-    isWsl = machine.wsl or false;
+  host = import ./host.nix {
+    inherit (nixpkgs) lib;
+    inherit machine;
   };
 
   # The config files for this system.
@@ -30,7 +29,6 @@ let
   # userOSConfig = ../users/${user}/${if host.isDarwin then "darwin" else "nixos"}.nix;
   # userHMConfig = ../users/${user}/home-manager.nix;
 
-  # NixOS vs cachyos vs nix-darwin functions
   systemFunc = if host.isDarwin then inputs.darwin.lib.darwinSystem else nixpkgs.lib.nixosSystem;
   home-manager =
     if host.isDarwin then inputs.home-manager.darwinModules else inputs.home-manager.nixosModules;
@@ -69,14 +67,6 @@ systemFunc rec {
       };
       home-manager.users.${user}.imports = [ machineHMConfig ];
       home-manager.backupFileExtension = "backup";
-
-      security.pam.services.sudo_local = {
-        touchIdAuth = true;
-      };
-      system = {
-        primaryUser = user;
-        stateVersion = 6;
-      };
     }
 
     # We expose some extra arguments so that our modules can parameterize
@@ -89,6 +79,15 @@ systemFunc rec {
         currentSystemName = name;
         currentSystemUser = user;
         isWSL = host.isWsl;
+      };
+    }
+  ]
+  ++ optionals host.isDarwin [
+    {
+      security.pam.services.sudo_local.touchIdAuth = true;
+      system = {
+        primaryUser = user;
+        stateVersion = 6;
       };
     }
   ];

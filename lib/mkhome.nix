@@ -1,3 +1,6 @@
+# standalone home-manager, no os rebuild
+# nixos or nix-darwin use mksystem.nix
+
 {
   inputs,
   nixpkgs,
@@ -14,13 +17,9 @@ let
     inherit (machine) system;
   };
 
-  _platform = pkgs.stdenv.hostPlatform;
-
-  host = {
-    isDarwin = _platform.isDarwin;
-    isLinux = _platform.isLinux && !(machine.nixos or false);
-    isNixos = machine.nixos or false;
-    isWsl = machine.wsl or false;
+  host = import ./host.nix {
+    inherit (nixpkgs) lib;
+    inherit machine;
   };
 in
 

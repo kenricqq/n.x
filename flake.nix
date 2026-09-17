@@ -15,6 +15,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     helium = {
       url = "github:schembriaiden/helium-browser-nix-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -143,14 +148,16 @@
           ];
         };
 
-        vm-agents = {
-          name = "vm-agents";
+        laurentii = {
+          name = "laurentii";
           system = "x86_64-linux";
           user = "kenrict";
           nixos = true;
 
           sync = {
+            id = "EKJVIR6-JU62KRJ-J3V2PED-XVYHOBD-K532VXE-AXVZJHP-RA64EIM-3MLEXQ4";
             tb = "10.10.10.4";
+            # tailscale = "100.xx.";
           };
         };
       };
@@ -161,7 +168,7 @@
 
       homeConfigurations.${profile.meridian.name} = mkHome profile.meridian;
 
-      nixosConfigurations.${profile.vm-agents.name} = mkSystem profile.vm-agents;
+      nixosConfigurations.${profile.laurentii.name} = mkSystem profile.laurentii;
 
       # nixosConfigurations.wsl = mkSystem "wsl" {
       #   system = "x86_64-linux";

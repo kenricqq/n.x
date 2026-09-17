@@ -13,6 +13,9 @@
 
 ## Nix / Home Manager sources and modules
 
+- Do not read package derivation outputs while evaluating shared helpers. `builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh"` made full-system evaluation require a source build; execute that script from the generated `ns` wrapper instead.
+  - Check system derivation evaluation with `--option allow-import-from-derivation false`. When testing generated `writeShellApplication` scripts, replace their exported runtime PATH before running them with command stubs; the wrapper otherwise overrides the test PATH.
+
 - Before managing an existing user daemon, inspect its active unit name and enablement. Reuse or explicitly retire that unit; a second name can start duplicate processes against the same state or port. When taking over an unmanaged unit, force both the unit file and its target-wants link.
   - Check a verbose Home Manager activation dry-run, then inspect `systemctl --user list-unit-files` and the service's listening sockets after switching.
 
@@ -31,7 +34,7 @@
 - Live out-of-store config edits take effect before a new Home Manager generation is activated. Do not make them depend on an executable that is not installed yet.
   - Check every new command resolves in the live consumer's environment before activation.
 
-- Pass dependencies explicitly to imported helpers. Darwin and Home Manager have separate module argument scopes; construct Darwin `paths` and `dlaunch` in `machines/m0nix/darwin.nix` and expose them through `_module.args`.
+- Pass dependencies explicitly to imported helpers. Darwin and Home Manager have separate module argument scopes; construct Darwin `paths` and `dlaunch` in `machines/m0nix/darwin.nix` and expose them through `_module.args`. Pass `machine.repo` to both path helpers so custom checkouts stay aligned across scopes.
   - Check: `bun test tests/machine-paths.test.ts` and `nix eval --raw .#darwinConfigurations.m0nix.system.drvPath`. Home Manager-only evaluation misses Darwin Homebrew and launchd failures.
 
 - Pass inputs used in module `imports` through system `specialArgs`, not `_module.args`; imports are resolved before module configuration, so the latter can cause infinite recursion.
@@ -40,7 +43,10 @@
 - Gate platform-specific packages and completions where they are registered, as `hm/display.nix` does for Linux-only `lg-input`.
   - Check both profiles: the package and completion must be absent on Darwin and present on Linux.
 
-- Handle both legacy and versioned `nix derivation show` JSON. Versioned output nests entries under `derivations`; keys may be basenames rather than full store paths.
+- Define host flags only in `lib/host.nix`, shared by `lib/mkhome.nix` and `lib/mksystem.nix`. `host.isLinux` means Linux excluding NixOS; inherit it instead of redefining a local `isLinux` from `pkgs.stdenv.hostPlatform.isLinux`. Use `(isLinux || isNixos)` for features shared by standalone Linux and NixOS.
+  - Check: only `lib/host.nix` assigns `isLinux` in `lib/` and `hm/`. Evaluate standalone Linux, NixOS, and Darwin with `--option allow-import-from-derivation false` and verify intended package, path, and file gates.
+
+- Handle both legacy and versioned `nix derivation show` JSON. Versioned output nests entries under `derivations`; keys may be basenames rather than full store paths, and generated script text may be under `structuredAttrs` rather than `env`.
   - Check: `bun test tests/machine-paths.test.ts` must inspect generated scripts without building or running them.
 
 ## Packages and caches

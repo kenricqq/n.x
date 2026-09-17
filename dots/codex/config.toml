@@ -1,8 +1,8 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 
 # Model and behavior
-model = "gpt-5.6-sol"
-model_reasoning_effort = "high"
+model = "gpt-6-astra"
+model_reasoning_effort = "xhigh"
 model_verbosity = "low"
 default_permissions = ":workspace"
 personality = "pragmatic"
@@ -86,10 +86,10 @@ trust_level = "trusted"
 [projects."/home/kenrict/.codex/sessions/2026"]
 trust_level = "trusted"
 
-[projects."/home/kenrict/laurentii"]
+[projects."/home/kenrict/Projects/Sandbox"]
 trust_level = "trusted"
 
-[projects."/home/kenrict/Projects/Sandbox"]
+[projects."/home/kenrict/laurentii"]
 trust_level = "trusted"
 
 # Installed plugin registrations (distinct from the default-on plugins feature)
@@ -182,6 +182,3 @@ trusted_hash = "sha256:01eca8a4449adf706d9274b9e1dd3407a393a2a0ec613ab78d7ae9984
 
 [notice]
 hide_rate_limit_model_nudge = true
-
-[hooks.state."/home/kenrict/.codex/hooks.json:stop:0:0"]
-trusted_hash = "sha256:01eca8a4449adf706d9274b9e1dd3407a393a2a0ec613ab78d7ae99842ae0fe1"
