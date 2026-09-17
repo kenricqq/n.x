@@ -40,6 +40,13 @@ The standalone Home Manager and nix-darwin activation paths remain available.
 `home-profile update` updates flake inputs and switches the selected target;
 Homebrew and Determinate Nix updates run only for nix-darwin profiles.
 
+### Arch / CachyOS Nix caches
+
+`arch-install` writes `os/shared/nix-caches.nix` to
+`/etc/nix/shared-caches.conf`, includes it once from the existing `nix.conf`, and
+restarts the running Nix daemon. After changing the cache list, apply Home
+Manager and rerun `arch-install` to refresh it.
+
 ### build from existing flake.nix
 
 Run the commands for the intended target from its checkout:

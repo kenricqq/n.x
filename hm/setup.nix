@@ -14,6 +14,8 @@ let
 
   ## -- Arch System Packages -- ##
 
+  nixCaches = import ../os/shared/nix-caches.nix;
+
   system-packages = [
     "bun"
     "cronie"
@@ -33,6 +35,16 @@ let
     name = "arch-install";
 
     text = ''
+      # Share caches with NixOS and nix-darwin, preserving existing Nix settings.
+      sudo tee /etc/nix/shared-caches.conf > /dev/null <<'EOF'
+      extra-substituters = ${lib.concatStringsSep " " nixCaches.substituters}
+      extra-trusted-public-keys = ${lib.concatStringsSep " " nixCaches.trusted-public-keys}
+      EOF
+      if ! sudo grep -Fxq '!include shared-caches.conf' /etc/nix/nix.conf; then
+        printf '\n!include shared-caches.conf\n' | sudo tee -a /etc/nix/nix.conf > /dev/null
+      fi
+      sudo systemctl try-restart nix-daemon.service
+
       sudo pacman -S --needed ${lib.escapeShellArgs system-packages}
 
       # activate tailscale
