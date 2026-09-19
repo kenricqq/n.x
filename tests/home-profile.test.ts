@@ -46,7 +46,7 @@ const profiles = [
 ];
 
 for (const profile of profiles) {
-  test(`${profile.label} home-profile preserves activate, switch, and update routing`, () => {
+  test(`${profile.label} home-profile preserves activate, switch, update, and clean routing`, () => {
     // Evaluate only the generated wrapper; forbid builds and import-from-derivation.
     const config = runJSON([
       "nix", "eval", "--json", ...evaluationOptions,
@@ -73,6 +73,10 @@ for (const profile of profiles) {
     const derivation = Object.values(derivations)[0];
     const script = (derivation.structuredAttrs ?? derivation.env).text;
     expect(typeof script).toBe("string");
+    const runtimePath = script.match(/^export PATH="([^"]+)"$/m);
+    expect(runtimePath).not.toBeNull();
+    expect(/\/nix\/store\/[^/:]+-nix-[0-9][^/:]*\/bin(?=:|$)/.test(runtimePath![1]))
+      .toBe(profile.label !== "nix-darwin");
     const isolatedScript = script.replace(/^export PATH=.*$/m, 'export PATH="$PROFILE_TEST_PATH"');
     expect(isolatedScript).not.toBe(script);
 
@@ -83,7 +87,7 @@ for (const profile of profiles) {
       mkdirSync(activation);
       const stub = (path: string, body: string) =>
         writeFileSync(path, `#!/bin/sh\n${body}\n`, { mode: 0o755 });
-      for (const command of ["nh", "brew", "determinate-nixd", "sudo"]) {
+      for (const command of ["nh", "brew", "determinate-nixd", "sudo", "mole"]) {
         stub(join(dir, command), `printf "%s\\n" ${command} "$@" >> "$PROFILE_TEST_CALLS"`);
       }
       stub(join(dir, "nix"), [
@@ -94,11 +98,20 @@ for (const profile of profiles) {
       stub(join(activation, "activate"), 'printf "%s\\n" activate "$@" >> "$PROFILE_TEST_CALLS"');
 
       const bash = Bun.which("bash")!;
+      if (profile.label === "nix-darwin") {
+        // Keep the real wrapper PATH: Darwin must preserve the caller's Nix.
+        const resolution = Bun.spawnSync([bash, "-c", `${runtimePath![0]}\ncommand -v nix`], {
+          env: { PATH: dir },
+          timeout: 5_000,
+        });
+        expect(resolution.exitCode, resolution.stderr.toString()).toBe(0);
+        expect(resolution.stdout.toString().trim()).toBe(join(dir, "nix"));
+      }
       // Check cd's destination without requiring the other machine's home directory.
       // PATH contains only recording stubs; sudo never executes its arguments.
       const fixture = 'cd() { [[ $# == 1 && $1 == "$PROFILE_TEST_REPO" ]]; }\n' + isolatedScript;
       for (const kernel of ["Linux", "Darwin"]) {
-        for (const action of ["activate", "switch", "update"]) {
+        for (const action of ["activate", "switch", "update", "clean"]) {
           writeFileSync(calls, "");
           const run = Bun.spawnSync([bash, "-c", fixture, "home-profile", action], {
             env: {
@@ -113,7 +126,14 @@ for (const profile of profiles) {
           });
           expect(run.exitCode, `${action} with uname=${kernel}: ${run.stderr.toString()}`).toBe(0);
           // Routing follows the configured profile, even when inspected on another OS.
-          const expected = action === "activate" && profile.activationAttribute
+          const expected = action === "clean"
+            ? [
+              "nh", "clean", "all",
+              ...(profile.label === "nix-darwin"
+                ? ["--keep", "2", "--keep-since", "4d", "--no-gc", "--no-gcroots", "--no-direnv"]
+                : ["mole", "clean"]),
+            ]
+            : action === "activate" && profile.activationAttribute
             ? [
               "nix", "build", "--no-link", "--print-out-paths",
               `${profile.repo}#${profile.activationAttribute}`, "activate",

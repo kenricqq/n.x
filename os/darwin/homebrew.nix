@@ -161,7 +161,7 @@
       "conductor"
 
       ## Productivity
-      "blender"
+      # "blender"
       "superhuman"
       "linear"
       "superwhisper"

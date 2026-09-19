@@ -72,11 +72,14 @@ let
   # The configured profile determines routing, including when inspected on another OS.
   homeProfile = pkgs.writeShellApplication {
     name = "home-profile";
-    runtimeInputs = with pkgs; [
-      nh
-      nix
-      sops
-    ];
+    # Darwin uses the installed Determinate Nix from the caller's PATH.
+    runtimeInputs =
+      with pkgs;
+      [
+        nh
+        sops
+      ]
+      ++ lib.optional (!host.isDarwin) nix;
     text = ''
       repo=${lib.escapeShellArg paths.nixrt}
       profile=${lib.escapeShellArg machine.name}
@@ -195,9 +198,14 @@ let
             usage >&2
             exit 2
           }
-          nh clean all
-          if command -v mole >/dev/null 2>&1; then
-            mole clean
+          if [[ $profile_kind == darwin ]]; then
+            # Determinate owns store GC; only prune generations here.
+            nh clean all --keep 2 --keep-since 4d --no-gc --no-gcroots --no-direnv
+          else
+            nh clean all
+            if command -v mole >/dev/null 2>&1; then
+              mole clean
+            fi
           fi
           ;;
         shell)

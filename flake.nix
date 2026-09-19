@@ -129,6 +129,7 @@
 
           # peers are those allowed to SSH into me
           # require mutual to enable syncthing
+          # first peer on mac is used for switching monitor input (reg usbc hub don't work)
           peers = with profile; [
             meridian
           ];
