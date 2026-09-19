@@ -16,7 +16,7 @@ let
   darwinPath = ../../os/darwin;
 
   system-config = import (darwinPath + "/system.nix");
-  nixCaches = import ../../os/shared/nix-caches.nix;
+  nixCaches = import ../nix-caches.nix;
 
   paths =
     (import ../../lib/paths.nix {

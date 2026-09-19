@@ -8,6 +8,8 @@
 {
   imports = [
     ./hardware.nix
+    ../../os/nixos/tailscale.nix
+    ../../os/nixos/openssh.nix
     inputs.nix-index-database.nixosModules.default
   ];
 
@@ -54,7 +56,6 @@
       alsa.support32Bit = true;
       pulse.enable = true;
     };
-    openssh.enable = true;
   };
 
   # disable cursor blinking
@@ -99,7 +100,7 @@
     packages = [ pkgs.tree ];
   };
 
-  nix.settings = (import ../../os/shared/nix-caches.nix) // {
+  nix.settings = (import ../nix-caches.nix) // {
     experimental-features = [
       "nix-command"
       "flakes"

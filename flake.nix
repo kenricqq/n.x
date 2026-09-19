@@ -127,6 +127,8 @@
             tailscale = "100.79.126.103";
           };
 
+          # peers are those allowed to SSH into me
+          # require mutual to enable syncthing
           peers = with profile; [
             meridian
           ];
@@ -157,8 +159,13 @@
           sync = {
             id = "EKJVIR6-JU62KRJ-J3V2PED-XVYHOBD-K532VXE-AXVZJHP-RA64EIM-3MLEXQ4";
             tb = "10.10.10.4";
-            # tailscale = "100.xx.";
+            tailscale = "100.112.47.42";
           };
+
+          peers = with profile; [
+            mba
+            meridian
+          ];
         };
       };
     in

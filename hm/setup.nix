@@ -7,14 +7,12 @@
 
 let
   inherit (host)
-    isDarwin
     isLinux
-    isNixos
     ;
 
   ## -- Arch System Packages -- ##
 
-  nixCaches = import ../os/shared/nix-caches.nix;
+  nixCaches = import ../machines/nix-caches.nix;
 
   system-packages = [
     "bun"

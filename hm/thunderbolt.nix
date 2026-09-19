@@ -47,14 +47,19 @@ let
             ipv4.addresses ${tb}/24 \
             ipv4.never-default yes
 
-          # restrict ssh to peers & require keys, BUT tailscale exceptions...
+          ## restrict ssh to peers & require keys
           sudo install -d -m 0755 /etc/ssh/sshd_config.d
           sudo tee /etc/ssh/sshd_config.d/00-thunderbolt-key-only.conf >/dev/null <<'EOF'
-          AllowUsers ${allowedUsers} ${machine.user}@100.64.0.0/10
-          Match LocalAddress *,!100.64.0.0/10
-            AuthenticationMethods publickey
-          Match all
-          EOF
+
+          AllowUsers ${allowedUsers}
+          AuthenticationMethods publickey
+
+          ## BUT tailscale exceptions...
+          # AllowUsers ${allowedUsers} ${machine.user}@100.64.0.0/10
+          # Match LocalAddress *,!100.64.0.0/10
+          #   AuthenticationMethods publickey
+          # Match all
+          # EOF
 
           # Generate missing host keys on a fresh machine, then validate SSH.
           sudo /usr/bin/ssh-keygen -A
