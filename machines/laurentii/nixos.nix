@@ -34,6 +34,8 @@
       ly = {
         enable = true;
         settings = {
+          # avoid Ly initial misplaced cursor
+          default_input = "password";
           load = false;
           save = false;
         };
@@ -54,6 +56,9 @@
     };
     openssh.enable = true;
   };
+
+  # disable cursor blinking
+  boot.kernelParams = [ "vt.cur_default=0x700011" ];
 
   boot.loader = {
     systemd-boot.enable = true;
