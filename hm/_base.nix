@@ -153,6 +153,7 @@ in
         "Library/Logs/glance/.keep".text = "";
       }
       // lib.optionalAttrs (isLinux || isNixos) {
+        ".local/bin/inir" = paths.mkDotFile "quickshell/inir/scripts/inir";
         ".local/share/com.pais.handy/settings_store.json" = paths.mkDotFile "handy/settings_store.json";
       };
   };

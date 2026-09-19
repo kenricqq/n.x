@@ -110,15 +110,21 @@
       zoxide
       nushell
       wget
+
+      alacritty
       ghostty
+      kitty
+
       jujutsu
       bun
       nodejs
+
       bubblewrap
-      alacritty
+
       fuzzel
       swaylock
       swayidle
+
       lf
       btop
     ];
