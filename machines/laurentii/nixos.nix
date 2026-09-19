@@ -61,7 +61,10 @@
   boot.kernelParams = [ "vt.cur_default=0x700011" ];
 
   boot.loader = {
-    systemd-boot.enable = true;
+    systemd-boot = {
+      enable = true;
+      memtest86.enable = true;
+    };
     efi.canTouchEfiVariables = true;
   };
 
