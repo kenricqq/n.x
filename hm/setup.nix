@@ -89,6 +89,8 @@ let
       for skill_repo in ${lib.escapeShellArgs skills}; do
         bunx skills@latest add "$skill_repo" --global
       done
+
+      pi update --extensions
     '';
   };
 

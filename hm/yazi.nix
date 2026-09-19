@@ -82,6 +82,17 @@ in
       mgr = {
         prepend_keymap = [
           {
+            on = [
+              "g"
+              "o"
+            ];
+            run = [
+              "escape --search"
+              "reveal"
+            ];
+            desc = "Go to file's parent folder";
+          }
+          {
             on = "T";
             run = "plugin toggle-pane min-preview";
             desc = "Show or hide the preview pane";

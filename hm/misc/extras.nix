@@ -17,7 +17,7 @@
     mdbook-linkcheck2 # check links in mdBook projects
 
     # service binaries only; no daemons/DNS changes enabled
-    qui # alt web UI for existing qBittorrent instance
+    # qui # alt web UI for existing qBittorrent instance
     telegram-bot-api # self-hosted Telegram Bot API server
     dnscrypt-proxy # encrypted DNS proxy
 

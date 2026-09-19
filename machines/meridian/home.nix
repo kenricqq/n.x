@@ -62,6 +62,14 @@ in
     };
   };
 
+  xdg.enable = true;
+
+  nix.package = pkgs.nix;
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
+
   systemd.user = {
     services.nvidia-home-manager-reminder = {
       Unit = {
@@ -84,6 +92,4 @@ in
       Install.WantedBy = [ "timers.target" ];
     };
   };
-
-  xdg.enable = true;
 }
