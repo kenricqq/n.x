@@ -59,7 +59,7 @@ let
           # Match LocalAddress *,!100.64.0.0/10
           #   AuthenticationMethods publickey
           # Match all
-          # EOF
+          EOF
 
           # Generate missing host keys on a fresh machine, then validate SSH.
           sudo /usr/bin/ssh-keygen -A

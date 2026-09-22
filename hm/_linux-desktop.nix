@@ -43,7 +43,7 @@
 
       # dev
       # beekeeper-studio
-      podman-desktop
+      (podman-desktop.override { nodejs-slim_26 = nodejs-slim_24; })
       yaak
 
       # optional gui apps
