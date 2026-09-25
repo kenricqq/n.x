@@ -165,6 +165,7 @@
       "superhuman"
       "linear"
       "superwhisper"
+      "zulip"
 
       ## Notes
       "obsidian"

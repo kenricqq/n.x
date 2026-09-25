@@ -182,6 +182,8 @@ in
     jnv # interactive jq filtering
     yq-go # query and edit YAML and other structured formats
 
+    ghostscript # image/pdf manipulation
+
     python314Packages.curl-cffi
   ];
 }

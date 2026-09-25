@@ -61,9 +61,11 @@ let
     "opencode-ai@latest"
 
     "svelte-language-server"
+    "typescript-svelte-plugin"
 
     "oxlint-tsgolint@latest"
     "oxfmt@latest"
+
   ];
 
   skills = [

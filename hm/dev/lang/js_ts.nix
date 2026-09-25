@@ -20,6 +20,8 @@
 
   home.packages = with pkgs; [
     typescript
+    typescript-language-server
+    oxlint
     vtsls
 
     prettier

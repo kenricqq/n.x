@@ -238,7 +238,7 @@ in
           name = "astro";
           auto-format = true;
           language-servers = [
-            "oxlint"
+            "oxlint-language-server"
             "astro-ls"
             "scls"
           ];
@@ -298,7 +298,7 @@ in
           #   ];
           # };
           language-servers = [
-            "oxlint"
+            "oxlint-language-server"
             "svelteserver"
             "scls"
             "tailwindcss-ls"
@@ -315,8 +315,8 @@ in
             ];
           };
           language-servers = [
-            "oxlint"
-            "tsgo"
+            "typescript-language-server"
+            "oxlint-language-server"
             "scls"
           ];
         }
@@ -331,7 +331,7 @@ in
             ];
           };
           language-servers = [
-            "oxlint"
+            "oxlint-language-server"
             "tsgo"
             "scls"
           ];
@@ -347,7 +347,7 @@ in
             ];
           };
           language-servers = [
-            "oxlint"
+            "oxlint-language-server"
             "tsgo"
             "scls"
           ];
@@ -363,7 +363,7 @@ in
             ];
           };
           language-servers = [
-            "oxlint"
+            "oxlint-language-server"
             "tsgo"
             "scls"
           ];
@@ -406,7 +406,7 @@ in
             ];
           };
           language-servers = [
-            "oxlint"
+            "oxlint-language-server"
             {
               name = "vscode-json-language-server";
               except-features = [ "format" ];
@@ -469,13 +469,6 @@ in
         };
         iwe = {
           command = "iwes";
-        };
-
-        oxlint = {
-          command = "oxlint";
-          args = [
-            "--lsp"
-          ];
         };
         oxfmt = {
           command = "oxfmt";

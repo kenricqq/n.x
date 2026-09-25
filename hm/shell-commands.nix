@@ -303,6 +303,29 @@ let
     '';
   };
 
+  emptyTrash = pkgs.writeShellApplication {
+    name = "emptytrash";
+    runtimeInputs = with pkgs; [
+      coreutils
+      findutils
+      sqlite
+    ];
+    text = ''
+      find "$HOME/.Trash" -mindepth 1 -maxdepth 1 -exec rm -rfv -- {} +
+      quarantine="$HOME/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2"
+      if [[ -f "$quarantine" ]]; then
+        sqlite3 "$quarantine" 'delete from LSQuarantineEvent; vacuum'
+      fi
+    '';
+  };
+
+  restartMpd = pkgs.writeShellApplication {
+    name = "restart-mpd";
+    text = ''
+      exec /bin/launchctl kickstart -k "gui/$(/usr/bin/id -u)/org.nix-community.home.mpd"
+    '';
+  };
+
   lockScreen = pkgs.writeShellApplication {
     name = "lock-screen";
     text = ''
@@ -324,6 +347,10 @@ in
     ytMusic
     ytVideo
   ]
-  ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ lockScreen ]
+  ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+    emptyTrash
+    lockScreen
+    restartMpd
+  ]
   ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.wl-clipboard ];
 }

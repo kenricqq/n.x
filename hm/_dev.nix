@@ -15,6 +15,7 @@ in
     ./dev/lang/js_ts.nix
     ./dev/lang/markdown.nix
     ./dev/lang/rust.nix
+    ./dev/lang/svg.nix
     ./dev/lang/typst.nix
     ./dev/lang/zig.nix
 

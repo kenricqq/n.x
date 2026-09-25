@@ -12,6 +12,7 @@ let
   coreAliases = {
     ask = "pi -p";
     cl = "clear";
+    cleanup = "fd '^\\.DS_Store$' -H -t f -x rm";
     co = "codex";
     comfy = "nix run github:utensils/comfyui-nix#cuda --disable-xformers --use-pytorch-cross-attention";
     df = "duf";
@@ -32,9 +33,11 @@ let
     lst = "eza -T -L=2 -l --icons --git";
     lt = "eza -T -L=2 --icons --git-ignore --group-directories-first -a -I '.git|.jj' --color=always";
     nso = "nix store optimise";
+    oc = "opencode";
     py = "python3";
     python = "python3";
     skup = "bunx --bun skills@latest update";
+    snip = edit "${paths.hm}/snippets";
     todo = "dooit";
     whtr = "curl wttr.in/Santa+Cruz";
     ytm = "yt-music";
@@ -136,6 +139,18 @@ let
       bu = "update";
     };
 
+    cargo = {
+      ca = "add";
+      cb = "build";
+      cbi = "binstall";
+      cc = "check";
+      ci = "init";
+      cn = "new";
+      cr = "run";
+      ct = "test";
+      cu = "update";
+    };
+
     codex = {
       col = "exec -c model_reasoning_effort=low";
       cor = "resume";
@@ -214,6 +229,19 @@ let
       uvu = "sync --upgrade";
       uvx = "tool run";
     };
+
+    zig = {
+      zb = "build";
+      zbd = "build dev";
+      zbr = "build run";
+      zf = "fetch";
+      zfmt = "fmt";
+      zib = "build -p ~/.local";
+      zin = "init";
+      zr = "run";
+      zt = "test";
+      zv = "version";
+    };
   };
 
   platformAliases =
@@ -221,8 +249,10 @@ let
       afk = "lock-screen";
       airport = "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport";
       clip = "pbcopy";
+      et = "emptytrash";
       localip = "ipconfig getifaddr en0";
       lg-input = "ssh ${(builtins.head machine.allowIncoming).name} lg-input";
+      restart = "restart-mpd";
     }
     // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
       clip = "wl-copy";
