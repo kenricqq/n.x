@@ -1,0 +1,19 @@
+{
+  "version": "2.31.0",
+  "commit": "9574fa42",
+  "installed_at": "2026-09-25T07:53:06-07:00",
+  "installedAt": "2026-09-25T07:53:06-07:00",
+  "source": "update",
+  "repo_path": "/home/kenrict/.local/src/inir",
+  "repoPath": "/home/kenrict/.local/src/inir",
+  "install_mode": "repo-copy",
+  "installMode": "repo-copy",
+  "update_strategy": "repo-setup",
+  "updateStrategy": "repo-setup",
+  "package_manager": "",
+  "packageManager": "",
+  "package_name": "",
+  "packageName": "",
+  "package_update_hint": "",
+  "packageUpdateHint": ""
+}

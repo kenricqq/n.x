@@ -312,6 +312,10 @@ OFFICIAL_PACKAGES=(
   mission-center
 )
 
+if [[ "${OS_SPECIFIC_ID:-}" == "cachyos" ]] && pacman -Si niri-focused-booster &>/dev/null; then
+  OFFICIAL_PACKAGES+=(niri-focused-booster)
+fi
+
 # Preserve install-group flags while preferring signed Arch packages wherever
 # possible. These used to be installed through AUR only when their group was on.
 if $INSTALL_FONTS; then
@@ -524,7 +528,7 @@ tui_info "Registering dependencies with pacman..."
 _meta_dir="./sdata/dist-arch/inir-deps"
 if [[ -f "$_meta_dir/PKGBUILD" ]]; then
   # Update pkgver from VERSION file
-  _inir_ver="$(cat ./VERSION 2>/dev/null || echo '2.30.0')"
+  _inir_ver="$(cat ./VERSION 2>/dev/null || echo '2.31.0')"
   sed -i "s/^pkgver=.*/pkgver=${_inir_ver}/" "$_meta_dir/PKGBUILD"
 
   (

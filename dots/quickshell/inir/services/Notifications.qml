@@ -394,7 +394,10 @@ Singleton {
             return maxLifetime;
         }
 
-        // 3) Defaults by urgency (use enum comparison, not fragile toString)
+        // 3) Defaults by urgency (use enum comparison, not fragile toString).
+        // iRiS banners have their own, shorter, duration for low and normal.
+        if (Config.options?.panelFamily === "iris" && notification.urgency !== NotificationUrgency.Critical)
+            return Math.max(1000, Number(Config.options?.iris?.notifications?.duration ?? 4000));
         if (notification.urgency === NotificationUrgency.Low) {
             return Config.options?.notifications?.timeoutLow ?? 5000;
         } else if (notification.urgency === NotificationUrgency.Critical) {
@@ -525,6 +528,32 @@ Singleton {
 
         // Remove from re-entrancy guard after dismiss chain completes
         Qt.callLater(() => root._discardingIds.delete(id));
+    }
+
+    function discardNotificationsForApp(appName) {
+        const doomed = root.list.filter(notif => notif.appName === appName)
+        if (doomed.length === 0)
+            return
+        for (const notif of doomed) {
+            if (notif.timer) {
+                notif.timer.stop();
+                notif.timer.destroy();
+                notif.timer = null;
+            }
+        }
+        root.list = root.list.filter(notif => notif.appName !== appName)
+        triggerListChange();
+        notifFileView.setText(stringifyList(root.list));
+        for (const notif of doomed) {
+            const id = notif.notificationId
+            root._discardingIds.add(id);
+            const tracked = notifServer.trackedNotifications.values.find(server => server.id + root.idOffset === id)
+            if (tracked)
+                tracked.dismiss()
+            root.discard(id);
+            notif.destroy();
+            Qt.callLater(() => root._discardingIds.delete(id));
+        }
     }
 
     function discardAllNotifications() {
