@@ -1,9 +1,12 @@
 {
   config,
+  inputs,
   pkgs,
   ...
 }:
 {
+  imports = [ inputs.zen-browser.homeModules.default ];
+
   xdg.mimeApps =
     let
       associations = builtins.listToAttrs (
@@ -103,17 +106,17 @@
           #   id = "wappalyzer";
           #   pinned = true;
           # };
-          "wappalyzer@crunchlabz.com" = "wappalyzer";
+          # "wappalyzer@crunchlabz.com" = "wappalyzer";
           "{85860b32-02a8-431a-b2b1-40fbd64c9c69}" = "github-file-icons";
           "{d7742d87-e61d-4b78-b8a1-b469842139fa}" = "vimium-ff";
           "addon@darkreader.org" = "darkreader";
-          "jid0-adyhmvsP91nUO8pRv0Mn2VKeB84@jetpack" = "raindropio";
+          # "jid0-adyhmvsP91nUO8pRv0Mn2VKeB84@jetpack" = "raindropio";
           "sponsorBlocker@ajay.app" = "sponsorblock";
           "{74145f27-f039-47ce-a470-a662b129930a}" = "clearurls";
           "deArrow@ajay.app" = "dearrow";
           "uBlock0@raymondhill.net" = "ublock-origin";
-          "{5cce4ab5-3d47-41b9-af5e-8203eea05245}" = "control-panel-for-twitter";
-          "@searchengineadremover" = "searchengineadremover";
+          # "{5cce4ab5-3d47-41b9-af5e-8203eea05245}" = "control-panel-for-twitter";
+          # "@searchengineadremover" = "searchengineadremover";
           "78272b6fa58f4a1abaac99321d503a20@proton.me" = "proton-pass";
           "jid1-BoFifL9Vbdl2zQ@jetpack" = "decentraleyes";
 
@@ -211,6 +214,10 @@
                 ];
                 url = "https://wiki.nixos.org/";
               }
+              {
+                name = "github";
+                url = "https://github.com/kenric-tee/";
+              }
             ];
           }
         ];
@@ -270,7 +277,7 @@
             texture = 0.5;
           };
         };
-        "Open" = {
+        "Oyster" = {
           id = "572910e1-1168-4832-a869-0b3a93e2f165";
           icon = "Z";
           container = containers."KTQQ".id;

@@ -34,6 +34,7 @@ in
     ./shell-commands.nix
     ./yazi.nix
     ./thunderbolt.nix
+    ./zen.nix
 
     ./sync.nix # restic/rsync/syncthing
 
@@ -174,6 +175,7 @@ in
     // lib.optionalAttrs (isLinux || isNixos) {
       "autostart/handy.desktop" = "handy/handy.desktop";
       "quickshell" = "quickshell";
+      "inir" = "inir";
     }
   );
 }
