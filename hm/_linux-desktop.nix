@@ -16,6 +16,7 @@
     ./linux/hermes.nix
     ./linux/niri.nix
     ./linux/obsidian.nix
+    ./linux/zathura.nix
     ./linux/zed.nix
     # ./linux/zen.nix
   ];
@@ -24,10 +25,10 @@
     packages = with pkgs; [
       # gui apps
       vicinae # raycast-like
-      zathura # pdf viewer
       obsidian
       vlc
       jellyfin-desktop
+      zulip
 
       # browser
       inputs.helium.packages.${machine.system}.default

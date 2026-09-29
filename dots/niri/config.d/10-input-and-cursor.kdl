@@ -21,8 +21,8 @@ input {
             // org.freedesktop.locale1 (controlled via `localectl`).
             layout "us"
 
-            options "caps:escape, altwin:swap_lalt_lwin"
-            // options "caps:escape"
+            // options "caps:escape, altwin:swap_lalt_lwin"
+            options "caps:escape"
         }
 
         // Enable numlock at login. Remove to leave it off.
@@ -54,7 +54,9 @@ input {
         accel-profile "flat"
 
         // Adjust pointer speed: -1.0 (slowest) … 0.0 (default) … 1.0 (fastest).
-        // accel-speed 0.0
+        accel-speed 1.0
+
+        scroll-factor 1.0
     }
 
     // Trackpoint (ThinkPad nub, etc.).

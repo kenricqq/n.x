@@ -203,6 +203,13 @@ in
         ];
       };
       opener = {
+        zathura = [
+          {
+            run = "zathura %s1";
+            orphan = true;
+            for = "linux";
+          }
+        ];
         bulk-rename = [
           {
             run = "hx \"$@\"";
@@ -227,6 +234,14 @@ in
       };
       open = {
         prepend_rules = [
+          {
+            mime = "application/pdf";
+            use = [
+              "zathura"
+              "open"
+              "reveal"
+            ];
+          }
           {
             mime = "image/*";
             use = [
