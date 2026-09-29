@@ -28,6 +28,8 @@
   security.polkit.enable = true;
   security.rtkit.enable = true;
 
+  hardware.i2c.enable = true; # for monitor input switching
+
   services = {
     desktopManager.gnome.enable = true;
     displayManager = {
@@ -72,6 +74,12 @@
   networking = {
     hostName = "nixos";
     networkmanager.enable = true;
+    interfaces.thunderbolt0.ipv4.addresses = [
+      {
+        address = machine.sync.tb;
+        prefixLength = 24;
+      }
+    ];
   };
 
   time.timeZone = "America/Los_Angeles";
@@ -96,6 +104,7 @@
     extraGroups = [
       "networkmanager"
       "wheel"
+      "i2c"
     ];
     packages = [ pkgs.tree ];
   };
@@ -113,6 +122,7 @@
       EDITOR = "hx";
     };
     systemPackages = with pkgs; [
+      ddcutil
       helix
       yazi
       ripgrep

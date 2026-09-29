@@ -29,7 +29,6 @@
       shellAliases = {
         btw = "echo i use nixos, btw";
         run = "sudo nixos-rebuild switch --flake ${lib.escapeShellArg "${paths.nixrt}#${machine.name}"}";
-        y = "yazi";
       };
     };
     # Laurentii's NixOS module owns nh and cleanup. Shared HM defaults stay

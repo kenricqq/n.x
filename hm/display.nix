@@ -24,7 +24,7 @@ let
       esac
 
       ${
-        if host.isLinux then
+        if host.isLinux || host.isNixos then
           ''
             exec ddcutil \
               -d "''${DDC_DISPLAY:-1}" \
@@ -74,7 +74,7 @@ let
 in
 {
   home.packages =
-    lib.optionals host.isLinux [
+    lib.optionals (host.isLinux || host.isNixos) [
       lgInput
     ]
     ++ lib.optionals host.isDarwin [
@@ -83,7 +83,7 @@ in
     ];
 
   programs.nushell.extraConfig =
-    lib.optionalString host.isLinux ''
+    lib.optionalString (host.isLinux || host.isNixos) ''
       def "nu-complete lg-input" [] { [ dp hdmi1 hdmi2 ] }
       extern "lg-input" [input: string@"nu-complete lg-input"]
     ''

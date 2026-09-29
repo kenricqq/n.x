@@ -31,6 +31,7 @@ test("Laurentii preserves its installation and uses the shared NixOS home", () =
       nixSubvolume = c.fileSystems."/nix".options;
       npu = c.hardware.cpu.intel.npu.enable;
       session = c.services.displayManager.defaultSession;
+      thunderbolt = (c.systemd.services.network-addresses-thunderbolt0 or {}).script or "";
       ly = c.services.displayManager.ly.enable;
       user = hm.home.username;
       repo = hm.home.sessionVariables.NX;
@@ -46,6 +47,11 @@ test("Laurentii preserves its installation and uses the shared NixOS home", () =
       helix = hm.programs.helix.enable;
       direnv = hm.programs.direnv.enable;
       ghostty = hm.programs.ghostty.enable;
+      lgInput = builtins.any (p: (p.pname or p.name or "") == "lg-input") hm.home.packages;
+      lgCompletion = builtins.match ".*nu-complete lg-input.*" hm.programs.nushell.extraConfig != null;
+      ddcutil = builtins.any (p: (p.pname or p.name or "") == "ddcutil") c.environment.systemPackages;
+      i2c = c.hardware.i2c.enable;
+      groups = c.users.users.kenrict.extraGroups;
     }`);
 
   expect(config.failures).toEqual([]);
@@ -58,6 +64,7 @@ test("Laurentii preserves its installation and uses the shared NixOS home", () =
   expect(config.nixSubvolume).toContain("subvol=nix");
   expect(config.npu).toBe(true);
   expect(config.session).toBe("niri");
+  expect(config.thunderbolt).toContain("10.10.10.4/24");
   expect(config.ly).toBe(true);
   expect(config.user).toBe("kenrict");
   expect(config.repo).toBe("/home/kenrict/laurentii");
@@ -71,4 +78,7 @@ test("Laurentii preserves its installation and uses the shared NixOS home", () =
   expect(config.homeCleanup).toBe(false);
   expect(config.nhFlake).toBe(`${config.repo}#laurentii`);
   expect(config.helix && config.direnv && config.ghostty).toBe(true);
+  expect(config.lgInput && config.lgCompletion).toBe(true);
+  expect(config.ddcutil && config.i2c).toBe(true);
+  expect(config.groups).toContain("i2c");
 }, 120_000);
