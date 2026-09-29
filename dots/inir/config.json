@@ -2120,10 +2120,9 @@
       "numbersFontFamily": "",
       "preset": "iris",
       "previews": true,
+      "saved": [],
       "scheme": "auto",
       "settingsLayout": "sidebar",
-      "saved": [],
-      "studioPreview": true,
       "surfaces": {
         "cards": {
           "design": "welded",
@@ -2302,8 +2301,8 @@
       "notchCurve": 100,
       "padding": 100,
       "pageWidth": 440,
-      "piecesSide": "end",
       "pieces": [],
+      "piecesSide": "end",
       "position": "top",
       "reserveSpace": true,
       "rightModules": [],
@@ -2737,10 +2736,10 @@
       "liveQuality": "best",
       "motion": true,
       "onlineSort": "top",
+      "pinned": [],
       "sort": "newest",
       "sources": ["wallhaven", "live"],
       "suggestive": false,
-      "pinned": [],
       "thumbnailSize": 228,
       "topRange": "1w",
       "width": 960
@@ -3395,9 +3394,9 @@
     "dismissedCommit": "",
     "enabled": true,
     "lastNotifiedAt": 0,
-    "remindDays": 3,
     "lastNotifiedCommit": "3b3e1a59",
-    "openTerminalOnUpdate": true
+    "openTerminalOnUpdate": true,
+    "remindDays": 3
   },
   "sidebar": {
     "ai": {

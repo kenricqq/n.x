@@ -124,6 +124,7 @@ let
       bunx impeccable@latest update --user
       bunx skills@latest update -g -y
 
+      pi update
       pi update --extensions
     '';
   };

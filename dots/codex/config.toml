@@ -2,11 +2,11 @@
 
 # Model and behavior
 model = "gpt-6-astra"
-model_reasoning_effort = "max"
+model_reasoning_effort = "xhigh"
 model_verbosity = "low"
 default_permissions = ":workspace"
 personality = "pragmatic"
-service_tier = "fast"
+service_tier = "default"
 approvals_reviewer = "auto_review"
 web_search = "live"
 project_root_markers = [".git", ".jj"]
@@ -33,15 +33,9 @@ max_bytes = 5242880 # 5 MiB of CLI input history
 
 [tui]
 session_picker_view = "dense"
-status_line = [
-  "model-with-reasoning",
-  "current-dir",
-  "branch-changes",
-  "context-used",
-  "weekly-limit",
-  "used-tokens",
-]
+status_line = ["model-with-reasoning", "current-dir", "branch-changes", "context-used", "weekly-limit", "fast-mode", "thread-title"]
 screen_reader_detection_done = true
+status_line_use_colors = true
 
 [tui.keymap.chat]
 decrease_reasoning_effort = "shift-down"
@@ -49,7 +43,7 @@ increase_reasoning_effort = "shift-up"
 
 [tui.model_availability_nux]
 gpt-6-astra = 4
-"gpt-6.1-sol" = 1
+"gpt-6.1-sol" = 4
 
 # Desktop preferences
 [desktop]
@@ -59,6 +53,8 @@ keepRemoteControlAwakeWhilePluggedIn = true
 git-commit-instructions = "tag it with `<tag>: <commit message>`"
 git-pr-instructions = "Write summary of changes. Cite specific files."
 notifications-turn-mode = "always"
+enabled-reasoning-efforts = ["low", "medium", "high", "xhigh", "ultra", "persistent", "max"]
+show-context-window-usage = true
 
 # Existing trust decisions for this Linux machine
 [projects]
@@ -98,10 +94,15 @@ trust_level = "trusted"
 [projects."/home/kenrict/Sync"]
 trust_level = "trusted"
 
+[projects."/home/kenrict/Projects/Sandbox/house-tour"]
+trust_level = "trusted"
+
+[projects."/home/kenrict/Projects/eido"]
+trust_level = "trusted"
+
 # Installed plugin registrations (distinct from the default-on plugins feature)
 [plugins]
 "codex-app-tools@openai-bundled" = { enabled = true }
-"sites@openai-bundled" = { enabled = true }
 "browser@openai-bundled" = { enabled = true }
 "visualize@openai-bundled" = { enabled = true }
 
@@ -133,26 +134,26 @@ source = "/Users/kenrictee/.cache/codex-runtimes/codex-primary-runtime/plugins/o
 
 [mcp_servers.node_repl]
 args = []
-command = "/nix/store/76skdsmgdl2f76vwb8ppfykc5279khx8-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.908.40834/opt/codex-desktop/resources/cua_node/bin/node_repl"
+command = "/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/resources/cua_node/bin/node_repl"
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
-NODE_REPL_NODE_MODULE_DIRS = "/nix/store/76skdsmgdl2f76vwb8ppfykc5279khx8-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.908.40834/opt/codex-desktop/resources/cua_node/lib/node_modules"
-NODE_REPL_NODE_PATH = "/nix/store/76skdsmgdl2f76vwb8ppfykc5279khx8-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.908.40834/opt/codex-desktop/resources/cua_node/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/home/kenrict/.codex:/nix/store/76skdsmgdl2f76vwb8ppfykc5279khx8-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.908.40834/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_MODULE_DIRS = "/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/kenrict/.codex:/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/resources/cua_node/lib/node_modules"
 CODEX_HOME = "/home/kenrict/.codex"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 BROWSER_USE_TINYSKY_ENABLED = "0"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.908.40834"
-NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/kenrict/.codex/plugins/cache/openai-bundled/browser/26.908.40834/scripts/browser-service.mjs"}'
-CODEX_CLI_PATH = "/nix/store/76skdsmgdl2f76vwb8ppfykc5279khx8-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.908.40834/opt/codex-desktop/resources/codex"
+BROWSER_USE_CODEX_APP_VERSION = "26.917.71314"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/kenrict/.codex/plugins/cache/openai-bundled/browser/26.917.71314/scripts/browser-service.mjs"}'
+CODEX_CLI_PATH = "/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/resources/codex"
 
 [mcp_servers.cua_repl]
-command = "/nix/store/76skdsmgdl2f76vwb8ppfykc5279khx8-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.908.40834/opt/codex-desktop/ChatGPT"
+command = "/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/ChatGPT"
 enabled = false
 
 [hooks.state]

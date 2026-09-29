@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.85.1",
+  "lastChangelogVersion": "0.99.2",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-6-astra",
   "defaultThinkingLevel": "high",
@@ -11,7 +11,9 @@
   "packages": [
     {
       "source": "git:github.com/tmustier/pi-extensions",
-      "extensions": ["files-widget/index.ts"]
+      "extensions": [
+        "files-widget/index.ts"
+      ]
     },
     "git:github.com/nicobailon/visual-explainer",
     "git:github.com/nicobailon/pi-intercom",
@@ -21,7 +23,9 @@
     "git:git@github.com:nicobailon/pi-subagents.git",
     "npm:@juicesharp/rpiv-todo"
   ],
-  "npmCommand": ["bun"],
+  "npmCommand": [
+    "bun"
+  ],
   "compaction": {
     "enabled": true
   },

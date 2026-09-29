@@ -106,7 +106,10 @@ in
             "desc" = "Search file by content (rga)";
           }
           {
-            on = "T";
+            on = [
+              "g"
+              "p"
+            ];
             run = "plugin toggle-pane max-preview";
             desc = "Maximize or restore the preview pane";
           }
