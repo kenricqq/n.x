@@ -816,6 +816,13 @@ Singleton {
         },
         {
             pageIndex: 2, pageName: root.pages[2].name,
+            section: Translation.tr("Modules"),
+            label: Translation.tr("Music width (px)"),
+            description: Translation.tr("How wide the song title gets. The window title gives way; a crowded bar still shrinks music first."),
+            keywords: ["music", "media", "song", "title", "width", "cut", "cut off", "truncated", "window title", "active window", "bar"]
+        },
+        {
+            pageIndex: 2, pageName: root.pages[2].name,
             section: Translation.tr("Bar module layout"),
             label: Translation.tr("Bar module layout"),
             description: Translation.tr("Reorder modules in horizontal Stock, Islands, Scenic and Frame bars"),
@@ -1050,6 +1057,13 @@ Singleton {
             label: Translation.tr("Overlay opacity"),
             description: Translation.tr("Background opacity of overlay panels"),
             keywords: ["overlay", "opacity", "background", "transparent", "panel"]
+        },
+        {
+            pageIndex: 5, pageName: root.pages[5].name,
+            section: Translation.tr("Alt+Tab"),
+            label: Translation.tr("Alt+Tab opens"),
+            description: Translation.tr("Niri's Recent Windows or the iNiR switcher"),
+            keywords: ["alt", "tab", "alt+tab", "switcher", "window", "windows", "recent", "niri", "inir", "switch", "cycle", "keybind", "shortcut"]
         },
         {
             pageIndex: 5, pageName: root.pages[5].name,
@@ -1330,6 +1344,13 @@ Singleton {
             label: Translation.tr("Media OSD"),
             description: Translation.tr("Control explicit media feedback and Pill track announcements; automatic changes stay hidden during games"),
             keywords: ["osd", "media", "music", "player", "shortcuts", "pill", "track", "fullscreen", "game", "automatic", "skip"]
+        },
+        {
+            pageIndex: 6, pageName: root.pages[6].name,
+            section: Translation.tr("On-screen display"),
+            label: Translation.tr("Connection notices"),
+            description: Translation.tr("A short notice when something is plugged in, connected, unplugged or lost"),
+            keywords: ["connection", "connected", "disconnected", "plug", "unplug", "device", "toast", "popup", "notice", "cable", "wifi", "ethernet", "internet", "offline", "bluetooth", "headphones", "charger", "charging", "battery", "sound output", "speaker", "monitor", "display", "usb", "drive", "pendrive", "mouse", "keyboard", "controller", "gamepad", "webcam", "camera", "phone", "sd", "memory card"]
         },
         {
             pageIndex: 5, pageName: root.pages[5].name,
@@ -1830,6 +1851,13 @@ Singleton {
             label: Translation.tr("Clip windows"),
             description: Translation.tr("Clip windows to their workspace bounds"),
             keywords: ["clip", "window", "workspace", "bounds", "hotspot"]
+        },
+        {
+            pageIndex: 12, pageName: root.pages[12].name,
+            section: Translation.tr("Animations"),
+            label: Translation.tr("Style"),
+            description: Translation.tr("Presets for how windows open, close and slide"),
+            keywords: ["animation", "preset", "style", "motion", "bounce", "bouncy", "snappy", "fast", "slow", "smooth", "material", "open", "close", "window", "niri"]
         },
         {
             pageIndex: 12, pageName: root.pages[12].name,

@@ -69,13 +69,12 @@ AbstractBackgroundWidget {
     // ── Popover: mode + resource toggles ──
     editPopoverContent: Component {
         ColumnLayout {
-            spacing: 6
-            GridLayout {
-                columns: 2
-                columnSpacing: 4
-                rowSpacing: 4
-                Layout.alignment: Qt.AlignHCenter
-                Repeater {
+            spacing: 14
+
+            WidgetQuickSection {
+                title: Translation.tr("Style")
+                WidgetQuickChoices {
+                    current: root.displayMode
                     model: [
                         { label: Translation.tr("Bars"), icon: "bar_chart", value: "bars" },
                         { label: Translation.tr("Graph"), icon: "show_chart", value: "graph" },
@@ -84,50 +83,47 @@ AbstractBackgroundWidget {
                         { label: Translation.tr("Tiles"), icon: "grid_view", value: "tiles" },
                         { label: Translation.tr("Instrument"), icon: "equalizer", value: "instrument" }
                     ]
-                    WidgetChoiceButton {
-                        required property var modelData
-                        Layout.fillWidth: true
-                        leftmost: true; rightmost: true
-                        buttonIcon: modelData.icon
-                        buttonText: modelData.label
-                        toggled: root.displayMode === modelData.value
-                        onClicked: root._setOutputValue("displayMode", modelData.value)
-                    }
+                    onPicked: value => root._setOutputValue("displayMode", value)
                 }
             }
-            GridLayout {
-                columns: 3
-                columnSpacing: 4
-                rowSpacing: 4
-                Layout.alignment: Qt.AlignHCenter
-                Repeater {
-                    model: [
-                        { label: Translation.tr("CPU"), icon: "memory", key: "showCpu", fallback: true },
-                        { label: Translation.tr("RAM"), icon: "storage", key: "showMemory", fallback: true },
-                        { label: Translation.tr("GPU"), icon: "developer_board", key: "showGpu", fallback: true },
-                        { label: Translation.tr("CPU temp"), icon: "thermostat", key: "showTemp", fallback: false },
-                        { label: Translation.tr("GPU temp"), icon: "device_thermostat", key: "showGpuTemp", fallback: false },
-                        { label: Translation.tr("Disk"), icon: "hard_drive", key: "showDisk", fallback: false }
-                    ]
-                    WidgetChoiceButton {
-                        required property var modelData
-                        Layout.fillWidth: true
-                        leftmost: true; rightmost: true
-                        buttonIcon: modelData.icon
-                        buttonText: modelData.label
-                        toggled: Boolean(root._readConfigKey(modelData.key) ?? modelData.fallback)
-                        enabled: !toggled || root._resourceModel.length > 1
-                        onClicked: root._setOutputValue(modelData.key, !toggled)
+
+            WidgetQuickSection {
+                title: Translation.tr("Metrics")
+                GridLayout {
+                    Layout.fillWidth: true
+                    columns: 2
+                    columnSpacing: 4
+                    rowSpacing: 4
+                    Repeater {
+                        model: [
+                            { label: Translation.tr("CPU"), icon: "memory", key: "showCpu", fallback: true },
+                            { label: Translation.tr("RAM"), icon: "storage", key: "showMemory", fallback: true },
+                            { label: Translation.tr("GPU"), icon: "developer_board", key: "showGpu", fallback: true },
+                            { label: Translation.tr("Disk"), icon: "hard_drive", key: "showDisk", fallback: false },
+                            { label: Translation.tr("CPU temp"), icon: "thermostat", key: "showTemp", fallback: false },
+                            { label: Translation.tr("GPU temp"), icon: "device_thermostat", key: "showGpuTemp", fallback: false }
+                        ]
+                        WidgetQuickToggle {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 1
+                            Layout.maximumWidth: Number.POSITIVE_INFINITY
+                            implicitWidth: 150
+                            iconName: modelData.icon
+                            label: modelData.label
+                            checked: Boolean(root._readConfigKey(modelData.key) ?? modelData.fallback)
+                            enabled: !checked || root._resourceModel.length > 1
+                            onToggled: root._setOutputValue(modelData.key, !checked)
+                        }
                     }
                 }
-            }
-            WidgetChoiceButton {
-                Layout.alignment: Qt.AlignHCenter
-                leftmost: true; rightmost: true
-                buttonIcon: "label"
-                buttonText: Translation.tr("Labels")
-                toggled: root.showLabels
-                onClicked: root._setOutputValue("showLabels", !root.showLabels)
+                WidgetQuickToggle {
+                    Layout.fillWidth: true
+                    iconName: "label"
+                    label: Translation.tr("Labels")
+                    checked: root.showLabels
+                    onToggled: root._setOutputValue("showLabels", !root.showLabels)
+                }
             }
         }
     }
@@ -161,15 +157,33 @@ AbstractBackgroundWidget {
         return items;
     }
 
+    // What the widget shows: the live readings while the desktop is seen, the last ones behind windows.
+    // Another consumer (ii's bar) can keep ResourceUsage polling; a covered widget must not redraw for it.
+    function _readingNow(): var {
+        return {
+            cpu: ResourceUsage.cpuUsage, mem: ResourceUsage.memoryUsedPercentage, gpu: ResourceUsage.gpuUsage,
+            cpuTemp: ResourceUsage.cpuTemp, gpuTemp: ResourceUsage.gpuTemp, gpuTempPercentage: ResourceUsage.gpuTempPercentage,
+            disk: ResourceUsage.diskUsedPercentage, cpuHistory: ResourceUsage.cpuUsageHistory,
+            memHistory: ResourceUsage.memoryUsageHistory, gpuHistory: ResourceUsage.gpuUsageHistory,
+            gpuTempHistory: ResourceUsage.gpuTempHistory
+        };
+    }
+    property var reading: ({})
+    Binding on reading {
+        when: root.motionActive
+        value: root._readingNow()
+        restoreMode: Binding.RestoreNone
+    }
+
     // Live value accessor — delegates use this to read current value
     function _getValue(key: string): real {
         switch (key) {
-            case "cpu": return ResourceUsage.cpuUsage;
-            case "mem": return ResourceUsage.memoryUsedPercentage;
-            case "gpu": return ResourceUsage.gpuUsage;
-            case "temp": return Math.min(ResourceUsage.cpuTemp / 100, 1.0);
-            case "gpuTemp": return ResourceUsage.gpuTempPercentage;
-            case "disk": return ResourceUsage.diskUsedPercentage;
+            case "cpu": return root.reading.cpu ?? 0;
+            case "mem": return root.reading.mem ?? 0;
+            case "gpu": return root.reading.gpu ?? 0;
+            case "temp": return Math.min((root.reading.cpuTemp ?? 0) / 100, 1.0);
+            case "gpuTemp": return root.reading.gpuTempPercentage ?? 0;
+            case "disk": return root.reading.disk ?? 0;
             default: return 0;
         }
     }
@@ -187,8 +201,8 @@ AbstractBackgroundWidget {
     }
 
     function _getDisplayText(key: string): string {
-        if (key === "temp") return ResourceUsage.cpuTemp + "°C";
-        if (key === "gpuTemp") return ResourceUsage.gpuTemp + "°C";
+        if (key === "temp") return (root.reading.cpuTemp ?? 0) + "°C";
+        if (key === "gpuTemp") return (root.reading.gpuTemp ?? 0) + "°C";
         return Math.round(root._getValue(key) * 100) + "%";
     }
 
@@ -211,7 +225,9 @@ AbstractBackgroundWidget {
     function _tileRole(key: string): var {
         const role = key === "mem" ? root.widgetSecondaryRole
             : key === "gpu" ? root.widgetTertiaryRole
-            : key === "temp" || key === "gpuTemp" ? root.widgetSignalRole
+            // Heat is only a signal when it is one: a cool reading in the alarm colour reads as a fault.
+            : key === "temp" || key === "gpuTemp" ? (root._metricSeverity(key) >= 2 ? root.widgetSignalRole
+                : root._metricSeverity(key) === 1 ? "warning" : root.widgetSurfaceRole)
             : key === "disk" ? root.widgetSurfaceRole
             : root.widgetPrimaryRole;
         const set = root.widgetSemanticSet(role);
@@ -258,10 +274,8 @@ AbstractBackgroundWidget {
     // backdrop polarity; do not saturate or re-hue either token. This keeps the
     // labels consistent with the shell's text hierarchy while the metric arc owns
     // the accent color.
-    readonly property color _metricLightInk: Appearance.m3colors.darkmode
-        ? Appearance.colors.colOnLayer0 : Appearance.m3colors.m3inverseOnSurface
-    readonly property color _metricDarkInk: Appearance.m3colors.darkmode
-        ? Appearance.m3colors.m3inverseOnSurface : Appearance.colors.colOnLayer0
+    readonly property color _metricLightInk: root._inkLight
+    readonly property color _metricDarkInk: root._inkDark
     readonly property color _metricText: root.forceLightInk ? root._metricLightInk
         : root.forceDarkInk ? root._metricDarkInk
         : root.widgetHasSurface
@@ -321,10 +335,13 @@ AbstractBackgroundWidget {
 
     // Animation duration for smooth value transitions
     readonly property int _animDuration: Appearance.animation.elementMove.duration
+    // Values tick every second: easing them behind windows repaints the desktop for nothing.
+    readonly property bool animatesValues: Appearance.animationsEnabled && root.motionActive
 
+    // Readings behind windows are never seen and each one redraws the desktop: polling follows motionActive.
     property bool _holdingResourceUsage: false
     function _syncResourceUsage(): void {
-        const shouldHold = root._active && root.visible && root.powerActive;
+        const shouldHold = root._active && root.visible && root.motionActive;
         if (shouldHold && !root._holdingResourceUsage) {
             root._holdingResourceUsage = true;
             ResourceUsage.keepAlive();
@@ -335,8 +352,8 @@ AbstractBackgroundWidget {
     }
     on_ActiveChanged: root._syncResourceUsage()
     onVisibleChanged: root._syncResourceUsage()
-    onPowerActiveChanged: root._syncResourceUsage()
-    Component.onCompleted: root._syncResourceUsage()
+    onMotionActiveChanged: root._syncResourceUsage()
+    Component.onCompleted: { root.reading = root._readingNow(); root._syncResourceUsage(); }
     Component.onDestruction: if (root._holdingResourceUsage) {
         root._holdingResourceUsage = false;
         ResourceUsage.releaseKeepAlive();
@@ -526,7 +543,7 @@ AbstractBackgroundWidget {
                         opacity: root.fillOpacity
 
                         Behavior on width {
-                            enabled: Appearance.animationsEnabled
+                            enabled: root.animatesValues
                             NumberAnimation { duration: root._animDuration; easing.type: Easing.OutCubic }
                         }
                     }
@@ -623,7 +640,7 @@ AbstractBackgroundWidget {
         Graph {
             anchors.fill: parent
             anchors.topMargin: parent._legendH
-            values: root.showCpu ? ResourceUsage.cpuUsageHistory : []
+            values: root.showCpu ? (root.reading.cpuHistory ?? []) : []
             color: root._graphColor("cpu")
             fillOpacity: root.graphFillOpacity + 0.05
             alignment: Graph.Alignment.Right
@@ -633,7 +650,7 @@ AbstractBackgroundWidget {
         Graph {
             anchors.fill: parent
             anchors.topMargin: parent._legendH
-            values: root.showMemory ? ResourceUsage.memoryUsageHistory : []
+            values: root.showMemory ? (root.reading.memHistory ?? []) : []
             color: root._graphColor("mem")
             fillOpacity: root.graphFillOpacity
             alignment: Graph.Alignment.Right
@@ -643,7 +660,7 @@ AbstractBackgroundWidget {
         Graph {
             anchors.fill: parent
             anchors.topMargin: parent._legendH
-            values: root.showGpuTemp ? ResourceUsage.gpuTempHistory : []
+            values: root.showGpuTemp ? (root.reading.gpuTempHistory ?? []) : []
             color: root._graphColor("gpuTemp")
             fillOpacity: root.graphFillOpacity - 0.05
             alignment: Graph.Alignment.Right
@@ -653,7 +670,7 @@ AbstractBackgroundWidget {
         Graph {
             anchors.fill: parent
             anchors.topMargin: parent._legendH
-            values: root.showGpu ? ResourceUsage.gpuUsageHistory : []
+            values: root.showGpu ? (root.reading.gpuHistory ?? []) : []
             color: root._graphColor("gpu")
             fillOpacity: root.graphFillOpacity - 0.05
             alignment: Graph.Alignment.Right
@@ -693,7 +710,7 @@ AbstractBackgroundWidget {
                 // Smoothly interpolated value for display
                 property real _animatedValue: _liveValue
                 Behavior on _animatedValue {
-                    enabled: Appearance.animationsEnabled
+                    enabled: root.animatesValues
                     NumberAnimation { duration: root._animDuration; easing.type: Easing.OutCubic }
                 }
 
@@ -719,8 +736,8 @@ AbstractBackgroundWidget {
                     // Percentage/value inside the ring
                     StyledText {
                         anchors.centerIn: parent
-                        text: ringCol.modelData.key === "temp" ? ResourceUsage.cpuTemp + "°"
-                            : ringCol.modelData.key === "gpuTemp" ? ResourceUsage.gpuTemp + "°"
+                        text: ringCol.modelData.key === "temp" ? (root.reading.cpuTemp ?? 0) + "°"
+                            : ringCol.modelData.key === "gpuTemp" ? (root.reading.gpuTemp ?? 0) + "°"
                             : Math.round(ringCol._animatedValue * 100)
                         color: ringCol._liveColor
                         font {

@@ -196,13 +196,35 @@ Scope {
             root.toggle()
         }
         function random(): void { Wallpapers.randomFromCurrentFolder() }
+        // A new wallpaper every few minutes: `on`, `off`, a number of minutes (turns it on) or `status`.
+        function shuffle(value: string): string {
+            const minutes = parseInt(value)
+            if (value === "on" || value === "off")
+                Config.setNestedValue("background.autoWallpaper.enable", value === "on")
+            else if (minutes >= 1 && minutes <= 1440)
+                Config.setNestedValues({ "background.autoWallpaper.enable": true, "background.autoWallpaper.intervalMinutes": minutes })
+            else if (value !== "status" && value !== "")
+                return "Use on, off, a number of minutes (1-1440) or status"
+            const enabled = value === "on" || minutes >= 1 || (value !== "off" && Wallpapers.autoWallpaperEnabled)
+            const every = minutes >= 1 ? minutes : Wallpapers.autoWallpaperInterval
+            return enabled ? "on, every " + every + " min" : "off"
+        }
         function set(path: string): void { Wallpapers.select(path) }
+        function preview(path: string): void { Wallpapers.previewWallpaper(path, "") }
+        function cancelPreview(): void { Wallpapers.cancelWallpaperPreview() }
         function browse(source: string, query: string): void {
-            GlobalStates.wallpaperSelectorSource = ["library", "wallhaven", "live"].includes(source) ? source : "library"
+            GlobalStates.wallpaperSelectorSource = ["library", "wallhaven", "konachan", "yandere", "live"].includes(source) ? source : "library"
             GlobalStates.wallpaperSelectorQuery = query === "-" ? "" : query
             if (GlobalStates.wallpaperSelectorOpen) return
             if (!GlobalStates.wallpaperLauncherOpen && !GlobalStates.coverflowSelectorOpen)
                 root.toggle()
+        }
+        function kind(name: string): string {
+            if (!["all", "still", "live", "gif"].includes(name))
+                return "Unknown kind: all, still, live or gif"
+            GlobalStates.wallpaperSelectorKind = ""
+            GlobalStates.wallpaperSelectorKind = name
+            return name
         }
         function status(): string {
             return JSON.stringify({
@@ -214,7 +236,8 @@ Scope {
                     || (Config.options?.wallpaperSelector?.targetMonitor ?? ""),
                 focusedMonitor: root.focusedMonitorName,
                 selectionTarget: Wallpapers.currentSelectionTarget(),
-                multiMonitor: Config.options?.background?.multiMonitor?.enable ?? false
+                multiMonitor: Config.options?.background?.multiMonitor?.enable ?? false,
+                kind: GlobalStates.wallpaperSelectorKindActive
             })
         }
     }

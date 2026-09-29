@@ -19,6 +19,13 @@ ContentPage {
     settingsPageName: Translation.tr("Widgets")
 
     property bool isIiActive: ["ii", "iris"].includes(Config.options?.panelFamily ?? "ii")
+    // Under iRiS, widget design, material and colour are iRiS's own (iRiS Settings › Desktop › Widgets);
+    // Material's rows for them would write keys iRiS does not read.
+    readonly property bool irisActive: (Config.options?.panelFamily ?? "ii") === "iris"
+    function openIrisWidgets(): void {
+        const page = SettingsPageRegistry.pages.findIndex(entry => entry.key === "iris")
+        if (page >= 0) GlobalStates.openSettingsPage(page, "desktop/widgets")
+    }
     property int _customMediaFolderCount: 0
     property int _customMediaFolderImageCount: 0
     property int _customMediaFolderGifCount: 0
@@ -1667,6 +1674,64 @@ ContentPage {
 
         SettingsGroup {
             StyledText {
+                visible: root.irisActive
+                Layout.fillWidth: true
+                text: Translation.tr("iRiS sets the design, material and colours of every widget in its own Settings. The options on each widget below apply while it wears the Material, iNstrument or Readout design.")
+                color: Appearance.colors.colSubtext
+                font.pixelSize: Appearance.font.pixelSize.smaller
+                wrapMode: Text.WordWrap
+            }
+            SelectionGroupButton {
+                visible: root.irisActive
+                Layout.fillWidth: false
+                leftmost: true; rightmost: true
+                buttonIcon: "widgets"
+                buttonText: Translation.tr("Open iRiS widget settings")
+                onClicked: root.openIrisWidgets()
+            }
+            WidgetSettingRow {
+                visible: !root.irisActive
+                label: Translation.tr("Global widget design")
+                icon: "widgets"
+                trailing: false
+                ConfigSelectionArray {
+                    currentValue: DesktopWidgetDesign.shared
+                    options: DesktopWidgetDesign.choices.map(choice => ({
+                        displayName: Translation.tr(choice.label), icon: choice.icon, value: choice.value
+                    }))
+                    onSelected: newValue => DesktopWidgetDesign.apply(newValue)
+                }
+            }
+            StyledText {
+                visible: !root.irisActive
+                Layout.fillWidth: true
+                text: Translation.tr("One look on every widget. Individual keeps each widget's own style.")
+                color: Appearance.colors.colSubtext
+                font.pixelSize: Appearance.font.pixelSize.smaller
+                wrapMode: Text.WordWrap
+            }
+            RowLayout {
+                visible: !root.irisActive && (DesktopWidgetDesign.exceptionCount > 0 || DesktopWidgetDesign.canUndo)
+                spacing: 6
+                SelectionGroupButton {
+                    visible: DesktopWidgetDesign.exceptionCount > 0
+                    Layout.fillWidth: false
+                    leftmost: true; rightmost: true
+                    buttonIcon: "select_all"
+                    buttonText: Translation.tr("Match every widget")
+                    onClicked: DesktopWidgetDesign.apply(DesktopWidgetDesign.shared)
+                }
+                SelectionGroupButton {
+                    visible: DesktopWidgetDesign.canUndo
+                    Layout.fillWidth: false
+                    leftmost: true; rightmost: true
+                    buttonIcon: "undo"
+                    buttonText: Translation.tr("Undo design change")
+                    onClicked: DesktopWidgetDesign.undo()
+                }
+            }
+            StyledText {
+                visible: !root.irisActive
                 Layout.fillWidth: true
                 text: Translation.tr("Apply one wallpaper-generated color preset to every built-in desktop widget. You can still tune any widget individually below.")
                 color: Appearance.colors.colSubtext
@@ -1675,20 +1740,22 @@ ContentPage {
             }
 
             SettingsSwitch {
+                visible: !root.irisActive
                 Layout.fillWidth: true
                 buttonIcon: "wallpaper"
-                text: Translation.tr("Adapt colors to widget position")
+                text: Translation.tr("Ink follows the wallpaper")
                 autoToggle: false
                 checked: Config.getNestedValue(
-                    "background.widgets.adaptColorsToWallpaperPosition", false)
+                    "background.widgets.adaptColorsToWallpaperPosition", true)
                 onToggledByUser: checked => Config.setNestedValue(
                     "background.widgets.adaptColorsToWallpaperPosition", checked)
                 StyledToolTip {
-                    text: Translation.tr("Sample the wallpaper behind each widget to adjust readable ink and semantic foreground choices. Off keeps colors stable when widgets move.")
+                    text: Translation.tr("Each widget reads the wallpaper under it: dark ink and deeper accents where it is light, light ink where it is dark. Off keeps the theme's ink everywhere.")
                 }
             }
 
             WidgetPalettePresetPicker {
+                visible: !root.irisActive
                 configPath: ""
                 applyGlobally: true
             }
@@ -1982,14 +2049,14 @@ ContentPage {
                         text: Translation.tr("Adapt digital clock locally")
                         autoToggle: false
                         enabled: Config.getNestedValue(
-                            "background.widgets.adaptColorsToWallpaperPosition", false)
+                            "background.widgets.adaptColorsToWallpaperPosition", true)
                         opacity: enabled ? 1 : 0.45
                         checked: Config.getNestedValue("background.widgets.clock.digital.adaptToWallpaper", true)
                         onToggledByUser: checked => Config.setNestedValue("background.widgets.clock.digital.adaptToWallpaper", checked)
                         StyledToolTip {
                             text: enabled
                                 ? Translation.tr("Let the digital clock use the wallpaper sample behind it.")
-                                : Translation.tr("Enable Adapt colors to widget position in Widget Colors first.")
+                                : Translation.tr("Turn on Ink follows the wallpaper in Widget Colors first.")
                         }
                     }
                 }

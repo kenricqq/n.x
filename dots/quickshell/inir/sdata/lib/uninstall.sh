@@ -51,7 +51,7 @@ declare -A SHARED_PATHS=(
     ["${XDG_CONFIG_HOME}/dolphinrc"]="Dolphin file manager config|dolphin|optional"
     ["${XDG_CONFIG_HOME}/gtk-3.0/gtk.css"]="GTK3 custom styles||optional"
     ["${XDG_CONFIG_HOME}/gtk-4.0/gtk.css"]="GTK4 custom styles||optional"
-    ["${XDG_CONFIG_HOME}/fontconfig"]="Font configuration||essential"
+    ["${XDG_CONFIG_HOME}/fontconfig/conf.d/90-inir-shell.conf"]="iNiR shell font rendering||inir_default"
     ["${XDG_DATA_HOME:-$HOME/.local/share}/color-schemes/Darkly.colors"]="Darkly color scheme||inir_default"
 )
 
@@ -792,6 +792,10 @@ uninstall_show_manual_steps() {
     echo ""
     echo -e "  ${STY_YELLOW}•${STY_RST} SDDM theme drop-in: /etc/sddm.conf.d/99-inir-theme.conf"
     echo -e "    ${STY_FAINT}Used by: sets Current=ii-pixel (legacy path: /etc/sddm.conf.d/inir-theme.conf)${STY_RST}"
+    if [[ -f /etc/sddm.conf.d/98-inir-greeter.conf ]]; then
+        echo -e "  ${STY_YELLOW}•${STY_RST} SDDM greeter drop-in: /etc/sddm.conf.d/98-inir-greeter.conf"
+        echo -e "    ${STY_FAINT}Used by: login screen on Wayland with Niri (/usr/share/inir/sddm/niri-greeter.kdl)${STY_RST}"
+    fi
     echo ""
 
     if $ask && tui_confirm "Show commands to revert these changes?" "no"; then
@@ -812,6 +816,10 @@ uninstall_show_manual_steps() {
         echo ""
         echo -e "  ${STY_CYAN}# Remove SDDM theme config drop-in${STY_RST}"
         echo -e "  sudo rm -f /etc/sddm.conf.d/99-inir-theme.conf /etc/sddm.conf.d/inir-theme.conf"
+        if [[ -f /etc/sddm.conf.d/98-inir-greeter.conf ]]; then
+            echo -e "  ${STY_CYAN}# Put the login screen back on the distribution's display server${STY_RST}"
+            echo -e "  sudo rm -f /etc/sddm.conf.d/98-inir-greeter.conf && sudo rm -rf /usr/share/inir/sddm"
+        fi
         echo ""
     fi
 }

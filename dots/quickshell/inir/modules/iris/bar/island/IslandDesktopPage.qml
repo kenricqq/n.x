@@ -75,7 +75,7 @@ ColumnLayout {
             scale: block.carried ? 1.02 : 1
             Behavior on opacity { NumberAnimation { duration: IrisStyle.duration(160); easing.type: IrisStyle.feedbackEasing } }
             Behavior on scale { NumberAnimation { duration: IrisStyle.duration(140); easing.type: IrisStyle.feedbackEasing } }
-            Behavior on color { ColorAnimation { duration: IrisStyle.duration(120) } }
+            Behavior on color { ColorAnimation { duration: IrisStyle.duration(120); easing.type: IrisStyle.feedbackEasing } }
         }
         property real inset: page.island.studio ? Math.round(10 * IrisStyle.density) : 0
         Behavior on inset { NumberAnimation { duration: IrisStyle.moveDuration; easing.type: Easing.BezierSpline; easing.bezierCurve: IrisStyle.moveCurve } }
@@ -101,7 +101,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 text: page.island.desktopBlockLabel(block.kind) + " · " + Translation.tr("nothing to show right now")
                 color: IrisStyle.textTertiary
-                font.pixelSize: 12 * IrisStyle.typeScale
+                font.pixelSize: IrisStyle.typeMeta
                 elide: Text.ElideRight
             }
         }
@@ -126,7 +126,7 @@ ColumnLayout {
                 width: Math.round(9 * IrisStyle.density)
                 height: Math.max(2, Math.round(2 * IrisStyle.density))
                 radius: height / 2
-                color: IrisStyle.onDanger
+                color: IrisStyle.inkOnDanger
             }
         }
         Item {
@@ -192,6 +192,14 @@ ColumnLayout {
     readonly property string bannerSource: String(page.island.options?.desktopBanner ?? "wallpaper") === "wallpaper"
         ? WallpaperListener.wallpaperUrlForScreen(page.island.targetScreen) : ""
     readonly property bool showBanner: page.bannerSource.length > 0
+    // Settings › Island › Desktop page: 100 / 100 / 0 is the header as designed.
+    function bannerPart(key: string, fallback: int): real {
+        return Math.max(0, Math.min(100, Number(page.island.options?.[key] ?? fallback))) / 100
+    }
+    readonly property real bannerFade: page.bannerPart("desktopBannerFade", 100)
+    readonly property real bannerTop: page.bannerPart("desktopBannerTop", 100)
+    readonly property real bannerVeil: page.bannerPart("desktopBannerVeil", 100)
+    readonly property real bannerBlur: page.bannerPart("desktopBannerBlur", 0)
     function blockAvailable(kind: string): bool {
         if (kind === "context") return page.focusedWindow !== null || page.workspaces.length > 1
         if (kind === "modules") return page.customModules.length > 0
@@ -227,93 +235,152 @@ ColumnLayout {
                 maskSource: heroFade
                 maskThresholdMin: 0.5
                 maskSpreadAtMin: 1
+                blurEnabled: page.bannerBlur > 0
+                blur: page.bannerBlur
+                blurMax: 48
             }
-            opacity: heroImage.status === Image.Ready ? 1 : 0
+            opacity: heroImage.ready ? 1 : 0
             x: -page.island.padding
             y: -heroBleed.topBleed
             width: hero.width + page.island.padding * 2
             height: hero.height + heroBleed.topBleed + Math.round(12 * IrisStyle.density)
 
-            Image {
-                id: heroImage
+            // On a side edge the join is beside the header: the same treatment turned sideways (sideJoin).
+            Item {
+                id: heroContent
                 anchors.fill: parent
-                source: page.showBanner ? page.bannerSource : ""
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: page.island.heroPreloadItem.status !== Image.Ready
-                cache: true
-                smooth: true
-                sourceSize.width: page.island.heroDecodeWidth
-            }
-            Rectangle {
-                id: heroScrim
-                anchors.fill: parent
-                readonly property bool hangs: (page.island.notch && !page.island.bottomEdge) || heroBleed.navBand > 0
-                readonly property real solidTop: (page.island.notch && !page.island.bottomEdge ? page.island.chassisItem.topInset : 0)
-                    + (heroBleed.navBand > 0 ? page.island.padding + heroBleed.navBand * 0.5 : 0)
-                readonly property real edge: hangs ? solidTop / Math.max(1, height) : 0
-                readonly property real topFade: hangs ? (solidTop + 30 * IrisStyle.density + heroBleed.navBand * 0.5) / Math.max(1, height) : 0.001
-                gradient: Gradient {
-                    GradientStop { position: 0; color: ColorUtils.applyAlpha(IrisStyle.bodyScrim, heroScrim.hangs && !IrisStyle.glassy ? 1 : 0.12) } // iris-literal: hero fade ramp
-                    GradientStop { position: heroScrim.edge; color: ColorUtils.applyAlpha(IrisStyle.bodyScrim, heroScrim.hangs && !IrisStyle.glassy ? 1 : 0.12) } // iris-literal: hero fade ramp
-                    GradientStop { position: heroScrim.topFade; color: ColorUtils.applyAlpha(IrisStyle.bodyScrim, 0.12) } // iris-literal: hero fade ramp
-                    GradientStop { position: 0.42; color: ColorUtils.applyAlpha(IrisStyle.surfaceOpaque, IrisStyle.wallpaperVeil) }
-                    GradientStop { position: 1; color: IrisStyle.bodyScrim }
+                // Always layered, like heroBleed: toggling layers inside the chassis stops it painting.
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    maskEnabled: sideJoin.active
+                    maskSource: sideJoin
+                    maskThresholdMin: 0.5
+                    maskSpreadAtMin: 1
+                }
+                IrisWallpaperView {
+                    id: heroImage
+                    anchors.fill: parent
+                    active: page.showBanner
+                    screen: page.island.targetScreen
+                    live: page.current && page.island.visualExpanded
+                    asynchronous: page.island.heroPreloadItem.status !== Image.Ready
+                    decodeSize: Qt.size(page.island.heroDecodeWidth, 0)
+                }
+                IrisHeaderScrim {
+                    id: heroScrim
+                    anchors.fill: parent
+                    hangs: (page.island.notch && !page.island.bottomEdge) || heroBleed.navBand > 0
+                    solidTop: (page.island.notch && !page.island.bottomEdge ? page.island.chassisItem.topInset : 0)
+                        + (heroBleed.navBand > 0 ? page.island.padding + heroBleed.navBand * 0.5 : 0)
+                    navBand: heroBleed.navBand
+                    topJoin: page.island.notch && page.island.edge === "top"
+                    // Measured from the chassis, not the header: while the Island opens the page rides above the body's
+                    // top, and a join fixed in the header's coordinates slid off the screen, letting the image touch the band.
+                    joinDepth: page.island.chassisItem.topInset + page.island.fillet + 4 * IrisStyle.density - heroScrim.chassisTop
+                    readonly property real chassisTop: {
+                        void (page.island.chassisItem.bodyHeight + page.island.chassisItem.height + heroBleed.height + heroBleed.y)
+                        return heroBleed.mapToItem(page.island.chassisItem, 0, 0).y
+                    }
+                    meltTop: page.bannerTop
+                    meltFade: page.bannerFade
+                    meltVeil: page.bannerVeil
                 }
             }
         }
 
+        // The Island notched on a side edge: its body runs into the frame beside the header. The image keeps off
+        // the band and the shoulders (the body's own material there) and enters on a ramp as long again, the
+        // same join as at the top.
         Item {
-            id: heroFade
+            id: sideJoin
+            readonly property string edge: page.island.notch ? String(page.island.edge) : ""
+            readonly property bool active: sideJoin.edge === "left" || sideJoin.edge === "right"
+            readonly property real depth: IrisFrame.band + page.island.fillet + 4 * IrisStyle.density
+            // Where the screen edge falls in the header's own coordinates.
+            readonly property real edgeX: {
+                void (heroBleed.width + heroBleed.x + page.island.chassisItem.width + page.island.chassisItem.x)
+                const window = heroBleed.Window.window
+                if (!window) return 0
+                return heroBleed.mapFromItem(null, sideJoin.edge === "right" ? window.width : 0, 0).x
+            }
+            readonly property real solid: Math.max(0, Math.min(1, (sideJoin.edge === "right"
+                ? sideJoin.edgeX - sideJoin.depth : sideJoin.edgeX + sideJoin.depth) / Math.max(1, width)))
+            readonly property real ramp: Math.max(0, Math.min(1, (sideJoin.edge === "right"
+                ? sideJoin.edgeX - sideJoin.depth / 0.45 : sideJoin.edgeX + sideJoin.depth / 0.45) / Math.max(1, width)))
             x: heroBleed.x
             y: heroBleed.y
             width: heroBleed.width
             height: heroBleed.height
             visible: false
             layer.enabled: true
-            readonly property real solidEnd: heroScrim.hangs ? heroScrim.edge : 0
             Rectangle {
                 anchors.fill: parent
                 gradient: Gradient {
-                    GradientStop { position: 0; color: IrisStyle.glassy ? "transparent" : "white" }
-                    GradientStop { position: heroFade.solidEnd; color: IrisStyle.glassy ? "transparent" : "white" }
-                    GradientStop { position: Math.min(0.99, heroScrim.topFade + 0.08); color: "white" }
-                    GradientStop { position: 0.6; color: "white" }
-                    GradientStop { position: 1; color: IrisStyle.glassy ? "transparent" : "white" }
+                    orientation: Gradient.Horizontal
+                    GradientStop { position: 0; color: sideJoin.edge === "right" ? "white" : "transparent" }
+                    GradientStop { position: Math.min(sideJoin.solid, sideJoin.ramp); color: sideJoin.edge === "right" ? "white" : "transparent" }
+                    GradientStop { position: Math.max(sideJoin.solid, sideJoin.ramp); color: sideJoin.edge === "right" ? "transparent" : "white" }
+                    GradientStop { position: 1; color: sideJoin.edge === "right" ? "transparent" : "white" }
                 }
             }
         }
 
-        GlyphButton {
-            anchors.right: wallpaperButton.visible ? wallpaperButton.left : parent.right
-            anchors.rightMargin: wallpaperButton.visible ? Math.round(6 * IrisStyle.density) : 0
-            anchors.top: parent.top
-            anchors.topMargin: -Math.round(6 * IrisStyle.density)
-            glyph: page.island.studio ? "check" : "edit"
-            glyphSize: 17 * IrisStyle.density
-            implicitWidth: Math.round(32 * IrisStyle.density)
-            colBackground: page.showBanner ? IrisStyle.veil : IrisStyle.fillQuiet
-            colBackgroundHover: page.showBanner ? IrisStyle.veilStrong : IrisStyle.fillHover
-            Accessible.name: page.island.studio ? Translation.tr("Done") : Translation.tr("Arrange this page")
-            onClicked: {
-                page.island.pinned = true
-                GlobalStates.irisArrange = !page.island.studio
-            }
+        IrisHeaderFade {
+            id: heroFade
+            scrim: heroScrim
+            x: heroBleed.x
+            y: heroBleed.y
+            width: heroBleed.width
+            height: heroBleed.height
         }
-        GlyphButton {
-            id: wallpaperButton
-            visible: page.showBanner
+
+        // The header's tools share the Island's plate (IrisIsland.pagePlate); bare, each keeps its own veil.
+        IrisControlPlate {
+            id: heroTools
             anchors.right: parent.right
+            anchors.rightMargin: -heroTools.inset
             anchors.top: parent.top
-            anchors.topMargin: -Math.round(6 * IrisStyle.density)
-            glyph: "wallpaper"
-            glyphSize: 17 * IrisStyle.density
-            implicitWidth: Math.round(32 * IrisStyle.density)
-            colBackground: IrisStyle.veil
-            colBackgroundHover: IrisStyle.veilStrong
-            Accessible.name: Translation.tr("Change wallpaper")
-            onClicked: {
-                GlobalStates.wallpaperSelectorTargetMonitor = page.island.targetScreen?.name ?? ""
-                GlobalStates.wallpaperSelectorOpen = true
+            anchors.topMargin: -Math.round(6 * IrisStyle.density) - heroTools.inset
+            material: page.island.pagePlate
+            controlHeight: Math.round(32 * IrisStyle.density)
+
+            RowLayout {
+                spacing: heroTools.framed ? Math.round(2 * IrisStyle.density) : Math.round(6 * IrisStyle.density)
+
+                GlyphButton {
+                    glyph: page.island.studio ? "check" : "edit"
+                    glyphSize: 17 * IrisStyle.density
+                    glyphColor: page.showBanner ? IrisStyle.onMedia : IrisStyle.text
+                    implicitWidth: Math.round(32 * IrisStyle.density)
+                    buttonRadius: heroTools.framed ? heroTools.controlRadius : height / 2
+                    buttonRadiusPressed: heroTools.framed ? heroTools.controlRadius : height / 2
+                    quiet: heroTools.framed
+                    colBackground: heroTools.framed ? "transparent" : page.showBanner ? IrisStyle.veil : IrisStyle.fillQuiet
+                    colBackgroundHover: heroTools.framed ? IrisStyle.fillHover : page.showBanner ? IrisStyle.veilStrong : IrisStyle.fillHover
+                    Accessible.name: page.island.studio ? Translation.tr("Done") : Translation.tr("Arrange this page")
+                    onClicked: {
+                        page.island.pinned = true
+                        GlobalStates.irisArrange = !page.island.studio
+                    }
+                }
+                GlyphButton {
+                    id: wallpaperButton
+                    visible: page.showBanner
+                    glyph: "wallpaper"
+                    glyphSize: 17 * IrisStyle.density
+                    glyphColor: IrisStyle.onMedia
+                    implicitWidth: Math.round(32 * IrisStyle.density)
+                    buttonRadius: heroTools.framed ? heroTools.controlRadius : height / 2
+                    buttonRadiusPressed: heroTools.framed ? heroTools.controlRadius : height / 2
+                    quiet: heroTools.framed
+                    colBackground: heroTools.framed ? "transparent" : IrisStyle.veil
+                    colBackgroundHover: heroTools.framed ? IrisStyle.fillHover : IrisStyle.veilStrong
+                    Accessible.name: Translation.tr("Change wallpaper")
+                    onClicked: {
+                        GlobalStates.wallpaperSelectorTargetMonitor = page.island.targetScreen?.name ?? ""
+                        GlobalStates.wallpaperSelectorOpen = true
+                    }
+                }
             }
         }
 
@@ -333,8 +400,8 @@ ColumnLayout {
                         + Qt.locale().toString(DateTime.clock.date, "dddd") + "</b></font> "
                         + Qt.locale().toString(DateTime.clock.date, "d MMMM")
                     color: (page.showBanner ? IrisStyle.textStrong : IrisStyle.textSecondary)
-                    font.pixelSize: 13 * IrisStyle.typeScale
-                    font.weight: Font.Medium
+                    font.pixelSize: IrisStyle.typeLabel
+                    font.weight: IrisStyle.weight(Font.Medium)
                 }
                 IrisClock {
                     id: heroClock
@@ -367,7 +434,7 @@ ColumnLayout {
                     Layout.maximumWidth: 150 * IrisStyle.density
                     text: String(Weather.data?.description ?? "")
                     color: (page.showBanner ? IrisStyle.textStrong : IrisStyle.textSecondary)
-                    font.pixelSize: 12 * IrisStyle.typeScale
+                    font.pixelSize: IrisStyle.typeMeta
                     elide: Text.ElideRight
                 }
             }
@@ -414,15 +481,10 @@ ColumnLayout {
                     scale: avatarHover.hovered ? 1.05 : 1
                     Behavior on scale { NumberAnimation { duration: IrisStyle.duration(120); easing.type: IrisStyle.feedbackEasing } }
 
-                    Image {
+                    IrisImage {
                         id: avatarImage
                         anchors.fill: parent
                         source: Directories.avatarSourceAt(avatar.sourceIndex)
-                        fillMode: Image.PreserveAspectCrop
-                        asynchronous: true
-                        smooth: true
-                        sourceSize.width: avatar.width * 2
-                        sourceSize.height: avatar.height * 2
                         onStatusChanged: {
                             if (status === Image.Error && avatar.sourceIndex + 1 < Directories.userAvatarPaths.length)
                                 Qt.callLater(() => avatar.sourceIndex++)
@@ -432,19 +494,20 @@ ColumnLayout {
                         anchors.centerIn: parent
                         visible: avatarImage.status !== Image.Ready
                         text: (SystemInfo.displayName || SystemInfo.username || "?").charAt(0).toUpperCase()
-                        font.pixelSize: 17 * IrisStyle.typeScale
-                        font.weight: Font.DemiBold
+                        font.pixelSize: IrisStyle.typeTitle
+                        font.weight: IrisStyle.weight(Font.DemiBold)
                     }
                     Rectangle {
                         anchors.fill: parent
                         color: (avatarHover.hovered ? IrisStyle.veil : ColorUtils.applyAlpha(IrisStyle.bodySurface, 0))
-                        Behavior on color { ColorAnimation { duration: IrisStyle.duration(120) } }
+                        Behavior on color { ColorAnimation { duration: IrisStyle.duration(120); easing.type: IrisStyle.feedbackEasing } }
                         Glyph {
                             anchors.centerIn: parent
                             text: "edit"
                             iconSize: 17 * IrisStyle.density
+                            color: IrisStyle.onMedia
                             opacity: avatarHover.hovered ? 1 : 0
-                            Behavior on opacity { NumberAnimation { duration: IrisStyle.duration(120) } }
+                            Behavior on opacity { NumberAnimation { duration: IrisStyle.duration(120); easing.type: IrisStyle.feedbackEasing } }
                         }
                     }
                 }
@@ -456,8 +519,8 @@ ColumnLayout {
                 IrisText {
                     Layout.fillWidth: true
                     text: SystemInfo.displayName || SystemInfo.username || "user"
-                    font.pixelSize: 13.5 * IrisStyle.typeScale
-                    font.weight: Font.DemiBold
+                    font.pixelSize: IrisStyle.typeLabel
+                    font.weight: IrisStyle.weight(Font.DemiBold)
                     elide: Text.ElideRight
                 }
                 IrisText {
@@ -467,7 +530,7 @@ ColumnLayout {
                         + (distro.length > 0 && distro !== "unknown" ? "@" + distro : "")
                         + " · " + Translation.tr("Up %1").arg(DateTime.uptime)
                     color: IrisStyle.textSecondary
-                    font.pixelSize: 11.5 * IrisStyle.typeScale
+                    font.pixelSize: IrisStyle.typeMeta
                     elide: Text.ElideRight
                 }
             }
@@ -541,8 +604,8 @@ ColumnLayout {
                 IrisText {
                     Layout.fillWidth: true
                     text: page.focusedWindow ? String(page.focusedWindow.title ?? "") : contextRow.workspaceName
-                    font.pixelSize: 13 * IrisStyle.typeScale
-                    font.weight: Font.DemiBold
+                    font.pixelSize: IrisStyle.typeLabel
+                    font.weight: IrisStyle.weight(Font.DemiBold)
                     elide: Text.ElideRight
                 }
                 IrisText {
@@ -552,7 +615,7 @@ ColumnLayout {
                         ? app + (contextRow.workspaceName.length > 0 ? " · " + contextRow.workspaceName : "")
                         : Translation.tr("No windows")
                     color: IrisStyle.textSecondary
-                    font.pixelSize: 11.5 * IrisStyle.typeScale
+                    font.pixelSize: IrisStyle.typeMeta
                     elide: Text.ElideRight
                 }
             }
@@ -582,7 +645,7 @@ ColumnLayout {
                             color: dot.active ? IrisStyle.accent
                                 : (dot.containsMouse ? IrisStyle.textStrong : dot.occupied ? IrisStyle.textTertiary : IrisStyle.fillHover)
                             Behavior on width { NumberAnimation { duration: IrisStyle.morphDuration; easing.type: Easing.BezierSpline; easing.bezierCurve: IrisStyle.morphCurve } }
-                            Behavior on color { ColorAnimation { duration: IrisStyle.duration(120) } }
+                            Behavior on color { ColorAnimation { duration: IrisStyle.duration(120); easing.type: IrisStyle.feedbackEasing } }
                         }
                     }
                 }
@@ -615,7 +678,7 @@ ColumnLayout {
                     horizontalAlignment: Text.AlignHCenter
                     text: Translation.tr("No forecast yet")
                     color: IrisStyle.textTertiary
-                    font.pixelSize: 12 * IrisStyle.typeScale
+                    font.pixelSize: IrisStyle.typeMeta
                 }
                 Repeater {
                     model: page.hours
@@ -633,7 +696,7 @@ ColumnLayout {
                             Layout.alignment: Qt.AlignHCenter
                             text: hour.index === 0 ? Translation.tr("Now") : String(hour.modelData.label).slice(0, 2)
                             color: hour.index === 0 ? IrisStyle.text : IrisStyle.textTertiary
-                            font.pixelSize: 11 * IrisStyle.typeScale
+                            font.pixelSize: IrisStyle.typeFootnote
                             font.weight: hour.index === 0 ? Font.DemiBold : Font.Medium
                             font.features: { "tnum": 1 }
                         }
@@ -646,8 +709,8 @@ ColumnLayout {
                         IrisText {
                             Layout.alignment: Qt.AlignHCenter
                             text: String(hour.modelData.temp)
-                            font.pixelSize: 12.5 * IrisStyle.typeScale
-                            font.weight: Font.DemiBold
+                            font.pixelSize: IrisStyle.typeLabel
+                            font.weight: IrisStyle.weight(Font.DemiBold)
                             font.features: { "tnum": 1 }
                         }
                     }
@@ -699,13 +762,13 @@ ColumnLayout {
                         text: Qt.locale().toString(agenda.when, "ddd").toUpperCase()
                         color: IrisStyle.danger
                         font.pixelSize: 8.5 * IrisStyle.typeScale
-                        font.weight: Font.Bold
+                        font.weight: IrisStyle.weight(Font.Bold)
                     }
                     IrisText {
                         Layout.alignment: Qt.AlignHCenter
                         text: agenda.when.getDate()
-                        font.pixelSize: 17 * IrisStyle.typeScale
-                        font.weight: Font.DemiBold
+                        font.pixelSize: IrisStyle.typeTitle
+                        font.weight: IrisStyle.weight(Font.DemiBold)
                         font.features: { "tnum": 1 }
                     }
                 }
@@ -717,15 +780,15 @@ ColumnLayout {
                     Layout.fillWidth: true
                     text: agenda.event ? String(agenda.event.title || Translation.tr("Event"))
                         : Translation.tr("Nothing scheduled")
-                    font.pixelSize: 13 * IrisStyle.typeScale
-                    font.weight: Font.DemiBold
+                    font.pixelSize: IrisStyle.typeLabel
+                    font.weight: IrisStyle.weight(Font.DemiBold)
                     elide: Text.ElideRight
                 }
                 IrisText {
                     Layout.fillWidth: true
                     text: agenda.event ? agenda.whenText : Translation.tr("This week is clear")
                     color: IrisStyle.textSecondary
-                    font.pixelSize: 11.5 * IrisStyle.typeScale
+                    font.pixelSize: IrisStyle.typeMeta
                     elide: Text.ElideRight
                 }
             }
@@ -748,8 +811,8 @@ ColumnLayout {
                     IrisText {
                         anchors.verticalCenter: parent.verticalCenter
                         text: page.pendingTasks
-                        font.pixelSize: 12.5 * IrisStyle.typeScale
-                        font.weight: Font.DemiBold
+                        font.pixelSize: IrisStyle.typeLabel
+                        font.weight: IrisStyle.weight(Font.DemiBold)
                         font.features: { "tnum": 1 }
                     }
                 }
@@ -836,14 +899,14 @@ ColumnLayout {
                                 Layout.fillWidth: true
                                 text: vital.modelData.label
                                 color: IrisStyle.muted
-                                font.pixelSize: 9.5 * IrisStyle.typeScale
-                                font.weight: Font.Medium
+                                font.pixelSize: IrisStyle.typeCaption
+                                font.weight: IrisStyle.weight(Font.Medium)
                                 elide: Text.ElideRight
                             }
                             Metric {
                                 value: vital.modelData.value
                                 unit: vital.modelData.unit
-                                pixelSize: 12.5 * IrisStyle.typeScale
+                                pixelSize: IrisStyle.typeLabel
                                 weight: Font.Bold
                             }
                         }
@@ -886,14 +949,14 @@ ColumnLayout {
             spacing: 6 * IrisStyle.density
             Repeater {
                 model: page.island.desktopBlockKinds.filter(kind => !page.island.desktopBlocks.includes(kind))
-                StudioChip {
+                IrisChip {
                     required property string modelData
                     glyph: page.island.desktopBlockGlyph(modelData)
                     label: page.island.desktopBlockLabel(modelData)
                     onClicked: page.island.setDesktopBlock(modelData, true)
                 }
             }
-            StudioChip {
+            IrisChip {
                 glyph: "check"
                 label: Translation.tr("Done")
                 emphasized: true

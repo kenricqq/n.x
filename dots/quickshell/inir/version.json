@@ -1,8 +1,8 @@
 {
-  "version": "2.31.0",
-  "commit": "9574fa42",
-  "installed_at": "2026-09-25T07:53:06-07:00",
-  "installedAt": "2026-09-25T07:53:06-07:00",
+  "version": "2.32.0",
+  "commit": "c08bb928",
+  "installed_at": "2026-09-30T17:31:19-07:00",
+  "installedAt": "2026-09-30T17:31:19-07:00",
   "source": "setup-update",
   "repo_path": "/home/kenrict/.local/src/inir",
   "repoPath": "/home/kenrict/.local/src/inir",

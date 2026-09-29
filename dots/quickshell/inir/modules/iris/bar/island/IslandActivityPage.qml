@@ -42,11 +42,15 @@ ColumnLayout {
             Layout.fillWidth: true
             spacing: 1
             IrisText {
+                Layout.fillWidth: true
+                elide: Text.ElideRight
                 text: Translation.tr("Screen recording")
-                font.pixelSize: 14 * IrisStyle.typeScale
-                font.weight: Font.DemiBold
+                font.pixelSize: IrisStyle.typeBody
+                font.weight: IrisStyle.weight(Font.DemiBold)
             }
             IrisText {
+                Layout.fillWidth: true
+                elide: Text.ElideRight
                 text: RecorderStatus.effectiveAudioMode === "none" ? Translation.tr("No audio")
                     : RecorderStatus.effectiveAudioMode === "microphone" ? Translation.tr("Microphone")
                     : RecorderStatus.effectiveAudioMode === "both" ? Translation.tr("System and microphone")
@@ -59,7 +63,7 @@ ColumnLayout {
             color: IrisStyle.danger
             pixelSize: 28 * IrisStyle.typeScale
             weight: Font.Bold
-            letterSpacing: -0.6
+            letterSpacing: -1
         }
         GlyphButton {
             glyph: "stop"
@@ -105,11 +109,15 @@ ColumnLayout {
             Layout.fillWidth: true
             spacing: 1
             IrisText {
+                Layout.fillWidth: true
+                elide: Text.ElideRight
                 text: page.island.timerLabel
-                font.pixelSize: 14 * IrisStyle.typeScale
-                font.weight: Font.DemiBold
+                font.pixelSize: IrisStyle.typeBody
+                font.weight: IrisStyle.weight(Font.DemiBold)
             }
             IrisText {
+                Layout.fillWidth: true
+                elide: Text.ElideRight
                 text: page.island.timerPaused ? Translation.tr("Paused")
                     : page.island.timerKind === "pomodoro"
                         ? Translation.tr("Cycle %1 of %2").arg(TimerService.pomodoroCycle + 1).arg(TimerService.cyclesBeforeLongBreak)
@@ -123,7 +131,7 @@ ColumnLayout {
             color: page.island.timerPaused ? IrisStyle.subtext : IrisStyle.secondaryAccent
             pixelSize: 28 * IrisStyle.typeScale
             weight: Font.Bold
-            letterSpacing: -0.6
+            letterSpacing: -1
         }
         GlyphButton {
             glyph: page.island.timerPaused ? "play_arrow" : "pause"
@@ -199,8 +207,8 @@ ColumnLayout {
                     IrisText {
                         Layout.fillWidth: true
                         text: String(taskEntry.modelData.title ?? "")
-                        font.pixelSize: 14 * IrisStyle.typeScale
-                        font.weight: Font.DemiBold
+                        font.pixelSize: IrisStyle.typeBody
+                        font.weight: IrisStyle.weight(Font.DemiBold)
                         elide: Text.ElideRight
                     }
                     IrisText {
@@ -217,7 +225,7 @@ ColumnLayout {
                     color: taskEntry.tint
                     pixelSize: 28 * IrisStyle.typeScale
                     weight: Font.Bold
-                    letterSpacing: -0.6
+                    letterSpacing: -1
                 }
                 GlyphButton {
                     glyph: "close"

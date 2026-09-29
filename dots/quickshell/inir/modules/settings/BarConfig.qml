@@ -2358,6 +2358,20 @@ ContentPage {
                         onCheckedChanged: Config.setNestedValue("bar.activeWindow.showTitle", checked)
                     }
 
+                    ConfigSpinBox {
+                        visible: Config.options?.bar?.modules?.media ?? true
+                        icon: "music_note"
+                        text: Translation.tr("Music width (px)")
+                        value: Config.options?.bar?.media?.maxWidth ?? 220
+                        from: 120
+                        to: 640
+                        stepSize: 10
+                        onValueChanged: if (value !== (Config.options?.bar?.media?.maxWidth ?? 220)) Config.setNestedValue("bar.media.maxWidth", value)
+                        StyledToolTip {
+                            text: Translation.tr("How wide the song title gets. The window title gives way; a crowded bar still shrinks music first.")
+                        }
+                    }
+
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 4
@@ -2391,7 +2405,7 @@ ContentPage {
 
                         StyledText {
                             Layout.fillWidth: true
-                            text: Translation.tr("‘distro’ auto-detects your distribution. Otherwise enter any icon name (looked up as <name>-symbolic).")
+                            text: Translation.tr("‘distro’ auto-detects your distribution, ‘avatar’ shows your profile picture. Otherwise enter any icon name (looked up as <name>-symbolic).")
                             color: Appearance.colors.colSubtext
                             font.pixelSize: Appearance.font.pixelSize.smaller
                             wrapMode: Text.WordWrap

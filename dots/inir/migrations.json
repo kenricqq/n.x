@@ -41,7 +41,8 @@
     "039-sddm-preserve-greeter-backend",
     "040-niri-session-environment-lifecycle",
     "041-visualizer-app-filter-semantics",
-    "042-cliphist-no-synthetic-newline"
+    "042-cliphist-no-synthetic-newline",
+    "043-spanish-catalogue-es-419"
   ],
   "skipped": []
 }
