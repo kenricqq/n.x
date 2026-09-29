@@ -222,7 +222,7 @@ let
       airport = "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport";
       clip = "pbcopy";
       localip = "ipconfig getifaddr en0";
-      lg-input = "ssh ${(builtins.head machine.peers).name} lg-input";
+      lg-input = "ssh ${(builtins.head machine.allowIncoming).name} lg-input";
     }
     // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
       clip = "wl-copy";

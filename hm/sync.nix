@@ -1,57 +1,29 @@
 {
   lib,
   machine,
-  paths,
   pkgs,
   ...
 }:
 
-let
-  inherit (paths)
-    home
-    ;
-
-  peers = builtins.filter (p: p ? sync) (machine.peers or [ ]);
-
-  peerNames = map (p: p.name) peers;
-
-  devices = builtins.listToAttrs (
-    map (
-      p:
-      lib.nameValuePair p.name {
-        id = p.sync.id;
-        addresses = [
-          "tcp://${p.sync.tailscale}:22000"
-          "tcp://${p.sync.tb}:22000"
-          "dynamic"
-        ];
-      }
-    ) peers
-  );
-
-  mkFolder = id: path: {
-    inherit id;
-    path = "${home}/${path}";
-    devices = peerNames;
-
-    versioning = {
-      type = "trashcan";
-      params.cleanoutDays = "30";
-    };
-  };
-in
 {
-  services.syncthing = lib.mkIf (machine ? sync) {
+  services.syncthing = lib.mkIf (machine ? syncthing) {
     enable = true;
 
     settings = {
-      inherit devices;
+      devices = removeAttrs machine.syncthing.devices [ machine.name ]; # exclude self
 
-      folders = {
-        sync = mkFolder "sync" "Sync";
-        # documents = mkFolder "documents" "Documents";
-        # projects = mkFolder "projects" "Projects";
-      };
+      folders = lib.mapAttrs (
+        _: folder:
+        folder
+        // {
+          enable = builtins.elem machine.name folder.devices;
+          devices = lib.remove machine.name folder.devices;
+          versioning = {
+            type = "trashcan";
+            params.cleanoutDays = "30";
+          };
+        }
+      ) machine.syncthing.folders;
 
       options.urAccepted = -1;
       gui.theme = "black";

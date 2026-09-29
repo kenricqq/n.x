@@ -7,16 +7,16 @@
 }:
 
 let
-  peers = builtins.filter (peer: peer ? sync) (machine.peers or [ ]);
+  allowIncoming = builtins.filter (peer: peer ? network) (machine.allowIncoming or [ ]);
 
-  tb = machine.sync.tb or null;
+  tb = machine.network.tb or null;
 
   allowedUsers = lib.concatMapStringsSep " " (ip: "${machine.user}@${ip}") (
     builtins.filter (ip: ip != null) (
       lib.concatMap (peer: [
-        (peer.sync.tb or null)
-        (peer.sync.tailscale or null)
-      ]) peers
+        (peer.network.tb or null)
+        (peer.network.tailscale or null)
+      ]) allowIncoming
     )
   );
 
@@ -72,11 +72,11 @@ let
           ${lib.concatMapStringsSep "\n" (peer: ''
             sudo ufw allow \
               in on thunderbolt0 \
-              from ${peer.sync.tb} \
+              from ${peer.network.tb} \
               to ${tb} \
               port 22 \
               proto tcp
-          '') peers}
+          '') allowIncoming}
 
           # enable only after adding allow rules; persist services across reboots
           sudo ufw enable

@@ -7,13 +7,13 @@
 }:
 
 let
-  peers = machine.peers or [ ];
+  allowIncoming = machine.allowIncoming or [ ];
 
   addresses = builtins.filter (address: address != null) (
     lib.concatMap (peer: [
-      (peer.sync.tb or null)
-      (peer.sync.tailscale or null)
-    ]) peers
+      (peer.network.tb or null)
+      (peer.network.tailscale or null)
+    ]) allowIncoming
   );
 
   allowedUsers = lib.concatMapStringsSep " " (address: "${machine.user}@${address}") addresses;

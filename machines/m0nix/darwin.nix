@@ -11,7 +11,7 @@ let
   username = machine.user;
   userHome = "/Users/${username}";
 
-  tb = machine.sync.tb or null;
+  tb = machine.network.tb or null;
 
   darwinPath = ../../os/darwin;
 

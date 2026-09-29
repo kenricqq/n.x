@@ -76,7 +76,7 @@
     networkmanager.enable = true;
     interfaces.thunderbolt0.ipv4.addresses = [
       {
-        address = machine.sync.tb;
+        address = machine.network.tb;
         prefixLength = 24;
       }
     ];

@@ -120,55 +120,107 @@
           ;
       };
 
+      mkSyncAddresses = network: [
+        "tcp://${network.tailscale}:22000"
+        "tcp://${network.tb}:22000"
+        "dynamic"
+      ];
+
+      syncthing = {
+        devices = {
+          m0nix = {
+            id = "2UDHDAW-YWVLSHK-NTFHRL5-XJJJ44N-DCPQEQT-3AYPPA4-3RFBNBD-BXHMTQ7";
+            addresses = mkSyncAddresses profile.mba.network;
+          };
+          meridian = {
+            id = "DC7NXSI-JZ65WRZ-7B3MMHQ-QNJGZM5-6UM5C3F-NSWAHBM-YBOJLDJ-ZZXR7QR";
+            addresses = mkSyncAddresses profile.meridian.network;
+          };
+          laurentii = {
+            id = "EKJVIR6-JU62KRJ-J3V2PED-XVYHOBD-K532VXE-AXVZJHP-RA64EIM-3MLEXQ4";
+            addresses = mkSyncAddresses profile.laurentii.network;
+          };
+
+          i17p =
+            let
+              tailscale_ip = "100.96.80.45";
+            in
+            {
+              id = "TIKN6GA-V2JYS65-SRSH45S-NIB5D65-7L5KPJA-GDQGQMW-XMKGOSR-J2FFVQB";
+              addresses = [ "tcp://${tailscale_ip}:22000" ];
+              allowedNetworks = [ "${tailscale_ip}/32" ]; # also restrict incoming connections
+            };
+        };
+
+        folders = {
+          sync = {
+            path = "~/Sync";
+            devices = [
+              "m0nix"
+              "meridian"
+              "laurentii"
+            ];
+          };
+          docs = {
+            path = "~/Docs";
+            devices = [
+              "m0nix"
+              "meridian"
+              "i17p"
+            ];
+          };
+          # projects = { path = "~/Projects"; devices = [ "m0nix" "meridian" ]; };
+        };
+      };
+
       profile = {
         mba = {
+          inherit syncthing;
           name = "m0nix";
           system = "aarch64-darwin";
           user = "kenrictee";
 
-          sync = {
-            id = "2UDHDAW-YWVLSHK-NTFHRL5-XJJJ44N-DCPQEQT-3AYPPA4-3RFBNBD-BXHMTQ7";
+          network = {
             tb = "10.10.10.2";
             tailscale = "100.79.126.103";
           };
 
-          # peers are those allowed to SSH into me
-          # require mutual to enable syncthing
+          # allowIncoming lists machines allowed to SSH into me
           # first peer on mac is used for switching monitor input (reg usbc hub don't work)
-          peers = with profile; [
+          allowIncoming = with profile; [
             meridian
           ];
         };
 
         meridian = {
+          inherit syncthing;
           name = "meridian";
           system = "x86_64-linux";
           user = "kenrict";
 
-          sync = {
-            id = "DC7NXSI-JZ65WRZ-7B3MMHQ-QNJGZM5-6UM5C3F-NSWAHBM-YBOJLDJ-ZZXR7QR";
+          network = {
             tb = "10.10.10.3";
             tailscale = "100.100.44.94";
           };
 
-          peers = with profile; [
+          allowIncoming = with profile; [
             mba
           ];
         };
 
         laurentii = {
+          inherit syncthing;
           name = "laurentii";
           system = "x86_64-linux";
           user = "kenrict";
           nixos = true;
 
-          sync = {
-            id = "EKJVIR6-JU62KRJ-J3V2PED-XVYHOBD-K532VXE-AXVZJHP-RA64EIM-3MLEXQ4";
+          network = {
             tb = "10.10.10.4";
             tailscale = "100.112.47.42";
           };
 
-          peers = with profile; [
+          allowIncoming = with profile; [
             mba
             meridian
           ];
