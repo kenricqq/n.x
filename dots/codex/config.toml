@@ -159,16 +159,14 @@ enabled = false
 [hooks.state]
 
 [hooks.state."/home/kenrict/.codex/hooks.json:post_tool_use:0:0"]
-trusted_hash = "sha256:328b120bf00511768c280b0a45367646c11e22997d771b879717e5fdf5519843"
-trusted_hash = "sha256:3e5625b276f45215623a7985900546a07e178d7a9a42f783e2a0de601a5aa585"
-trusted_hash = "sha256:328b120bf00511768c280b0a45367646c11e22997d771b879717e5fdf5519843"
+trusted_hash = "sha256:72de3cd08abf2e5ac9248c427af8f47d19cef24f0652087c0059367a7c1ff149"
 enabled = true
 
 [hooks.state."/home/kenrict/.codex/hooks.json:user_prompt_submit:0:0"]
 trusted_hash = "sha256:d73e60ccd479a637e3748a31b02231beb5c4d405c7a9f2ab4af86f4d8c88ea20"
 
 [hooks.state."/Users/kenrictee/.codex/hooks.json:post_tool_use:0:0"]
-trusted_hash = "sha256:328b120bf00511768c280b0a45367646c11e22997d771b879717e5fdf5519843"
+trusted_hash = "sha256:72de3cd08abf2e5ac9248c427af8f47d19cef24f0652087c0059367a7c1ff149"
 
 [hooks.state."/Users/kenrictee/.codex/hooks.json:user_prompt_submit:0:0"]
 trusted_hash = "sha256:d73e60ccd479a637e3748a31b02231beb5c4d405c7a9f2ab4af86f4d8c88ea20"
@@ -185,10 +183,10 @@ trusted_hash = "sha256:328b120bf00511768c280b0a45367646c11e22997d771b879717e5fdf
 trusted_hash = "sha256:01eca8a4449adf706d9274b9e1dd3407a393a2a0ec613ab78d7ae99842ae0fe1"
 
 [hooks.state."/home/kenrict/.codex/hooks.json:stop:0:0"]
-trusted_hash = "sha256:01eca8a4449adf706d9274b9e1dd3407a393a2a0ec613ab78d7ae99842ae0fe1"
+trusted_hash = "sha256:b8fbf89a1177417772ae25e8ec664eb4136122b3006f3fff69ba6f539e46c66e"
 
 [hooks.state."/Users/kenrictee/.codex/hooks.json:stop:0:0"]
-trusted_hash = "sha256:01eca8a4449adf706d9274b9e1dd3407a393a2a0ec613ab78d7ae99842ae0fe1"
+trusted_hash = "sha256:b8fbf89a1177417772ae25e8ec664eb4136122b3006f3fff69ba6f539e46c66e"
 
 [notice]
 hide_rate_limit_model_nudge = true
