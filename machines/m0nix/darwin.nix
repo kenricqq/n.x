@@ -49,6 +49,7 @@ in
 
   imports = [
     inputs.nixcord.darwinModules.nixcord
+    inputs.nix-plist-manager.darwinModules.default
   ]
   ++ map (file: darwinPath + "/${file}") [
     "homebrew.nix"
@@ -174,4 +175,20 @@ in
   };
 
   time.timeZone = "America/Los_Angeles";
+
+  programs.nix-plist-manager = {
+    enable = true;
+    # Optional machine settings; uncomment only the ones you want managed.
+    options.applications.systemSettings = {
+      # network.firewall.firewall = true;
+      # network.firewall.options.enableStealthMode = true;
+      # general.softwareUpdate.automaticallyDownloadNewUpdatesWhenAvailable = true;
+      # general.softwareUpdate.automaticallyInstallMacOSUpdates = false;
+      # general.softwareUpdate.automaticallyInstallSystemDataFilesAndSecurityUpdates = true;
+      # lockScreen.turnDisplayOffOnBatteryWhenInactive = "For 5 minutes";
+      # lockScreen.turnDisplayOffOnPowerAdapterWhenInactive = "For 10 minutes";
+      # lockScreen.showPasswordHints = false;
+      # lockScreen.loginWindowShows = "Name and password";
+    };
+  };
 }

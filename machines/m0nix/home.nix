@@ -15,6 +15,7 @@ in
     "_base.nix"
     "_dev.nix"
     "nixcord.nix"
+    "macos/system-settings.nix"
   ]);
 
   home = {

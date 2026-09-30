@@ -1,19 +1,12 @@
 {
+  # Preferences without an exact nix-plist-manager equivalent stay here.
+  # Other user settings live in hm/macos/system-settings.nix.
   defaults = {
     CustomUserPreferences = {
       "com.apple.symbolichotkeys" = {
+        # Preserve custom Mission Control keys, disabled keys' saved bindings,
+        # and legacy IDs that nix-plist-manager cannot express unchanged.
         AppleSymbolicHotKeys = {
-          "8" = {
-            enabled = true;
-            value = {
-              parameters = [
-                100
-                2
-                655360
-              ];
-              type = "standard";
-            };
-          };
           "15" = {
             enabled = false;
           };
@@ -32,9 +25,6 @@
           "20" = {
             enabled = false;
           };
-          "21" = {
-            enabled = false;
-          };
           "22" = {
             enabled = false;
           };
@@ -42,12 +32,6 @@
             enabled = false;
           };
           "24" = {
-            enabled = false;
-          };
-          "25" = {
-            enabled = false;
-          };
-          "26" = {
             enabled = false;
           };
           "32" = {
@@ -112,50 +96,6 @@
                 65535
                 103
                 8519680
-              ];
-              type = "standard";
-            };
-          };
-          "60" = {
-            enabled = true;
-            value = {
-              parameters = [
-                32
-                49
-                262144
-              ];
-              type = "standard";
-            };
-          };
-          "61" = {
-            enabled = true;
-            value = {
-              parameters = [
-                32
-                49
-                786432
-              ];
-              type = "standard";
-            };
-          };
-          "64" = {
-            enabled = true;
-            value = {
-              parameters = [
-                32
-                49
-                524288
-              ];
-              type = "standard";
-            };
-          };
-          "65" = {
-            enabled = true;
-            value = {
-              parameters = [
-                32
-                49
-                1572864
               ];
               type = "standard";
             };
@@ -270,28 +210,6 @@
               type = "standard";
             };
           };
-          "124" = {
-            enabled = true;
-            value = {
-              parameters = [
-                55
-                26
-                524288
-              ];
-              type = "standard";
-            };
-          };
-          "125" = {
-            enabled = true;
-            value = {
-              parameters = [
-                56
-                28
-                524288
-              ];
-              type = "standard";
-            };
-          };
           "160" = {
             enabled = true;
             value = {
@@ -299,17 +217,6 @@
                 65535
                 65535
                 0
-              ];
-              type = "standard";
-            };
-          };
-          "162" = {
-            enabled = true;
-            value = {
-              parameters = [
-                65535
-                96
-                9961472
               ];
               type = "standard";
             };
@@ -329,15 +236,9 @@
       };
     };
     dock = {
-      autohide = true;
-      autohide-delay = 0.0;
-      autohide-time-modifier = 0.2;
-      orientation = "bottom";
-      tilesize = 62;
-      magnification = true;
-      minimize-to-application = false;
       expose-animation-duration = 0.1;
 
+      # nix-plist-manager's Dock snapshot also replaces persistent-others.
       persistent-apps = [ ];
 
       # hot corners
@@ -346,46 +247,21 @@
       # wvous-bl-corner = 5;
       # wvous-br-corner = 14;
 
-      # no reshuffling of spaces
-      mru-spaces = false;
-
       # Dock settings.
       showhidden = true;
-      show-recents = false;
-
     };
     finder = {
-      ShowPathbar = true;
-      ShowStatusBar = true;
-
       FXPreferredViewStyle = "Nlsv";
-      FXDefaultSearchScope = "SCcf";
 
+      # Keep the Finder-scoped preference; nix-plist-manager writes NSGlobalDomain.
       AppleShowAllExtensions = true;
-      FXEnableExtensionChangeWarning = false;
-
-      # file sorting
-      _FXSortFoldersFirst = true;
-      _FXSortFoldersFirstOnDesktop = true;
-
-      # keep external visible, hide noisy stuff
-      ShowExternalHardDrivesOnDesktop = true;
-      ShowHardDrivesOnDesktop = false;
-      ShowMountedServersOnDesktop = false;
-      ShowRemovableMediaOnDesktop = true;
-
-      # delete items in trash after 30 days
-      FXRemoveOldTrashItems = true;
     };
     NSGlobalDomain = {
+      # The nix-plist-manager menu-bar enum also changes full-screen behavior.
       _HIHideMenuBar = true;
       # _HIHideMenuBar = false;
-      "com.apple.swipescrolldirection" = true;
       # enables cmd+ctrl to move any window
       NSWindowShouldDragOnGesture = true;
-    };
-    spaces = {
-      spans-displays = false;
     };
   };
   keyboard = {
