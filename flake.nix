@@ -15,6 +15,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-plist-manager = {
+      url = "github:sushydev/nix-plist-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -31,7 +36,14 @@
     };
 
     zig.url = "github:mitchellh/zig-overlay";
-    zls.url = "github:zigtools/zls";
+    zig-flake = {
+      url = "github:silversquirl/zig-flake";
+      inputs.nixpkgs.follows = "zls/nixpkgs";
+    };
+    zls = {
+      url = "github:zigtools/zls";
+      inputs.zig-flake.follows = "zig-flake";
+    };
 
     dooit.url = "github:dooit-org/dooit";
     dooit-extras = {

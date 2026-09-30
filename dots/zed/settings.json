@@ -188,9 +188,8 @@
   "lsp": {
     "scls": {
       "binary": {
-        "path": "/etc/profiles/per-user/kenrictee/bin/simple-completion-language-server",
+        "path": "simple-completion-language-server",
         "env": {
-          "SNIPPETS_PATH": "/Users/kenrictee/KTQQ/m0nix/home-manager/snippets",
           "RUST_LOG": "info,simple-completion-language-server=info",
           "LOG_FILE": "/tmp/completion.log"
         }
