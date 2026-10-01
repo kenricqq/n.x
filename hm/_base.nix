@@ -167,6 +167,9 @@ in
       "niri" = "niri";
       "nushell/modules" = "nushell/modules";
       "ghostty" = "ghostty";
+
+      "zed/keymap.json" = "zed/keymap.json";
+      "zed/settings.json" = "zed/settings.json";
     }
     // lib.optionalAttrs isDarwin {
       "aerospace" = "aerospace";
