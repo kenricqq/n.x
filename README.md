@@ -42,7 +42,7 @@ Homebrew and Determinate Nix updates run only for nix-darwin profiles.
 
 ### Arch / CachyOS Nix caches
 
-`arch-install` writes `os/shared/nix-caches.nix` to
+`arch-install` writes `machines/nix-caches.nix` to
 `/etc/nix/shared-caches.conf`, includes it once from the existing `nix.conf`, and
 restarts the running Nix daemon. After changing the cache list, apply Home
 Manager and rerun `arch-install` to refresh it.

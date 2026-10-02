@@ -74,7 +74,7 @@ test("Laurentii preserves its installation and uses the shared NixOS home", () =
   expect(config.genericLinux).toBe(false);
   expect(config.globalPackages).toBe(true);
   expect(config.userPackages).toBe(true);
-  expect(config.systemCleanup).toBe(true);
+  expect(config.systemCleanup).toBe(false);
   expect(config.homeCleanup).toBe(false);
   expect(config.nhFlake).toBe(`${config.repo}#laurentii`);
   expect(config.helix && config.direnv && config.ghostty).toBe(true);

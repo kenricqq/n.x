@@ -60,9 +60,9 @@ for (const profile of profiles) {
       }`,
     ]);
     expect(config.repo).toBe(profile.repo);
-    // Laurentii's system-owned cleanup must not disable either existing HM profile.
+    // NH ownership differs by profile; automatic cleanup stays disabled everywhere.
     expect(config.nhEnabled).toBe(profile.homeManagerOwnsNh);
-    expect(config.cleanupEnabled).toBe(profile.homeManagerOwnsNh);
+    expect(config.cleanupEnabled).toBe(false);
     const result = runJSON(["nix", "derivation", "show", ...evaluationOptions, config.drvPath]);
     // Support legacy and versioned Nix JSON, including structured derivations.
     const derivations: Record<string, {

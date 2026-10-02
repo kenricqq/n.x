@@ -8,15 +8,9 @@ check-paths:
 update_bun:
     bun update -g
 
-linux:
-    # → displayport
-    ddcutil -d 1 setvcp xF4 x00D0 --i2c-source-addr=x50 --noverify
-
-    # → hdmi 1
-    ddcutil -d 1 setvcp xF4 x0090 --i2c-source-addr=x50 --noverify
-
-    # → hdmi 2
-    ddcutil -d 1 setvcp xF4 x0091 --i2c-source-addr=x50 --noverify
+# run Bun tests with Nix builds and import-from-derivation disabled
+test *args:
+    NIX_CONFIG="$(printf 'allow-import-from-derivation = false\nmax-jobs = 0\nbuilders = ')" bun test {{ args }}
 
 # synchronize Home Manager NVIDIA userspace with pacman-installed nvidia-utils
 nvidia-sync:
