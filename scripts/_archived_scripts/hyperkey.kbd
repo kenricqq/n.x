@@ -1,0 +1,22 @@
+;; Caps: tap = Esc, hold = Hyper (Ctrl+Opt+Cmd+Shift)
+;; Make sure macOS Modifier Keys has Caps set back to "Caps Lock".
+
+(defcfg
+  process-unmapped-keys yes
+)
+
+(defsrc
+  caps
+)
+
+(defalias
+  ;; Hold all four modifiers together
+  hyper (multi lctl lalt lmet lsft)
+
+  ;; Tap-hold with forgiving combo start; tweak 200/200 if desired
+  eschypercap   (tap-hold 200 200 esc @hyper)
+)
+
+(deflayer base
+  @eschypercap
+)

@@ -1,6 +1,12 @@
 **/*.zwc
 .serena
-**/*key*
+# Private key material. Keep this narrow: a broad *key* rule hid keymaps and
+# keybinding configs that live symlinks depend on.
+/secrets/*key*
+*.pem
+*.key
+id_rsa*
+id_ed25519*
 **/*playground*
 **/*.flakehub*
 **/*.direnv*

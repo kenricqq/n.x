@@ -1,6 +1,6 @@
 /firmware/
 
-# The parent repo ignores names containing "key"; these are keyboard sources.
+# Keyboard sources stay tracked even if a broader parent ignore rule returns.
 !/keymaps/
 !/keymaps/miryoku_callum/
 !/keymaps/miryoku_callum/**

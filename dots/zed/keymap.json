@@ -1,0 +1,195 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  // Unbinds
+  {
+    "context": "Pane",
+    "unbind": {
+      "cmd-shift-g": "search::SelectPreviousMatch",
+    },
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "ctrl-shift-g": "git_panel::ToggleFocus",
+    },
+  },
+  {
+    "context": "KeymapEditor",
+    "unbind": {
+      "cmd-e": "zed::OpenKeymapFile",
+    },
+  },
+  {
+    "context": "Editor && mode == full",
+    "unbind": {
+      "cmd-e": "buffer_search::UseSelectionForFind",
+    },
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "cmd-b": "workspace::ToggleLeftDock",
+    },
+  },
+  {
+    "context": "Terminal",
+    "unbind": {
+      "cmd-k": "assistant::InlineAssist",
+    },
+  },
+  {
+    "context": "Editor && mode == full",
+    "unbind": {
+      "cmd-k": "assistant::InlineAssist",
+    },
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "cmd-k cmd-left": "workspace::ActivatePaneLeft",
+    },
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "cmd-k cmd-up": "workspace::ActivatePaneUp",
+    },
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "cmd-k cmd-down": "workspace::ActivatePaneDown",
+    },
+  },
+
+  // Binds
+  {
+    "context": "Workspace",
+    "bindings": {
+      // "shift shift": "file_finder::Toggle"
+    },
+  },
+  {
+    "context": "Editor && vim_mode == insert",
+    "bindings": {
+      // "j k": "vim::NormalBefore"
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-g": "git_panel::ToggleFocus",
+    },
+  },
+  {
+    "context": "KeymapEditor",
+    "bindings": {
+      "alt-cmd-e": "zed::OpenKeymapFile",
+    },
+  },
+  {
+    "context": "Editor && mode == full",
+    "bindings": {
+      "ctrl-cmd-e": "buffer_search::UseSelectionForFind",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-e": "workspace::ToggleLeftDock",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-k l": "workspace::ActivatePaneRight",
+    },
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "cmd-k cmd-right": "workspace::ActivatePaneRight",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-k h": "workspace::ActivatePaneLeft",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-k k": "workspace::ActivatePaneUp",
+    },
+  },
+
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-k j": "workspace::ActivatePaneDown",
+    },
+  },
+
+  {
+    "context": "(vim_mode == helix_normal) && !menu",
+    "bindings": {
+      "escape": [
+        "action::Sequence",
+        ["vim::HelixKeepNewestSelection", "vim::HelixCollapseSelection"],
+      ],
+    },
+  },
+  {
+    "context": "(vim_mode == helix_normal || vim_mode == helix_select) && !menu",
+    "bindings": {
+      "ctrl-;": "vim::OtherEnd",
+    },
+  },
+  {
+    "context": "(vim_mode == helix_normal || vim_mode == helix_select) && !menu",
+    "bindings": {
+      "enter t h": "editor::ToggleInlayHints",
+    },
+  },
+  {
+    "context": "VimControl && vim_mode == helix_normal && !menu && !BufferSearchBar",
+    "bindings": {
+      "k": "vim::Up",
+    },
+  },
+  {
+    "context": "VimControl && vim_mode == helix_normal && !menu && !BufferSearchBar",
+    "bindings": {
+      "j": "vim::Down",
+    },
+  },
+  {
+    "context": "VimControl && vim_mode == helix_normal && !menu && !BufferSearchBar",
+    "bindings": {
+      "g k": [
+        "vim::Up",
+        {
+          "display_lines": true,
+        },
+      ],
+    },
+  },
+  {
+    "context": "VimControl && vim_mode == helix_normal && !menu && !BufferSearchBar",
+    "bindings": {
+      "g j": [
+        "vim::Down",
+        {
+          "display_lines": true,
+        },
+      ],
+    },
+  },
+]
