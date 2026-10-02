@@ -199,8 +199,8 @@ let
             exit 2
           }
           if [[ $profile_kind == darwin ]]; then
-            # Determinate owns store GC; only prune generations here.
-            nh clean all --keep 1 --keep-since 4d --no-gc --no-gcroots --no-direnv
+              # prune + GC here; dedupe separately via `nso`.
+              nh clean all --keep 2 --keep-one
           else
             nh clean all
             if command -v mole >/dev/null 2>&1; then

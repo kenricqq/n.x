@@ -3,11 +3,11 @@
   host,
   lib,
   pkgs,
-  path,
+  paths,
   ...
 }:
 let
-  inherit (path)
+  inherit (paths)
     home
     ;
 
