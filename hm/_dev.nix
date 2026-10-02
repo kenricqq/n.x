@@ -89,7 +89,7 @@ in
           ];
           inactiveBorderColor = [ "blue" ];
         };
-        commandTemplates.dockerCompose = "docker compose compose -f docker-compose.yml";
+        commandTemplates.dockerCompose = "docker compose -f docker-compose.yml";
       };
     };
 

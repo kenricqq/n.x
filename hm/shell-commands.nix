@@ -199,8 +199,8 @@ let
             exit 2
           }
           if [[ $profile_kind == darwin ]]; then
-              # prune + GC here; dedupe separately via `nso`.
-              nh clean all --keep 2 --keep-one
+            # prune + GC here; dedupe separately via `nso`.
+            nh clean all --keep 2 --keep-one
           else
             nh clean all
             if command -v mole >/dev/null 2>&1; then
@@ -303,6 +303,13 @@ let
     '';
   };
 
+  remoteOpenrgb = pkgs.writeShellApplication {
+    name = "openrgb";
+    text = ''
+      exec ssh "${(builtins.head machine.allowIncoming).name}" openrgb "$@"
+    '';
+  };
+
   emptyTrash = pkgs.writeShellApplication {
     name = "emptytrash";
     runtimeInputs = with pkgs; [
@@ -350,6 +357,7 @@ in
   ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
     emptyTrash
     lockScreen
+    remoteOpenrgb
     restartMpd
   ]
   ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.wl-clipboard ];

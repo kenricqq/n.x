@@ -151,6 +151,7 @@
 
       ## Dev Software
       "ghostty"
+      "kitty"
       # "ghostty@tip"
       # "rio"
       "zed@preview"

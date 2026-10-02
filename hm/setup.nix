@@ -24,7 +24,7 @@ let
     "brightnessctl"
 
     "python-ytmusicapi"
-    # "pacman-contrib"
+    "pacman-contrib" # paccache for arch-update
 
     "freecad"
   ];

@@ -5,11 +5,6 @@
   ...
 }:
 
-let
-  inherit (paths)
-    home
-    ;
-in
 {
   programs = {
     delta = {
@@ -54,11 +49,6 @@ in
         pager.difftool = true;
         merge = {
           conflictStyle = "zdiff3";
-        };
-        url = {
-          "ssh://git@host" = {
-            insteadOf = "otherhost";
-          };
         };
       };
     };

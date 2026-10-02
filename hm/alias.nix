@@ -108,10 +108,8 @@ let
     cco = "codex";
     ghco = "ghostty/config";
     glco = "glance/glance.yml";
-    rco = "rio/config.toml";
     sbco = "sketchybar";
     wsco = "nushell/zellij-workspaces.toml";
-    zelco = "zellij";
     zkco = "zk/config.toml";
   };
 

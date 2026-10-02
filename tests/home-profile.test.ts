@@ -130,7 +130,7 @@ for (const profile of profiles) {
             ? [
               "nh", "clean", "all",
               ...(profile.label === "nix-darwin"
-                ? ["--keep", "2", "--keep-since", "4d", "--no-gc", "--no-gcroots", "--no-direnv"]
+                ? ["--keep", "2", "--keep-one"]
                 : ["mole", "clean"]),
             ]
             : action === "activate" && profile.activationAttribute
