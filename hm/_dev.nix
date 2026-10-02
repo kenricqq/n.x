@@ -11,8 +11,9 @@ in
 {
   imports = [
     ./dev/lang/go.nix
-    ./dev/lang/python.nix
+    ./dev/lang/haskell.nix
     ./dev/lang/js_ts.nix
+    ./dev/lang/python.nix
     ./dev/lang/markdown.nix
     ./dev/lang/rust.nix
     ./dev/lang/svg.nix

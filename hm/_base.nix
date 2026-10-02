@@ -68,7 +68,7 @@ in
         fastfetch
 
         python314Packages.kokoro
-        signal-cli
+        # signal-cli
       ]
       ++ lib.optionals (isLinux || isNixos) [
         handy
