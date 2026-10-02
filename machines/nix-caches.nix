@@ -13,7 +13,6 @@
     "https://zig-overlay.cachix.org"
     "https://zigtools.cachix.org"
     "https://codex-desktop-linux.cachix.org"
-    "https://jj.cachix.org"
     "https://oxalica.cachix.org"
   ];
   trusted-public-keys = [
@@ -29,7 +28,6 @@
     "zig-overlay.cachix.org-1:MCS36+WBxE8vqfE4j5BnCAx0Gse9EnTLSukAvP8JwtA="
     "zigtools.cachix.org-1:USl8MDuq1Jyx4pET+Q8siEIf1Nfja7hyXr9NuOf12PU="
     "codex-desktop-linux.cachix.org-1:nX/xy6AdK9hQE24A8ALGjkCKj2ObFmcnemiL5Cid4nk="
-    "jj.cachix.org-1:rOXYMWIM8CAjR0M3kifWXVoDXVriTPz+gX5oSdJe2Is="
     "oxalica.cachix.org-1:h0iRBw6tQD8+51ZvnNEBPbwLR58UD7klauDBWzBdugQ="
   ];
 }

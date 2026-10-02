@@ -9,6 +9,7 @@ let
     (import ../lib/paths.nix {
       home = config.home.homeDirectory;
       inherit (machine) name;
+      repo = machine.repo or machine.name;
     })
     // {
       configHome = config.xdg.configHome;

@@ -22,6 +22,7 @@ let
     (import ../../lib/paths.nix {
       home = config.users.users.${username}.home;
       inherit (machine) name;
+      repo = machine.repo or machine.name;
     })
     // {
       configHome = config.home-manager.users.${username}.xdg.configHome;
@@ -78,15 +79,8 @@ in
     };
   };
 
-  # Host basics
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-    };
-    hostPlatform = {
-      system = "aarch64-darwin";
-    };
-  };
+  # Host basics; lib/mksystem.nix sets allowUnfree for every system.
+  nixpkgs.hostPlatform.system = "aarch64-darwin";
 
   # Create /etc/bashrc that loads the nix-darwin environment.
   # services.nix-daemon.enable = true;
@@ -150,9 +144,8 @@ in
     };
   };
 
+  # lib/mksystem.nix sets system.primaryUser and stateVersion.
   system = lib.recursiveUpdate system-config {
-    primaryUser = username;
-
     activationScripts.postActivation.text = lib.mkAfter ''
       if launchctl print system/systems.determinate.nix-daemon >/dev/null 2>&1; then
         launchctl kickstart -k system/systems.determinate.nix-daemon || true

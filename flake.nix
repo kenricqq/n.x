@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    # nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -67,10 +66,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    jujutsu = {
-      url = "github:martinvonz/jj";
-      # inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # jujutsu = {
+    #   url = "github:martinvonz/jj";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     # non flakes
 
@@ -96,24 +95,24 @@
         inputs.fenix.overlays.default
         inputs.zig.overlays.default
 
-        (
-          _final: prev:
-          let
-            system = prev.stdenv.hostPlatform.system;
-            unstable = import inputs.nixpkgs {
-              inherit system;
-              config.allowUnfree = true;
-            };
-          in
-          {
+        # (
+        #   _final: prev:
+        #   let
+        #     system = prev.stdenv.hostPlatform.system;
+        #     unstable = import inputs.nixpkgs {
+        #       inherit system;
+        #       config.allowUnfree = true;
+        #     };
+        #   in
+        #   {
 
-            # Want the latest version of these
-            codex = unstable.codex;
-            nushell = unstable.nushell;
-            ghostty = unstable.ghostty;
-            gh = unstable.gh;
-          }
-        )
+        #     # Want the latest version of these
+        #     codex = unstable.codex;
+        #     nushell = unstable.nushell;
+        #     ghostty = unstable.ghostty;
+        #     gh = unstable.gh;
+        #   }
+        # )
       ];
 
       mkSystem = import ./lib/mksystem.nix {
@@ -246,11 +245,5 @@
       homeConfigurations.${profile.meridian.name} = mkHome profile.meridian;
 
       nixosConfigurations.${profile.laurentii.name} = mkSystem profile.laurentii;
-
-      # nixosConfigurations.wsl = mkSystem "wsl" {
-      #   system = "x86_64-linux";
-      #   user = "kenrict";
-      #   wsl = true;
-      # };
     };
 }

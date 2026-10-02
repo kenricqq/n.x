@@ -29,7 +29,8 @@
         enable = false;
         extraArgs = "--keep-since 4d --keep 2";
       };
-      flake = "${paths.nixrt}/flake.nix";
+      # NH_FLAKE must name the flake directory, not flake.nix.
+      flake = paths.nixrt;
     };
 
     nix-search-tv = {

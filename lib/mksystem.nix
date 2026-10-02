@@ -26,8 +26,6 @@ let
   # The config files for this system.
   machineHMConfig = ../machines/${name}/home.nix;
   machineOSConfig = ../machines/${name}/${if host.isDarwin then "darwin" else "nixos"}.nix;
-  # userOSConfig = ../users/${user}/${if host.isDarwin then "darwin" else "nixos"}.nix;
-  # userHMConfig = ../users/${user}/home-manager.nix;
 
   systemFunc = if host.isDarwin then inputs.darwin.lib.darwinSystem else nixpkgs.lib.nixosSystem;
   home-manager =
@@ -35,7 +33,7 @@ let
 
   inherit (nixpkgs.lib) optionals;
 in
-systemFunc rec {
+systemFunc {
   inherit system;
 
   # Inputs must be available while resolving machine module imports.
@@ -49,14 +47,7 @@ systemFunc rec {
 
     # Allow unfree packages.
     { nixpkgs.config.allowUnfree = true; }
-  ]
-  ++ optionals host.isWsl [
-    inputs.nixos-wsl.nixosModules.wsl
-  ]
-  ++ optionals host.isLinux [
-    # inputs.nix-snapd.nixosModules.default
-  ]
-  ++ [
+
     machineOSConfig
     home-manager.home-manager
     {
@@ -69,16 +60,10 @@ systemFunc rec {
       home-manager.backupFileExtension = "backup";
     }
 
-    # We expose some extra arguments so that our modules can parameterize
-    # better based on these values.
+    # Expose machine metadata and platform flags to system modules.
     {
       config._module.args = {
         inherit machine host;
-
-        currentSystem = system;
-        currentSystemName = name;
-        currentSystemUser = user;
-        isWSL = host.isWsl;
       };
     }
   ]
