@@ -1,10 +1,5 @@
-{ config, paths, pkgs, ... }:
+{ ... }:
 
-let
-  inherit (paths)
-    home
-  ;
-in
 {
   programs.obsidian = {
     enable = true;

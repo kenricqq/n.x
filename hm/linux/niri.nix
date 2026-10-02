@@ -1,4 +1,4 @@
-{ lib, paths, ... }:
+{ ... }:
 
 {
   wayland.windowManager.niri = {

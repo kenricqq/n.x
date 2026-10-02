@@ -1,10 +1,5 @@
-{ paths, ... }:
+{ ... }:
 
-let
-  inherit (paths)
-    home
-    ;
-in
 {
   programs.zathura = {
     enable = true;

@@ -5,9 +5,6 @@
   ...
 }:
 
-let
-  gpuVersion = "610.57.04";
-in
 {
   imports = [
   ]

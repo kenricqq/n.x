@@ -6,7 +6,6 @@
     crates-tui # browse crates.io in terminal
     gping # compare latency with live graphs
     kondo # clean project deps + build artifacts
-    lychee # link check for docs/sites
     ttyper # typing practice
 
     # dev/doc tools

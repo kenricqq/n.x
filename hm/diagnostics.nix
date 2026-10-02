@@ -1,16 +1,10 @@
 {
-  config,
   host,
   lib,
   pkgs,
-  paths,
   ...
 }:
 let
-  inherit (paths)
-    home
-    ;
-
   inherit (host)
     isDarwin
     ;

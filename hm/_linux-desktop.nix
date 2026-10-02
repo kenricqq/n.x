@@ -25,7 +25,6 @@
     packages = with pkgs; [
       # gui apps
       vicinae # raycast-like
-      obsidian
       vlc
       jellyfin-desktop
       zulip

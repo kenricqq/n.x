@@ -1,15 +1,5 @@
-{
-  config,
-  pkgs,
-  paths,
-  ...
-}:
-let
-  inherit (paths)
-    home
-    nixrt
-    ;
-in
+{ pkgs, ... }:
+
 {
   programs = {
     numbat = {

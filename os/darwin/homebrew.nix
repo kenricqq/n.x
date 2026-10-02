@@ -53,7 +53,6 @@
       "sunshine" # display streaming
 
       "pandoc"
-      "zsh-async"
 
       "odin"
       "ols"

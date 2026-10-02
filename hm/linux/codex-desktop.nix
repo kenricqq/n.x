@@ -1,15 +1,5 @@
-{
-  config,
-  paths,
-  pkgs,
-  ...
-}:
+{ ... }:
 
-let
-  inherit (paths)
-    home
-    ;
-in
 {
   programs.codexDesktopLinux = {
     enable = true;

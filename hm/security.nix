@@ -11,8 +11,9 @@
   home.packages = with pkgs; [
     age # simple modern file encryption
     sops # encrypted secrets/config files
-    gnupg # OpenPGP encryption and signing
   ];
+
+  # OpenPGP encryption and signing; installs gnupg.
 
   programs.gpg = {
     enable = true;
