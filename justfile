@@ -1,6 +1,10 @@
 setup:
     lefthook install
 
+# report missing, empty, or inaccessible service paths without changing them
+check-paths:
+    @uv run --no-project --offline --no-cache --no-python-downloads python scripts/check-paths.py
+
 update_bun:
     bun update -g
 

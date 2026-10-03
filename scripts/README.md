@@ -7,6 +7,15 @@ dependencies and runs ShellCheck during the build.
 
 ## Commands
 
+- `just check-paths` (root or `hm/`) runs `check-paths.py` through installed
+  Python via uv, offline. Checks local MPD, Syncthing, sops, Darwin launch
+  agents/configs, and Linux Hermes prerequisites. Uses installed service
+  configuration; does not evaluate Nix, create paths, or restart services.
+  Missing/broken/inaccessible paths and empty input files are errors. Empty
+  content directories warn, ignoring placeholders and sync metadata. Log/state
+  outputs may be empty or absent when their parent is writable. Any finding
+  exits 1; a clean check exits 0. Run as your normal user outside a sandbox for
+  accurate permission checks. Passing checks does not prove service health.
 - `hx-history` owns Helix's XDG-backed recent-file history. The public entry
   points are `hx-open`, `hx-last`, and `hx-recent`; interactive shells shorten
   those to `hx`, `hxl`, and `hxr`.

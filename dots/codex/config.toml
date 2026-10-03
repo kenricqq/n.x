@@ -33,7 +33,16 @@ max_bytes = 5242880 # 5 MiB of CLI input history
 
 [tui]
 session_picker_view = "dense"
-status_line = ["model-with-reasoning", "current-dir", "branch-changes", "context-used", "weekly-limit", "fast-mode", "thread-title"]
+status_line = [
+  "thread-name",
+  "model-with-reasoning",
+  "current-dir",
+  "branch-changes",
+  "context-used",
+  "weekly-limit",
+  "used-tokens",
+  "fast-mode",
+]
 screen_reader_detection_done = true
 status_line_use_colors = true
 
