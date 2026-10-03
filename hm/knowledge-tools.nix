@@ -25,7 +25,7 @@ in
     memos # memo hub
     glance # browser dashboard
 
-    miniflux # rss backend
+    # miniflux # rss backend
 
     graphify # codebase to knowledge graph
 
@@ -42,7 +42,7 @@ in
 
   programs = {
     eilmeldung = {
-      enable = true;
+      enable = false;
       settings = {
         # after_sync_commands = [
         #   "query lastsync"

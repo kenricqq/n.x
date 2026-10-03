@@ -16,7 +16,7 @@
   programs = {
     nh = {
       enable = true;
-      clean.enable = true;
+      clean.enable = false;
       flake = "/home/${machine.user}/${machine.repo or machine.name}#${machine.name}";
     };
     command-not-found.enable = false;

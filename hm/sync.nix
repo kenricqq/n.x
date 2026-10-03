@@ -31,7 +31,7 @@
   };
 
   services.restic = {
-    enable = true;
+    enable = false;
     backups = {
       #   localbackup = {
       #     exclude = [

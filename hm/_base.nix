@@ -53,8 +53,8 @@ in
     ./ssh.nix
   ]
   ++ lib.optionals isDarwin [
-    ./macos/sketchybar.nix
-    ./macos/aerospace.nix
+    # ./macos/sketchybar.nix
+    # ./macos/aerospace.nix
   ];
 
   home = {
@@ -150,8 +150,6 @@ in
       }
       // lib.optionalAttrs isDarwin {
         "Library/Application Support/dooit/config.py" = paths.mkDotFile "dooit/config.py";
-        # ensure launchd log directory exists so glance can start at login
-        "Library/Logs/glance/.keep".text = "";
       }
       // lib.optionalAttrs (isLinux || isNixos) {
         ".local/bin/inir" = paths.mkDotFile "quickshell/inir/scripts/inir";
@@ -172,8 +170,8 @@ in
       "zed/settings.json" = "zed/settings.json";
     }
     // lib.optionalAttrs isDarwin {
-      "aerospace" = "aerospace";
-      "sketchybar" = "sketchybar";
+      # "aerospace" = "aerospace";
+      # "sketchybar" = "sketchybar";
     }
     // lib.optionalAttrs (isLinux || isNixos) {
       "autostart/handy.desktop" = "handy/handy.desktop";

@@ -117,6 +117,7 @@ in
       enable = true;
       enableTCPIP = true;
       package = pkgs.postgresql_18;
+      dataDir = "${paths.nixrt}/extensions/postgresql/18";
       port = 5433;
       # ensureDatabases = [
       #   "miniflux"

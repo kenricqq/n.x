@@ -23,6 +23,9 @@ node_modules
 
 *.rayconfig
 
+# PostgreSQL runtime data.
+/extensions/postgresql/
+
 __pycache__
 
 # Impeccable installs platform engines; its tracked launcher can fetch the pinned version.

@@ -29,7 +29,7 @@ pages:
             cache: 1h
             url: https://api.raindrop.io/rest/v1/raindrops/0?perpage=10
             headers:
-              Authorization: 'Bearer ${RAINDROP_TOKEN}'
+              Authorization: "Bearer ${RAINDROP_TOKEN}"
             template: |
               {{ if .JSON.Bool "result" }}
                 <ul class="list list-gap-10 collapsible-container" data-collapse-after="2">
@@ -210,7 +210,6 @@ pages:
               # Science
               - UCYO_jab_esuFRV4b17AJtAw # 3Blue1Brown
               - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
-              -  # Big Think
 
           - type: group
             widgets:

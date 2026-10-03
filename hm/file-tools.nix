@@ -162,8 +162,9 @@ in
     # faster tldr, man pages
     tealdeer = {
       enable = true;
+      # manual: tldr --update
+      enableAutoUpdates = false;
       settings = {
-        enableAutoUpdates = false;
         # display = {
         #   compact = true;
         #   use_pager = true;

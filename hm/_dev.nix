@@ -1,4 +1,5 @@
 {
+  host,
   lib,
   pkgs,
   machine,
@@ -6,7 +7,7 @@
 }:
 
 let
-  isDarwin = false;
+  inherit (host) isLinux;
 in
 {
   imports = [
@@ -24,6 +25,9 @@ in
     ./dev/lsp.nix
     ./dev/pi.nix
     ./dev/vcs.nix
+  ]
+  ++ lib.optionals (isLinux) [
+    # running ollama-cuda, only cachyos machine w discrete gpu
     ./dev/ollama.nix
   ];
 

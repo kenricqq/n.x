@@ -6,7 +6,7 @@
 }:
 
 let
-  inherit (lib) concatMapStringsSep concatStringsSep;
+  inherit (lib) concatStringsSep;
 
   dlaunch = rec {
     script = name: text: "${pkgs.writeShellScriptBin name text}/bin/${name}";
@@ -34,12 +34,6 @@ let
 
     logDir = name: "${paths.home}/Library/Logs/${name}";
     logBase = name: flat: if flat then logDir name else "${logDir name}/${name}";
-
-    mkLogDirs =
-      names:
-      concatMapStringsSep "\n" (
-        name: "install -d -m 755 -o ${machine.user} -g staff '${logDir name}'"
-      ) names;
 
     mkAgentServiceConfig =
       {

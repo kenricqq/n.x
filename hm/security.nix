@@ -19,7 +19,7 @@
   };
 
   services.gpg-agent = {
-    enable = true;
+    enable = false;
     enableSshSupport = false;
   };
 
@@ -34,6 +34,9 @@
 
     secrets = {
       FLAKEHUB_TOKEN = { };
+      TS_AUTHKEY = { };
+
+      # don't really use raindrop anymore...
       RAINDROP_TOKEN = { };
     };
   };

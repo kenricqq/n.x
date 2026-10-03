@@ -2,7 +2,6 @@
   lib,
   machine,
   paths,
-  pkgs,
   ...
 }:
 
@@ -36,9 +35,6 @@
     nh.enable = lib.mkForce false;
     nh.clean.enable = lib.mkForce false;
   };
-
-  # This Intel machine does not need Meridian's CUDA Ollama package.
-  services.ollama.package = lib.mkForce pkgs.ollama;
 
   xdg.enable = true;
 }

@@ -26,7 +26,7 @@
     nh = {
       enable = true;
       clean = {
-        enable = true;
+        enable = false;
         extraArgs = "--keep-since 4d --keep 2";
       };
       flake = "${paths.nixrt}/flake.nix";

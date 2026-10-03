@@ -21,10 +21,7 @@ in
       # dataDir = "${home}/.mpd"; # Default: "$XDG_DATA_HOME/mpd"
       # dbFile = "${home}/.mpd/database";
       playlistDirectory = "${home}/Music/mpd/playlists";
-      extraArgs = [
-        "--stderr"
-        "--verbose"
-      ];
+      extraArgs = [ "--stderr" ];
       network = {
         listenAddress = "127.0.0.1";
         port = 6600;
@@ -63,9 +60,7 @@ in
 
   xdg.configFile."mpd/mpd.conf".text = config.services.mpd.generatedConfig;
 
-  home.file = {
-    ".mpd/.keep".text = "";
-  } // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+  home.file = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
     "Library/Logs/mpd/.keep".text = "";
   };
 
