@@ -135,6 +135,8 @@
       # "betterdisplay"
       # "lunar" # brightness
 
+      "scroll-reverser"
+
       "moonlight"
 
       "notion"

@@ -67,6 +67,8 @@ in
         dnsutils # dig
         fastfetch
 
+        watchexec
+
         python314Packages.kokoro
         # signal-cli
       ]

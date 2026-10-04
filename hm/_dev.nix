@@ -14,8 +14,9 @@ in
     ./dev/lang/go.nix
     ./dev/lang/haskell.nix
     ./dev/lang/js_ts.nix
-    ./dev/lang/python.nix
+    ./dev/lang/latex.nix
     ./dev/lang/markdown.nix
+    ./dev/lang/python.nix
     ./dev/lang/rust.nix
     ./dev/lang/svg.nix
     ./dev/lang/typst.nix
@@ -140,6 +141,11 @@ in
       enableNushellIntegration = true;
       # mise.enable = true;
       nix-direnv.enable = true;
+      config = {
+        global = {
+          hide_env_diff = true;
+        };
+      };
       silent = true;
     };
     # mise = {
