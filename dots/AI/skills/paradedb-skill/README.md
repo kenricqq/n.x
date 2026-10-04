@@ -9,33 +9,36 @@
   <br>
 </h1>
 
+<h2 align="center">Just use Postgres.</h2>
+
 <p align="center">
-  <b>Search without a second system.</b><br/>
-  One Postgres for your application data, full-text search, vector retrieval, and aggregations.
+  Fast text and vector search, filters, facets, and joins in Postgres.
 </p>
 
 <h3 align="center">
   <a href="https://paradedb.com">Website</a> &bull;
-  <a href="https://docs.paradedb.com">Docs</a> &bull;
+  <a href="https://www.paradedb.com/docs/start/introduction">Docs</a> &bull;
   <a href="https://paradedb.com/slack">Community</a> &bull;
   <a href="https://paradedb.com/blog/">Blog</a> &bull;
-  <a href="https://docs.paradedb.com/changelog/">Changelog</a>
+  <a href="https://www.paradedb.com/docs/project/changelog">Changelog</a>
 </h3>
 
 ---
 
 # ParadeDB Agent Skill
 
-An AI agent skill for [ParadeDB](https://paradedb.com) - One Postgres for your application data, full-text search, vector retrieval, and aggregations.. Once installed, the skill activates when you ask your agent about:
+An AI agent skill for [ParadeDB](https://paradedb.com) — fast text and vector search, filters, facets, and joins in Postgres. Once installed, the skill activates when you ask your agent about:
 
 - ParadeDB
-- BM25 indexing
+- ParadeDB indexing and BM25 scoring
 - Full-text search in Postgres
+- Vector and hybrid search in Postgres
+- Filters, facets, joins, and aggregations
 - Elasticsearch alternatives for Postgres
 
 > [!NOTE]
 > ParadeDB also supports MCP integrations. For setup instructions, use
-> [https://docs.paradedb.com/welcome/ai-agents](https://docs.paradedb.com/welcome/ai-agents).
+> [https://www.paradedb.com/docs/start/ai-agents](https://www.paradedb.com/docs/start/ai-agents).
 > The `/mcp` route is a protocol endpoint, not a human-readable docs page.
 
 ## Installation
@@ -52,19 +55,27 @@ npx skills add paradedb/agent-skills
 
 Use this path when `npx skills add` is unavailable.
 
+Install the skill in the directory that matches your agent. Several agents share
+the project-local `.agents/skills` directory, but global directories vary.
+
+| Agent          | Global directory            | Project directory  |
+| -------------- | --------------------------- | ------------------ |
+| Claude Code    | `~/.claude/skills`          | `.claude/skills`   |
+| Codex          | `~/.agents/skills`          | `.agents/skills`   |
+| Cursor         | `~/.cursor/skills`          | `.cursor/skills`   |
+| Devin          | `~/.config/devin/skills`    | `.devin/skills`    |
+| Gemini CLI     | `~/.gemini/skills`          | `.agents/skills`   |
+| GitHub Copilot | `~/.copilot/skills`         | `.agents/skills`   |
+| Grok Build     | `~/.grok/skills`            | `.grok/skills`     |
+| OpenCode       | `~/.config/opencode/skills` | `.opencode/skills` |
+| Warp           | `~/.agents/skills`          | `.agents/skills`   |
+
 > [!TIP]
-> Directory conventions below were verified on **March 3, 2026**.
+> Added directories were last checked against the installer on **September 24, 2026**.
+> See [vercel-labs/skills](https://github.com/vercel-labs/skills#supported-agents)
+> for the full, maintained list.
 
-| Agent       | Global directory                                      | Project directory                        |
-| ----------- | ----------------------------------------------------- | ---------------------------------------- |
-| Claude Code | `~/.claude/skills`                                    | `.claude/skills`                         |
-| OpenCode    | `~/.config/opencode/skills` (or `~/.opencode/skills`) | `.opencode/skills`                       |
-| Cursor      | `~/.cursor/skills`                                    | `.cursor/skills`                         |
-| Amp         | `~/.config/agents/skills`                             | `.agents/skills`                         |
-| Windsurf    | `~/.codeium/windsurf/skills`                          | `.windsurf/skills`                       |
-| Codex       | `$CODEX_HOME/skills`                                  | Set `CODEX_HOME` to a project-local path |
-
-Install the skill in the directory that matches your agent. For example, for Claude:
+For example, for Claude Code:
 
 ```bash
 TARGET_DIR="$HOME/.claude/skills/paradedb-skill"
@@ -77,7 +88,7 @@ chmod +x "$TARGET_DIR/scripts/paradedb-docs"
 ```
 
 For project-local installs, change `TARGET_DIR` to the corresponding project
-directory (for example, `.claude/skills/paradedb-skill`).
+directory (for example, `.agents/skills/paradedb-skill` or `.claude/skills/paradedb-skill`).
 
 ## Implementation
 
@@ -99,8 +110,8 @@ if [[ "$DOC_PATH" != *.md && "$DOC_PATH" != *.txt ]]; then
   exit 1
 fi
 
-curl -fsSL "https://docs.paradedb.com/$DOC_PATH"
-``` 
+curl -fsSL "https://www.paradedb.com/docs/$DOC_PATH"
+```
 
 ### Example Prompts
 
@@ -108,9 +119,9 @@ See [EXAMPLES.md](EXAMPLES.md) for categorized prompt examples.
 
 ## Links
 
-- [ParadeDB Documentation](https://docs.paradedb.com)
-- [ParadeDB AI Agents Guide](https://docs.paradedb.com/welcome/ai-agents)
-- [LLM-Optimized Docs](https://docs.paradedb.com/llms-full.txt)
+- [ParadeDB Documentation](https://www.paradedb.com/docs/start/introduction)
+- [ParadeDB AI Agents Guide](https://www.paradedb.com/docs/start/ai-agents)
+- [LLM-Optimized Docs](https://www.paradedb.com/docs/llms-full.txt)
 - [ParadeDB GitHub](https://github.com/paradedb/paradedb)
 
 ## License

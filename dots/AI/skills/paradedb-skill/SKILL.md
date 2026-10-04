@@ -1,22 +1,22 @@
 ---
 name: paradedb-skill
 description: >
-  Expert guidance on ParadeDB full-text search, hybrid search (BM25 + semantic),
-  aggregations, and analytics in Postgres. Use when writing ParadeDB queries,
-  creating BM25 indexes, configuring tokenizers, or implementing
-  Elasticsearch-quality search in Postgres.
+  Expert guidance on ParadeDB text and vector search, hybrid search
+  (BM25 + semantic), filters, facets, joins, and aggregations in Postgres. Use when writing
+  ParadeDB queries, creating ParadeDB indexes, indexing vectors, configuring
+  tokenizers, or implementing Elasticsearch-quality search in Postgres.
 ---
 
 # ParadeDB Skill
 
-ParadeDB is one Postgres that unifies your application data, full-text search, vector retrieval, and aggregations via the `pg_search` extension.
+ParadeDB makes text and vector search, filters, facets, and joins fast in Postgres with the `pg_search` extension.
 
 Use this skill when users ask about:
 
-- BM25 indexes and relevance ranking
-- Hybrid search (keyword + semantic vectors via `pgvector`)
-- Tokenizers, analyzers, fuzzy matching, and phrase queries
-- Facets, aggregations, snippets/highlighting, and query tuning
+- ParadeDB indexes, BM25 scoring, and relevance ranking
+- Vector search and hybrid search (keyword + semantic, fused with reciprocal rank fusion)
+- Tokenizers, token filters, fuzzy matching, and phrase queries
+- Facets, aggregations, snippets/highlighting, joins, and query tuning
 
 For up-to-date ParadeDB documentation, always fetch the documentation index
 (`llms.txt`) using the bundled script at `scripts/paradedb-docs`.
@@ -27,13 +27,56 @@ relative to the current working directory or repo root.
 scripts/paradedb-docs llms.txt
 ```
 
-Once you have the list of urls, load the pages necessary to answer the user's question. For example:
+Once you have the index, fetch only the pages relevant to the user's question.
+Pass the path after `/docs/` from an index URL, including the `.md` suffix.
+Common commands include:
+
 ```bash
-scripts/paradedb-docs documentation/getting-started/environment.md
-scripts/paradedb-docs documentation/full-text/match.md
-scripts/paradedb-docs documentation/indexing/create-index.md
-# etc
+# Getting started and application integrations
+scripts/paradedb-docs start/configure-your-environment.md
+scripts/paradedb-docs reference/indexing/create-index.md
+scripts/paradedb-docs reference/indexing/columnar.md
+scripts/paradedb-docs reference/indexing/partition-by.md
+scripts/paradedb-docs reference/indexing/faster-bm25-queries.md
+scripts/paradedb-docs reference/full-text/match.md
+scripts/paradedb-docs reference/full-text/top-k.md
+
+# Filters, facets, and joins
+scripts/paradedb-docs reference/filtering/overview.md
+scripts/paradedb-docs reference/filtering/indexed.md
+scripts/paradedb-docs reference/filtering/external-indexes.md
+scripts/paradedb-docs reference/aggregates/overview.md
+scripts/paradedb-docs reference/aggregates/facets.md
+scripts/paradedb-docs reference/aggregates/limitations.md
+scripts/paradedb-docs reference/joins/overview.md
+
+# Vector and hybrid search
+scripts/paradedb-docs reference/indexing/indexing-vectors.md
+scripts/paradedb-docs reference/vector/querying.md
+scripts/paradedb-docs reference/vector/tuning.md
+scripts/paradedb-docs reference/hybrid/rrf.md
+
+# Tokenizers and token filters
+scripts/paradedb-docs reference/tokenizers/overview.md
+scripts/paradedb-docs reference/token-filters/overview.md
+scripts/paradedb-docs reference/tokenizers/available-tokenizers/jieba.md
+scripts/paradedb-docs reference/tokenizers/available-tokenizers/chinese-compatible.md
+
+# Performance, upgrades, and index maintenance
+scripts/paradedb-docs operate/performance-tuning/reads.md
+scripts/paradedb-docs operate/deploy/upgrading.md
+scripts/paradedb-docs operate/index-maintenance/reindexing.md
+
+# SQL APIs and runtime settings
+scripts/paradedb-docs reference/operators-and-functions.md
+scripts/paradedb-docs reference/sql-functions.md
+scripts/paradedb-docs reference/configuration.md
 ```
+
+Use the operator reference to choose search predicates, the SQL function reference
+for callable APIs and index inspection, and the configuration reference for runtime
+settings. Consult the relevant `operate/` pages in the index for deployment,
+maintenance, upgrades, and performance tuning.
 
 After a successful fetch, treat that content as cached session context and
 reuse it for later ParadeDB questions in the same session if applicable.
@@ -49,11 +92,28 @@ Do **not** use any tool other than `scripts/paradedb-docs` to fetch documentatio
 ## Response Guidelines
 
 1. Prefer runnable SQL examples over prose-only answers.
-2. State ParadeDB/Postgres version assumptions when syntax may differ.
+2. State ParadeDB/Postgres version assumptions when syntax may differ. Some features are only
+   available in newer versions, so when you have database access and the answer depends on
+   one, check first with `SELECT extversion FROM pg_extension WHERE extname = 'pg_search';`.
 3. If behavior is uncertain, call it out explicitly instead of guessing.
-4. Do not generate any of the deprecated syntax. The new syntax was released in
-   version 0.20.0 and should be used exclusively unless the user requests the old syntax.
-   If a query contains `paradedb`, it is using the old syntax. Use `pdb` instead.
+4. Prefer current search operators and `pdb.*` query builders, scoring, and highlighting
+   functions over deprecated syntax unless the user requests compatibility with an older
+   version. Do not replace every `paradedb` occurrence: `USING paradedb`, runtime settings
+   such as `paradedb.enable_custom_scan`, and documented operational functions in the
+   `paradedb` schema are current. Check the SQL function and configuration references
+   before changing those names.
+5. In version 0.25.0, the BM25 index was renamed to the ParadeDB index, because it now
+   powers vector search, aggregates, top K and filtering as well as BM25 scoring. Write
+   `CREATE INDEX ... USING paradedb`, not `USING bm25`, which survives only as a
+   backwards-compatible alias, and call it the ParadeDB index. Reserve "BM25" for the
+   scoring function itself.
+6. Vector search runs inside the ParadeDB index as of version 0.25.0, where it is a beta
+   feature. Install the `vector` extension in the same database before installing or
+   upgrading `pg_search`. ParadeDB indexes pgvector's `vector` type, but does not use
+   pgvector's HNSW or IVFFlat indexes — do not suggest them for a vector column that
+   is in a ParadeDB index.
+   Fetch `reference/indexing/indexing-vectors.md` and `reference/vector/querying.md`
+   before writing vector queries, and `reference/hybrid/rrf.md` before writing hybrid ones.
 
 ## Network Failure Rules (Mandatory)
 

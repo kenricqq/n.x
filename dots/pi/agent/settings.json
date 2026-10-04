@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "1.0.0",
+  "lastChangelogVersion": "1.0.2",
   "defaultProvider": "openrouter",
   "defaultModel": "anthropic/claude-opus-5.5",
   "defaultThinkingLevel": "high",
@@ -11,7 +11,9 @@
   "packages": [
     {
       "source": "git:github.com/tmustier/pi-extensions",
-      "extensions": ["files-widget/index.ts"]
+      "extensions": [
+        "files-widget/index.ts"
+      ]
     },
     "git:github.com/nicobailon/visual-explainer",
     "git:github.com/nicobailon/pi-intercom",
@@ -20,7 +22,9 @@
     "git:git@github.com:nicobailon/pi-subagents.git",
     "npm:@juicesharp/rpiv-todo"
   ],
-  "npmCommand": ["bun"],
+  "npmCommand": [
+    "bun"
+  ],
   "compaction": {
     "enabled": true
   },
