@@ -12,7 +12,10 @@ web_search = "live"
 project_root_markers = [".git", ".jj"]
 allow_login_shell = false
 
-notify = ["/Users/kenrictee/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
+notify = [
+  "/Users/kenrictee/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient",
+  "turn-ended",
+]
 
 [features]
 computer_use = true
@@ -79,9 +82,6 @@ show-context-window-usage = true
 "/home/kenrict/Documents/Codex/2026-09-08/realtime-voice-chat" = { trust_level = "trusted" }
 
 [projects."/Users/kenrictee/m0nix"]
-trust_level = "trusted"
-
-[projects."/home/kenrict/laurentii"]
 trust_level = "trusted"
 
 [projects."/home/kenrict/Projects/Sandbox/iNiR"]
@@ -193,7 +193,7 @@ enabled = false
 [hooks.state]
 
 [hooks.state."/home/kenrict/.codex/hooks.json:post_tool_use:0:0"]
-trusted_hash = "sha256:72de3cd08abf2e5ac9248c427af8f47d19cef24f0652087c0059367a7c1ff149"
+trusted_hash = "sha256:328b120bf00511768c280b0a45367646c11e22997d771b879717e5fdf5519843"
 enabled = true
 
 [hooks.state."/home/kenrict/.codex/hooks.json:user_prompt_submit:0:0"]
@@ -207,8 +207,6 @@ trusted_hash = "sha256:d73e60ccd479a637e3748a31b02231beb5c4d405c7a9f2ab4af86f4d8
 
 [hooks.state."/home/kenrict/.codex/hooks.json:stop:0:0"]
 trusted_hash = "sha256:01eca8a4449adf706d9274b9e1dd3407a393a2a0ec613ab78d7ae99842ae0fe1"
-[notice]
-hide_rate_limit_model_nudge = true
 
 [hooks.state."/home/kenrict/Projects/esp32-s3/.codex/hooks.json:post_tool_use:0:0"]
 trusted_hash = "sha256:328b120bf00511768c280b0a45367646c11e22997d771b879717e5fdf5519843"
@@ -216,8 +214,6 @@ trusted_hash = "sha256:328b120bf00511768c280b0a45367646c11e22997d771b879717e5fdf
 [hooks.state."/home/kenrict/Projects/esp32-s3/.codex/hooks.json:stop:0:0"]
 trusted_hash = "sha256:01eca8a4449adf706d9274b9e1dd3407a393a2a0ec613ab78d7ae99842ae0fe1"
 
-[hooks.state."/home/kenrict/.codex/hooks.json:stop:0:0"]
-trusted_hash = "sha256:b8fbf89a1177417772ae25e8ec664eb4136122b3006f3fff69ba6f539e46c66e"
 
 [hooks.state."/Users/kenrictee/.codex/hooks.json:stop:0:0"]
 trusted_hash = "sha256:b8fbf89a1177417772ae25e8ec664eb4136122b3006f3fff69ba6f539e46c66e"

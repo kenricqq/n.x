@@ -128,5 +128,6 @@ in
     imagemagick # img transform
     upscayl # img upscaler
     termshot # terminal screenshots
+    img2pdf
   ];
 }
