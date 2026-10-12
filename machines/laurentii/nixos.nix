@@ -1,10 +1,20 @@
 {
+  config,
   inputs,
+  lib,
   machine,
   pkgs,
   ...
 }:
 
+let
+  paths = import ../../lib/paths.nix {
+    home = config.home-manager.users.${machine.user}.home.homeDirectory;
+    inherit (machine) name;
+    repo = machine.repo or machine.name;
+  };
+  memosHomeDir = "${config.home-manager.users.${machine.user}.xdg.dataHome}/memos";
+in
 {
   imports = [
     ./hardware.nix
@@ -31,6 +41,23 @@
   hardware.i2c.enable = true; # for monitor input switching
 
   services = {
+    memos = {
+      enable = true;
+      user = machine.user;
+      group = config.users.users.${machine.user}.group;
+      # Manage the real directory; Home Manager owns the home symlink.
+      dataDir = "${paths.dots}/memos";
+      openFirewall = false;
+      settings = {
+        MEMOS_ADDR = "127.0.0.1";
+        MEMOS_PORT = "8082";
+        MEMOS_DATA = memosHomeDir;
+        MEMOS_DRIVER = "sqlite";
+        MEMOS_DSN = "${memosHomeDir}/memos_dev.db";
+        MEMOS_INSTANCE_URL = "https://${machine.network.tailscaleDnsName}:8443";
+      };
+    };
+
     udev = {
       packages = [ pkgs.openrgb ];
       extraRules = ''
@@ -63,6 +90,36 @@
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
+    };
+  };
+
+  systemd.services.memos = {
+    requires = [ "home-manager-${machine.user}.service" ];
+    after = [ "home-manager-${machine.user}.service" ];
+    serviceConfig = {
+      Restart = "on-failure";
+      # The module's ReadWritePaths permits writes only to dataDir under home.
+      ProtectHome = lib.mkForce "read-only";
+    };
+  };
+
+  systemd.services.memos-serve = {
+    description = "Expose Memos through Tailscale Serve";
+    wantedBy = [ "multi-user.target" ];
+    wants = [
+      "memos.service"
+      "tailscaled.service"
+    ];
+    after = [
+      "memos.service"
+      "tailscaled.service"
+    ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${lib.getExe config.services.tailscale.package} serve --bg --yes --https=8443 http://127.0.0.1:${config.services.memos.settings.MEMOS_PORT}";
+      Restart = "on-failure";
+      RestartSec = 5;
     };
   };
 

@@ -22,15 +22,19 @@ node_modules
 .DS_Store
 /.cache/
 
+# pg runtime data
+/extensions/postgresql/
+
+
+# data files (golink + memos)
 /extensions/golink/golinks.sqlite
 **/memos_dev.db*
 
-/dots/AI/skills/impeccable/scripts/bin
+# memos runtime files
+**/memos/*-shm
+**/memos/*-wal
 
 *.rayconfig
-
-# PostgreSQL runtime data.
-/extensions/postgresql/
 
 __pycache__
 

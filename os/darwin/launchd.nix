@@ -33,6 +33,7 @@ let
   #   exec '${pkgs.miniflux}/bin/miniflux' -c '${paths.dots}/miniflux/config.env'
   # '';
 
+  memosDataDir = "${config.home-manager.users.${machine.user}.xdg.dataHome}/memos";
   golinkDir = "${paths.nixrt}/extensions/golink";
   golink = dlaunch.script "golink-launch" ''
     set -euo pipefail
@@ -41,6 +42,15 @@ let
     export TS_AUTHKEY
     exec '${pkgs.golink}/bin/golink' --sqlitedb '${golinkDir}/golinks.sqlite'
   '';
+
+  memosDataDir = "${config.home-manager.users.${machine.user}.xdg.dataHome}/memos";
+  golinkDir = "${paths.nixrt}/extensions/golink";
+  logDirs = [
+    "glance"
+    "miniflux"
+    "memos"
+    "golink"
+  ];
 in
 {
   launchd.user.agents = {
@@ -60,7 +70,8 @@ in
       label = "dev.memos";
       args = [
         "${pkgs.memos}/bin/memos"
-        "--data=${paths.home}/KTQQ/docs/notes/memos"
+        "--data=${memosDataDir}"
+        "--dsn=${memosDataDir}/memos_dev.db"
         "--port=8082"
       ];
       logName = "memos";

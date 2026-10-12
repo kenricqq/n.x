@@ -78,7 +78,7 @@ in
         handy
         wtype # needed for handy
 
-        comfyui
+        # comfyui
 
         loupe
         swayimg

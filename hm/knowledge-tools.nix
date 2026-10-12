@@ -1,6 +1,7 @@
 {
   inputs,
   machine,
+  paths,
   pkgs,
   ...
 }:
@@ -17,6 +18,8 @@ let
   };
 in
 {
+  xdg.dataFile."memos" = paths.mkDotFile "memos";
+
   home.packages = with pkgs; [
     # (dooit.override { extraPackages = [ dooit-extras ]; })
     dooitWithExtras

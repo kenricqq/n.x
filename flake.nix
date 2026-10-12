@@ -236,6 +236,7 @@
           network = {
             tb = "10.10.10.4";
             tailscale = "100.112.47.42";
+            tailscaleDnsName = "nixos.tailc65586.ts.net";
           };
 
           allowIncoming = with profile; [
