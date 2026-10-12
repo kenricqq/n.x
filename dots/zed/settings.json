@@ -216,7 +216,6 @@
   },
   "colorize_brackets": true,
   "hide_mouse": "on_typing_and_action",
-  // "hide_mouse": "never",
   "theme": {
     "mode": "dark",
     "light": "macOS Classic Light",
@@ -240,10 +239,7 @@
       // "hint.background": "#242933",
     }
   },
-  // "buffer_font_family": "VictorMono Nerd Font Mono",
-  // "buffer_font_family": "SpaceMono Nerd Font Mono",
   "buffer_font_family": "Maple Mono NF CN",
-  // "buffer_font_family": "Monaspace Neon",
   "buffer_font_size": 14.0,
   "buffer_font_features": {
     "calt": true,
@@ -290,6 +286,7 @@
     "tsgo": true,
     "typescript-snippets": true,
     "typst": true,
-    "zig": true
+    "zig": true,
+    "postgres-language-server": true
   }
 }

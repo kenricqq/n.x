@@ -39,14 +39,13 @@ max_bytes = 5242880 # 5 MiB of CLI input history
 [tui]
 session_picker_view = "dense"
 status_line = [
-  "thread-name",
   "model-with-reasoning",
   "current-dir",
   "branch-changes",
   "context-used",
   "weekly-limit",
-  "used-tokens",
   "fast-mode",
+  "thread-title",
 ]
 screen_reader_detection_done = true
 status_line_use_colors = true
@@ -111,15 +110,6 @@ trust_level = "trusted"
 [projects."/home/kenrict/Projects/eido"]
 trust_level = "trusted"
 
-[projects."/Users/kenrictee/KTQQ/docs/Ideaverse"]
-trust_level = "trusted"
-
-[projects."/Users/kenrictee/KTQQ/m0nix"]
-trust_level = "trusted"
-
-[projects."/Users/kenrictee/KTQQ/cse_ms/242/assignments"]
-trust_level = "trusted"
-
 # Installed plugin registrations (distinct from the default-on plugins feature)
 [plugins]
 "codex-app-tools@openai-bundled" = { enabled = true }
@@ -144,15 +134,9 @@ enabled = true
 [plugins."chrome@openai-bundled"]
 enabled = true
 
-[plugins."computer-use@openai-bundled"]
-enabled = true
-
-[plugins."code-review@openai-bundled"]
-enabled = true
-
 [marketplaces.openai-bundled]
 source_type = "local"
-source = "/Users/kenrictee/.codex/.tmp/bundled-marketplaces/openai-bundled"
+source = "/home/kenrict/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
 source_type = "local"
@@ -160,34 +144,26 @@ source = "/Users/kenrictee/.cache/codex-runtimes/codex-primary-runtime/plugins/o
 
 [mcp_servers.node_repl]
 args = []
-command = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl"
+command = "/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/resources/cua_node/bin/node_repl"
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
-NODE_REPL_NODE_MODULE_DIRS = "/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
-NODE_REPL_NODE_PATH = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/Users/kenrictee/.codex:/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
-CODEX_HOME = "/Users/kenrictee/.codex"
-BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab,mcpapps"
+NODE_REPL_NODE_MODULE_DIRS = "/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/kenrict/.codex:/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/resources/cua_node/lib/node_modules"
+CODEX_HOME = "/home/kenrict/.codex"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 BROWSER_USE_TINYSKY_ENABLED = "0"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
-NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = "Control desktop apps on macOS through Computer Use."
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.930.31730"
-NODE_REPL_TRUSTED_SERVICES = '{"browser":"/Users/kenrictee/.codex/plugins/cache/openai-bundled/browser/26.930.31730/scripts/browser-service.mjs","sky":"@oai/sky/service"}'
-SKY_CUA_SERVICE_PATH = "/Users/kenrictee/.codex/computer-use/Codex Computer Use.app"
-CODEX_CLI_PATH = "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex"
+BROWSER_USE_CODEX_APP_VERSION = "26.917.71314"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/kenrict/.codex/plugins/cache/openai-bundled/browser/26.917.71314/scripts/browser-service.mjs"}'
+CODEX_CLI_PATH = "/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/resources/codex"
 
 [mcp_servers.cua_repl]
-command = "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
-enabled = false
-
-[mcp_servers.computer-use]
-command = "./Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
-args = ["mcp"]
-cwd = "."
+command = "/nix/store/1xlvgmdpc96j8ls3wdch050way8h8k53-codex-desktop-read-aloud-remote-mobile-control-ui-tweaks-26.917.71314/opt/codex-desktop/ChatGPT"
 enabled = false
 
 [hooks.state]
@@ -213,7 +189,6 @@ trusted_hash = "sha256:328b120bf00511768c280b0a45367646c11e22997d771b879717e5fdf
 
 [hooks.state."/home/kenrict/Projects/esp32-s3/.codex/hooks.json:stop:0:0"]
 trusted_hash = "sha256:01eca8a4449adf706d9274b9e1dd3407a393a2a0ec613ab78d7ae99842ae0fe1"
-
 
 [hooks.state."/Users/kenrictee/.codex/hooks.json:stop:0:0"]
 trusted_hash = "sha256:b8fbf89a1177417772ae25e8ec664eb4136122b3006f3fff69ba6f539e46c66e"
