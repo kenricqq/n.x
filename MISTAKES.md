@@ -37,9 +37,6 @@
 - Pass dependencies explicitly to imported helpers. Darwin and Home Manager have separate module argument scopes; construct Darwin `paths` and `dlaunch` in `machines/m0nix/darwin.nix` and expose them through `_module.args`. Pass `machine.repo` to both path helpers so custom checkouts stay aligned across scopes.
   - Check: `bun test tests/machine-paths.test.ts` and `nix eval --raw .#darwinConfigurations.m0nix.system.drvPath`. Home Manager-only evaluation misses Darwin Homebrew and launchd failures.
 
-- Pass inputs used in module `imports` through system `specialArgs`, not `_module.args`; imports are resolved before module configuration, so the latter can cause infinite recursion.
-  - Check: `nix eval --raw .#darwinConfigurations.m0nix.system.drvPath` after moving an input-backed Darwin import into a machine module.
-
 - Gate platform-specific packages and completions where they are registered, as `hm/display.nix` does for Linux-only `lg-input`.
   - Check both profiles: the package and completion must be absent on Darwin and present on Linux.
 
