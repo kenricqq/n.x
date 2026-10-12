@@ -207,6 +207,7 @@ let
       jsp = "split";
       jsq = "squash";
       jst = "status";
+      jtip = "edit 'heads(all())'";
       ju = "undo";
       jw = "workspace";
       jwa = "workspace add";
