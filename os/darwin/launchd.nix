@@ -29,11 +29,13 @@ let
 
   # miniflux = dlaunch.script "miniflux-launch" ''
   #   set -euo pipefail
-  #   until '${pkgs.postgresql_18}/bin/pg_isready' -h 127.0.0.1 -p 5433 >/dev/null 2>&1; do sleep 1; done
-  #   exec '${pkgs.miniflux}/bin/miniflux' -c '${paths.dots}/miniflux/config.env'
+  #   auth_key_file=${lib.escapeShellArg secrets.TS_AUTHKEY.path}
+  #   TS_AUTHKEY="$(< "$auth_key_file")"
+  #   export TS_AUTHKEY
+  #   exec '${pkgs.golink}/bin/golink' --sqlitedb '${golinkDir}/golinks.sqlite'
   # '';
 
-  memosDataDir = "${config.home-manager.users.${machine.user}.xdg.dataHome}/memos";
+  memosDataDir = "${paths.dataHome}/memos";
   golinkDir = "${paths.nixrt}/extensions/golink";
   golink = dlaunch.script "golink-launch" ''
     set -euo pipefail
@@ -42,15 +44,6 @@ let
     export TS_AUTHKEY
     exec '${pkgs.golink}/bin/golink' --sqlitedb '${golinkDir}/golinks.sqlite'
   '';
-
-  memosDataDir = "${config.home-manager.users.${machine.user}.xdg.dataHome}/memos";
-  golinkDir = "${paths.nixrt}/extensions/golink";
-  logDirs = [
-    "glance"
-    "miniflux"
-    "memos"
-    "golink"
-  ];
 in
 {
   launchd.user.agents = {

@@ -1,8 +1,8 @@
 {
-  config,
   inputs,
   lib,
   machine,
+  paths,
   pkgs,
   ...
 }:
@@ -18,23 +18,12 @@ let
   system-config = import (darwinPath + "/system.nix");
   nixCaches = import ../nix-caches.nix;
 
-  paths =
-    (import ../../lib/paths.nix {
-      home = config.users.users.${username}.home;
-      inherit (machine) name;
-      repo = machine.repo or machine.name;
-    })
-    // {
-      configHome = config.home-manager.users.${username}.xdg.configHome;
-    };
-
   sp = lib.concatStringsSep " ";
   val = v: if builtins.isList v then sp (map toString v) else toString v;
   nixConf = s: lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "${k} = ${val v}") s);
 in
 {
   _module.args = {
-    inherit paths;
     inherit
       (import (darwinPath + "/helpers.nix") {
         inherit

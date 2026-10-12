@@ -5,24 +5,28 @@
 }:
 
 let
-  paths =
-    (import ../lib/paths.nix {
-      home = config.home.homeDirectory;
-      inherit (machine) name;
-      repo = machine.repo or machine.name;
-    })
-    // {
-      configHome = config.xdg.configHome;
-      cache = config.xdg.cacheHome;
-      share = "${paths.home}/.local/state/nix/profiles/home-manager/home-path/share";
+  paths = rec {
+    home = config.home.homeDirectory;
 
-      mkDotFile = subpath: {
-        source = config.lib.file.mkOutOfStoreSymlink "${paths.dots}/${subpath}";
-      };
+    # Checkout path is relative to home; defaults to the machine name.
+    nixrt = "${home}/${machine.repo or machine.name}";
+    hm = "${nixrt}/hm";
+    os = "${nixrt}/os";
+    dots = "${nixrt}/dots";
+    darwin = "${os}/darwin";
+    scripts = "${nixrt}/scripts";
+    snippets = "${hm}/snippets";
+
+    inherit (config.xdg) configHome dataHome;
+    cache = config.xdg.cacheHome;
+    share = "${home}/.local/state/nix/profiles/home-manager/home-path/share";
+
+    mkDotFile = subpath: {
+      source = config.lib.file.mkOutOfStoreSymlink "${dots}/${subpath}";
     };
+  };
 in
 {
-  _module.args = {
-    inherit paths;
-  };
+  lib.paths = paths;
+  _module.args.paths = paths;
 }

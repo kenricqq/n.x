@@ -60,12 +60,13 @@ systemFunc {
       home-manager.backupFileExtension = "backup";
     }
 
-    # Expose machine metadata and platform flags to system modules.
-    {
-      config._module.args = {
+    # Share the user's resolved paths with system modules.
+    ({ config, ... }: {
+      _module.args = {
         inherit machine host;
+        paths = config.home-manager.users.${user}.lib.paths;
       };
-    }
+    })
   ]
   ++ optionals host.isDarwin [
     {

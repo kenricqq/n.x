@@ -59,12 +59,12 @@ const darwinPaths = `c:
     ) { inherit (agents) glance golink; };
   }`;
 
-function expectDarwinPaths(config: ReturnType<typeof evaluate>) {
+function expectDarwinPaths(config: ReturnType<typeof evaluate>, checkout = "m0nix") {
   expect(config.stateVersion).toBe(6);
   expect(config.primaryUser).toBe("kenrictee");
   expect(config.touchId).toBe(true);
   expect(config.hmHome).toBe(config.home);
-  expect(config.repo).toBe(`${config.home}/m0nix`);
+  expect(config.repo).toBe(`${config.home}/${checkout}`);
   expect(config.dots).toBe(`${config.repo}/dots`);
   expect(config.ageKeyFile).toBe(`${config.repo}/secrets/keys.txt`);
   expect(config.shellAgeKeyFile).toBe(config.ageKeyFile);
@@ -164,6 +164,27 @@ test("Darwin paths follow configured home and Home Manager XDG overrides", () =>
   expect(config.home).toBe("/Users/path-check");
   expect(config.configHome).toBe("/Users/path-check/custom-config");
   expectDarwinPaths(config);
+}, 120_000);
+
+test("Darwin system and Home Manager paths share a custom checkout", () => {
+  const config = evaluate(
+    "darwinConfigurations.m0nix",
+    `d:
+      let
+        machine = d.config.home-manager.extraSpecialArgs.machine // {
+          repo = "custom/checkout";
+        };
+        changed = d.extendModules {
+          modules = [ ({ lib, ... }: {
+            _module.args.machine = lib.mkForce machine;
+            home-manager.extraSpecialArgs = lib.mkForce (
+              d.config.home-manager.extraSpecialArgs // { inherit machine; }
+            );
+          }) ];
+        };
+      in (${darwinPaths}) changed.config`,
+  );
+  expectDarwinPaths(config, "custom/checkout");
 }, 120_000);
 
 test("standalone Linux Home Manager retains its machine layout", () => {

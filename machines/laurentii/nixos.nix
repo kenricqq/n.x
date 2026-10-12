@@ -3,17 +3,13 @@
   inputs,
   lib,
   machine,
+  paths,
   pkgs,
   ...
 }:
 
 let
-  paths = import ../../lib/paths.nix {
-    home = config.home-manager.users.${machine.user}.home.homeDirectory;
-    inherit (machine) name;
-    repo = machine.repo or machine.name;
-  };
-  memosHomeDir = "${config.home-manager.users.${machine.user}.xdg.dataHome}/memos";
+  memosHomeDir = "${paths.dataHome}/memos";
 in
 {
   imports = [
@@ -27,7 +23,7 @@ in
     nh = {
       enable = true;
       clean.enable = false;
-      flake = "/home/${machine.user}/${machine.repo or machine.name}#${machine.name}";
+      flake = "${paths.nixrt}#${machine.name}";
     };
     command-not-found.enable = false;
     niri.enable = true;
