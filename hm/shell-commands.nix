@@ -306,7 +306,8 @@ let
   remoteOpenrgb = pkgs.writeShellApplication {
     name = "openrgb";
     text = ''
-      exec ssh "${(builtins.head machine.allowIncoming).name}" openrgb "$@"
+      printf -v remoteCommand '%q ' openrgb "$@"
+      exec ssh "${(builtins.head machine.allowIncoming).name}" "$remoteCommand"
     '';
   };
 

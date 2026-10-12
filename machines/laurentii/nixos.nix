@@ -31,6 +31,12 @@
   hardware.i2c.enable = true; # for monitor input switching
 
   services = {
+    udev = {
+      packages = [ pkgs.openrgb ];
+      extraRules = ''
+        SUBSYSTEM=="hidraw", ATTRS{idVendor}=="26ce", ATTRS{idProduct}=="01a2", OWNER="${machine.user}"
+      '';
+    };
     desktopManager.gnome.enable = true;
     displayManager = {
       gdm.enable = false;

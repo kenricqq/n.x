@@ -209,6 +209,11 @@
           system = "x86_64-linux";
           user = "kenrict";
 
+          openrgb = {
+            mobo = "ASRock Z890M Riptide WiFi";
+            gpu = "ASUS TUF GeForce RTX 5070 Gaming OC";
+          };
+
           network = {
             tb = "10.10.10.3";
             tailscale = "100.100.44.94";
@@ -225,6 +230,8 @@
           system = "x86_64-linux";
           user = "kenrict";
           nixos = true;
+
+          openrgb.mobo = "ASRock B860M Steel Legend WiFi";
 
           network = {
             tb = "10.10.10.4";

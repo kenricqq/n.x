@@ -18,28 +18,24 @@ bright-down amount="5":
 
 ## -- Hardware RGB -- ##
 
-# openrgb permissions
+# apply openrgb permissions until next boot (NixOS installs them declaratively)
+[linux]
 openrgb-setup:
-    sudo mkdir -p /etc/udev/rules.d
-    sudo "$(command -v openrgb)" --generate-udev-rules /etc/udev/rules.d/60-openrgb.rules
-
-    pkg="$(dirname "$(dirname "$(readlink -f "$(command -v openrgb)")")")" &&
-    sudo install -Dm644 \
-    "$pkg/lib/udev/rules.d/60-openrgb.rules" \
-    /etc/udev/rules.d/60-openrgb.rules &&
-
-    sudo udevadm control --reload-rules &&
+    sudo mkdir -p /run/udev/rules.d
+    sudo "$(command -v openrgb)" --generate-udev-rules /run/udev/rules.d/60-openrgb.rules
+    sudo udevadm control --reload-rules
     sudo udevadm trigger
+    sudo udevadm settle
 
 # save current RGB state as the startup profile
 openrgb-save:
     openrgb --save-profile default
 
 mobo-off:
-    openrgb --device 1 --mode off
+    openrgb --device "${OPENRGB_MOBO:?Motherboard RGB device not configured}" --mode off
 
 mobo-on:
-    openrgb --device 1 --mode rainbow
+    openrgb --device "${OPENRGB_MOBO:?Motherboard RGB device not configured}" --mode rainbow
 
 mobo:
     #!/usr/bin/env bash
@@ -48,21 +44,21 @@ mobo:
       'rainbow  --mode rainbow' \
       'red-dim  --mode static --color 110000' \
       'red      --mode static --color FF0000' \
-      | fzf --with-nth=1 --prompt='GPU RGB ❯ ')
+      | fzf --with-nth=1 --prompt='Motherboard RGB ❯ ')
 
-    [[ -n "$choice" ]] && openrgb --device 1 ${choice#* }
+    [[ -n "$choice" ]] && openrgb --device "${OPENRGB_MOBO:?Motherboard RGB device not configured}" ${choice#* }
 
 gpu-off:
-    openrgb --device 0 --mode off
+    openrgb --device "${OPENRGB_GPU:?GPU RGB device not configured}" --mode off
 
 gpu-on:
-    openrgb --device 0 --mode rainbow
+    openrgb --device "${OPENRGB_GPU:?GPU RGB device not configured}" --mode rainbow
 
 gpu-gradient:
-    openrgb --device 0 --mode direct --color FF0000,00FF00,0000FF,FFFFFF
+    openrgb --device "${OPENRGB_GPU:?GPU RGB device not configured}" --mode direct --color FF0000,00FF00,0000FF,FFFFFF
 
 gpu-red:
-    openrgb --device 0 --mode direct --color 110000
+    openrgb --device "${OPENRGB_GPU:?GPU RGB device not configured}" --mode direct --color 110000
 
 gpu:
     #!/usr/bin/env bash
@@ -74,7 +70,7 @@ gpu:
       'red      --mode direct --color FF0000' \
       | fzf --with-nth=1 --prompt='GPU RGB ❯ ')
 
-    [[ -n "$choice" ]] && openrgb --device 0 ${choice#* }
+    [[ -n "$choice" ]] && openrgb --device "${OPENRGB_GPU:?GPU RGB device not configured}" ${choice#* }
 
 ## -- Utils -- ##
 

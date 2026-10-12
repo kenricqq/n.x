@@ -24,6 +24,8 @@ let
     isNixos
     ;
 
+  rgbMachine = if isDarwin then builtins.head machine.allowIncoming else machine;
+
 in
 {
   imports = [
@@ -117,6 +119,8 @@ in
       DOT = paths.dots;
       SCRIPTS = paths.scripts;
       SNIPPETS_PATH = paths.snippets; # for scls
+      OPENRGB_MOBO = rgbMachine.openrgb.mobo or "";
+      OPENRGB_GPU = rgbMachine.openrgb.gpu or "";
       # SHARE = path.share;
 
       # NODE_PATH = "${home}/.cache/.bun/install/global/node_modules";
