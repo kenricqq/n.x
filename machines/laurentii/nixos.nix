@@ -14,10 +14,21 @@ in
 {
   imports = [
     ./hardware.nix
+    ../../os/nixos/jellyfin.nix
     ../../os/nixos/tailscale.nix
     ../../os/nixos/openssh.nix
     inputs.nix-index-database.nixosModules.default
   ];
+
+  fileSystems."/mnt/library" = {
+    device = "/dev/disk/by-uuid/094166e7-3055-451d-a365-3a86e6c9a2a0";
+    fsType = "btrfs";
+    options = [
+      "noatime"
+      "compress=zstd"
+      "nofail"
+    ];
+  };
 
   programs = {
     nh = {
@@ -35,6 +46,16 @@ in
   security.rtkit.enable = true;
 
   hardware.i2c.enable = true; # for monitor input switching
+
+  # Core Ultra 5 250K Plus iGPU: VA-API, QSV, and OpenCL tone mapping.
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver
+      vpl-gpu-rt
+      intel-compute-runtime
+    ];
+  };
 
   services = {
     memos = {

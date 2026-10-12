@@ -2,19 +2,26 @@
 
 usage() {
   printf '%s\n' \
-    'Usage: yt-video [-s|--subtitles] [-o DIRECTORY] URL' \
+    'Usage: yt-video [-S|--no-subtitles] [-o DIRECTORY] URL' \
+    '' \
+    'English subtitles or auto-captions are downloaded by default.' \
+    'Playlist order is stored in embedded metadata for Jellyfin.' \
     '' \
     'The default directory is YT_VIDEO_DIR or' \
     'XDG_VIDEOS_DIR/watch-later, falling back to ~/Videos/watch-later.'
 }
 
 output_dir=
-want_subtitles=0
+want_subtitles=1
 
 while (( $# )); do
   case "$1" in
     -s|--subtitles)
       want_subtitles=1
+      shift
+      ;;
+    -S|--no-subtitles)
+      want_subtitles=0
       shift
       ;;
     -o|--output)
@@ -60,6 +67,9 @@ mkdir -p -- "$output_dir"
 args=(
   --format 'bestvideo*+bestaudio/best'
   --output "$output_dir/%(title)s.%(ext)s"
+  --embed-metadata
+  --parse-metadata '%(playlist_index|)03d:(?P<meta_sort_name>.*)'
+  --postprocessor-args 'Metadata+ffmpeg_o:-movflags +use_metadata_tags'
   --sponsorblock-remove 'sponsor,selfpromo,interaction'
 )
 
