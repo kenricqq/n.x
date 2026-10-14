@@ -36,6 +36,8 @@ in
     packages = with pkgs; [
       lua
 
+      herdr # agentic multiplexer
+
       hunk # diff viewer
 
       buf # for protobuf apis

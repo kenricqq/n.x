@@ -1,7 +1,7 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 
 # Model and behavior
-model = "gpt-6.1-sol"
+model = "gpt-6-astra"
 model_reasoning_effort = "xhigh"
 model_verbosity = "low"
 default_permissions = ":workspace"
@@ -21,6 +21,7 @@ notify = [
 computer_use = true
 memories = true
 prevent_idle_sleep = true
+daemon_auto_start = true
 
 [features.multi_agent_v2]
 enabled = true
