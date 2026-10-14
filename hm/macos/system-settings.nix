@@ -12,8 +12,19 @@
       systemSettings = {
         accessibility.display.reduceTransparency = true;
         appearance.liquidGlass = 1.0;
+        privacyAndSecurity.appleAdvertising.personalizedAds = false;
+        spotlight.helpAppleImproveSearch = false;
+
+        appleIntelligenceAndSiri = {
+          appleIntelligence = false;
+          automaticVisualLookUp = false;
+          siri.enable = false;
+          chatGpt.useExtension = false;
+        };
 
         desktopAndDock = {
+          desktopAndStageManager.clickWallpaperToRevealDesktop = "Only in Stage Manager";
+
           dock = {
             automaticallyHideAndShowTheDock = {
               enabled = true;
@@ -108,6 +119,7 @@
             cdsDvdsAndiPods = true;
           };
           advanced = {
+            showAllFilenameExtensions = true;
             whenPerformingASearch = "Search the Current Folder";
             showWarningBeforeChangingAnExtension = false;
             # file sorting

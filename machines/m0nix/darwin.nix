@@ -56,6 +56,102 @@ in
     ];
 
     etc = {
+      "nix-darwin/privacy-check.ts".source = ../../scripts/privacy-check.ts;
+
+      # Install manually through System Settings; activation only writes the file.
+      "nix-darwin/privacy-restrictions.mobileconfig".text = lib.generators.toPlist { escape = true; } {
+        PayloadType = "Configuration";
+        PayloadVersion = 1;
+        PayloadIdentifier = "local.m0nix.privacy-restrictions";
+        PayloadUUID = "5499F224-571C-4E37-AD40-68D582797565";
+        PayloadDisplayName = "m0nix Privacy Restrictions";
+        PayloadDescription = "Disable selected Apple Intelligence features and model downloads, Game Center, Spotlight internet results, Apple Music, and the Book Store.";
+        PayloadScope = "System";
+        PayloadContent = [
+          {
+            PayloadType = "com.apple.applicationaccess";
+            PayloadVersion = 1;
+            PayloadIdentifier = "local.m0nix.privacy-restrictions.applicationaccess";
+            PayloadUUID = "7DB1AF13-B724-4EA7-A914-7E0DB763FE07";
+            PayloadDisplayName = "Apple Service Restrictions";
+            allowAssistant = false;
+            allowBookstore = false;
+            allowExternalIntelligenceIntegrations = false;
+            allowExternalIntelligenceIntegrationsSignIn = false;
+            allowGameCenter = false;
+            allowGenmoji = false;
+            allowImagePlayground = false;
+            allowMailSmartReplies = false;
+            allowMailSummary = false;
+            allowMusicService = false;
+            allowNotesTranscriptionSummary = false;
+            allowSafariSummary = false;
+            allowSpotlightInternetResults = false;
+            allowWritingTools = false;
+          }
+        ]
+        # macOS accepts only one preference domain per managed-preferences payload.
+        ++
+          lib.mapAttrsToList
+            (domain: settings: {
+              PayloadType = "com.apple.ManagedClient.preferences";
+              PayloadVersion = 1;
+              PayloadIdentifier = "local.m0nix.privacy-restrictions.preferences.${domain}";
+              PayloadUUID = settings.uuid;
+              PayloadDisplayName = "Apple Intelligence Preferences: ${domain}";
+              PayloadContent.${domain}.Forced = [
+                { mcx_preference_settings = settings.preferences; }
+              ];
+            })
+            {
+              ".GlobalPreferences" = {
+                uuid = "2A8CFA7E-ECAB-4A1F-8E12-6AD34483DE40";
+                preferences.NSAutomaticInlinePredictionEnabled = false;
+              };
+              "com.apple.MobileAsset" = {
+                uuid = "02D19164-F487-4105-B5CC-83B446515A4F";
+                # Match RemoveMacAI's download blocks; this local URL needs no app or server.
+                preferences = lib.genAttrs [
+                  "DownloadServerBaseURLOverride-com.apple.MobileAsset.UAF.FM.CodeLM"
+                  "DownloadServerBaseURLOverride-com.apple.MobileAsset.UAF.FM.GenerativeModels"
+                  "DownloadServerBaseURLOverride-com.apple.MobileAsset.UAF.FM.Visual"
+                  "DownloadServerBaseURLOverride-com.apple.MobileAsset.UAF.Photos.MagicCleanup"
+                  "DownloadServerBaseURLOverride-com.apple.MobileAsset.UAF.Photos.SpatialPhotosRelive"
+                ] (_: "https://127.0.0.1:9/removemacai-blocked/");
+              };
+              "com.apple.MobileSMS" = {
+                uuid = "42F562E2-AC5D-4891-8CBB-DB25DD51351E";
+                preferences.messageSummarizationEnabled = false;
+              };
+              "com.apple.Siri" = {
+                uuid = "D4919E8B-742E-4DA7-AAE2-00A9100B8726";
+                preferences = {
+                  StatusMenuVisible = false;
+                  VoiceTriggerUserEnabled = false;
+                };
+              };
+              "com.apple.assistant.support" = {
+                uuid = "2EB210F3-5620-4749-A091-214760A54B47";
+                preferences."Assistant Enabled" = false;
+              };
+              "com.apple.spatialphotosrelive" = {
+                uuid = "17D71C29-D272-4F82-B9B2-7BB025E95892";
+                preferences.LocallyDisabled = true;
+              };
+              "group.com.apple.mail" = {
+                uuid = "2AB1BABC-F6F4-4D6C-A854-BE8FB00EAD68";
+                preferences = {
+                  DisableAutomaticMessageSummarization = true;
+                  PersonalizedSmartReplies = false;
+                };
+              };
+              "group.com.apple.usernoted" = {
+                uuid = "8B8420B1-72D1-412F-B230-565A670C991D";
+                preferences.summarize_previews = false;
+              };
+            };
+      };
+
       "codex/requirements.toml".source = ../../dots/codex/requirements.toml;
 
       "codex/hooks/agent-policy-hook.mjs".source = ../../dots/codex/agent-policy-hook.mjs;
@@ -135,6 +231,13 @@ in
 
   # lib/mksystem.nix sets system.primaryUser and stateVersion.
   system = lib.recursiveUpdate system-config {
+    defaults.CustomUserPreferences = {
+      # Photos keeps a separate sandbox copy of this preference.
+      "com.apple.photos.shareddefaults".IPXDefaultEnhancedVisualSearchEnabled = false;
+      "${userHome}/Library/Containers/com.apple.Photos/Data/Library/Preferences/com.apple.photos.shareddefaults".IPXDefaultEnhancedVisualSearchEnabled =
+        false;
+    };
+
     activationScripts.postActivation.text = lib.mkAfter ''
       if launchctl print system/systems.determinate.nix-daemon >/dev/null 2>&1; then
         launchctl kickstart -k system/systems.determinate.nix-daemon || true
@@ -161,8 +264,10 @@ in
 
   programs.nix-plist-manager = {
     enable = true;
-    # Optional machine settings; uncomment only the ones you want managed.
     options.applications.systemSettings = {
+      privacyAndSecurity.analyticsAndImprovements.shareMacAnalytics = false;
+
+      # Optional machine settings; uncomment only the ones you want managed.
       # network.firewall.firewall = true;
       # network.firewall.options.enableStealthMode = true;
       # general.softwareUpdate.automaticallyDownloadNewUpdatesWhenAvailable = true;

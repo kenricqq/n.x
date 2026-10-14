@@ -3,6 +3,16 @@
   # Other user settings live in hm/macos/system-settings.nix.
   defaults = {
     CustomUserPreferences = {
+      "com.apple.assistant.support" = {
+        "Siri Data Sharing Opt-In Status" = 2;
+      };
+      "com.apple.lookup.shared" = {
+        LookupSuggestionsDisabled = true;
+      };
+      "com.apple.Safari" = {
+        UniversalSearchEnabled = false;
+        SuppressSearchSuggestions = true;
+      };
       "com.apple.symbolichotkeys" = {
         # Preserve custom Mission Control keys, disabled keys' saved bindings,
         # and legacy IDs that nix-plist-manager cannot express unchanged.

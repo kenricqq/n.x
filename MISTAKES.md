@@ -13,6 +13,12 @@
 
 ## Nix / Home Manager sources and modules
 
+- Check sandboxed app preferences in their container as well as the ordinary user domain. Photos retained `IPXDefaultEnhancedVisualSearchEnabled=true` in its container after the ordinary domain read false.
+  - Check both preference locations and the app's Settings when available. Derive container paths from the configured user's home; an outside-process CoreFoundation read alone does not prove the app sees the same value.
+
+- Use one preference domain per `com.apple.ManagedClient.preferences` payload. macOS 27.0.1 accepted a bundled profile but skipped domains with `expected 1 managed prefs dict, but found 5`.
+  - Check the exported profile has one domain per managed-preferences payload, then verify effective values with `CFPreferencesCopyAppValue` and enforcement with `CFPreferencesAppValueIsForced` after installation. A valid plist and installed profile do not prove settings applied.
+
 - Do not read package derivation outputs while evaluating shared helpers. `builtins.readFile "${pkgs.nix-search-tv.src}/nixpkgs.sh"` made full-system evaluation require a source build; execute that script from the generated `ns` wrapper instead.
   - Check system derivation evaluation with `--option allow-import-from-derivation false`. When testing generated `writeShellApplication` scripts, replace their exported runtime PATH before running them with command stubs; the wrapper otherwise overrides the test PATH.
 
