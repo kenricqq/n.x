@@ -255,6 +255,9 @@ let
     }
     // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
       clip = "wl-copy";
+    }
+    // lib.optionalAttrs (machine ? ytHost) {
+      yt-refresh = "ssh -t ${machine.ytHost.user}@${machine.ytHost.name} /run/current-system/sw/bin/yt-refresh";
     };
 
   common =

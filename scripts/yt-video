@@ -4,6 +4,7 @@ usage() {
   printf '%s\n' \
     'Usage: yt-video [-S|--no-subtitles] [-o DIRECTORY] URL' \
     '' \
+    'Video quality is capped at 2160p (4K).' \
     'English subtitles or auto-captions are downloaded by default.' \
     'Playlist order is stored in embedded metadata for Jellyfin.' \
     '' \
@@ -65,7 +66,7 @@ output_dir=${output_dir:-${YT_VIDEO_DIR:-${XDG_VIDEOS_DIR:-$HOME/Videos}/watch-l
 mkdir -p -- "$output_dir"
 
 args=(
-  --format 'bestvideo*+bestaudio/best'
+  --format 'bestvideo*[height<=2160]+bestaudio/best[height<=2160]'
   --output "$output_dir/%(title)s.%(ext)s"
   --embed-metadata
   --parse-metadata '%(playlist_index|)03d:(?P<meta_sort_name>.*)'

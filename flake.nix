@@ -190,6 +190,7 @@
           name = "m0nix";
           system = "aarch64-darwin";
           user = "kenrictee";
+          ytHost = profile.laurentii;
 
           network = {
             tb = "10.10.10.2";
@@ -208,6 +209,7 @@
           name = "meridian";
           system = "x86_64-linux";
           user = "kenrict";
+          ytHost = profile.laurentii;
 
           openrgb = {
             mobo = "ASRock Z890M Riptide WiFi";
