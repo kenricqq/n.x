@@ -1,46 +1,16 @@
-{ lib, pkgs, ... }:
+{
+  lib,
+  pkgs,
+  utils,
+  ...
+}:
 
 let
   libDir = "/mnt/library";
   mediaDir = "${libDir}/jellyfin/yt";
   # temporary download staging directory
   workDir = "${libDir}/.ytdl-sub-tmp";
-
-  instanceDefaults = {
-    enable = true;
-    # allow sandboxed downloader to write media and tmp files
-    readWritePaths = [
-      mediaDir
-      workDir
-    ];
-    config.configuration = {
-      working_directory = lib.mkForce workDir;
-      umask = "027";
-    };
-  };
-
-  # Shared defaults. Each source supplies a fixed YYYYMMDD cutoff so downtime cannot skip videos.
-  # No retention/pruning settings: downloaded videos stay on disk.
-  subscriptionDefaults = {
-    overrides.tv_show_directory = mediaDir;
-    date_range.after = "{download_since}";
-    # cut out all removable SponsorBlock categories
-    chapters = {
-      sponsorblock_categories = [ "all" ];
-      remove_sponsorblock_categories = [ "all" ];
-    };
-    subtitles = {
-      subtitles_name = "{episode_file_path}.{lang}.{subtitles_ext}";
-      subtitles_type = "srt";
-      languages = [ "en" ];
-      allow_auto_generated_subtitles = true;
-    };
-  };
-
-  downloadUnits = [
-    "ytdl-sub-learning-feed.service"
-    "ytdl-sub-course-lib.service"
-  ];
+  acaytUnit = "ytdl-sub-${utils.escapeSystemdPath "acayt"}";
 in
 {
   services.jellyfin = {
@@ -75,11 +45,37 @@ in
     group = "jellyfin";
     # subscription docs: https://ytdl-sub.readthedocs.io/en/latest/config_reference/subscription_yaml.html
     instances = {
-      learning-feed = instanceDefaults // {
+      acayt = {
+        enable = true;
+        # allow sandboxed downloader to write media and tmp files
+        readWritePaths = [
+          mediaDir
+          workDir
+        ];
+        config.configuration = {
+          working_directory = lib.mkForce workDir;
+          umask = "027";
+        };
         # check every 6 hrs
         schedule = "0/6:0";
         subscriptions = {
-          __preset__ = subscriptionDefaults;
+          # Each source supplies a fixed YYYYMMDD cutoff so downtime cannot skip videos.
+          # No retention/pruning settings: downloaded videos stay on disk.
+          __preset__ = {
+            overrides.tv_show_directory = mediaDir;
+            date_range.after = "{download_since}";
+            # cut out all removable SponsorBlock categories
+            chapters = {
+              sponsorblock_categories = [ "all" ];
+              remove_sponsorblock_categories = [ "all" ];
+            };
+            subtitles = {
+              subtitles_name = "{episode_file_path}.{lang}.{subtitles_ext}";
+              subtitles_type = "srt";
+              languages = [ "en" ];
+              allow_auto_generated_subtitles = true;
+            };
+          };
           # "|" combines Jellyfin metadata/date-based episodes with the best quality up to 4K.
           # Layout: https://ytdl-sub.readthedocs.io/en/latest/prebuilt_presets/tv_shows.html
           # Quality: https://ytdl-sub.readthedocs.io/en/latest/prebuilt_presets/media_quality.html
@@ -92,14 +88,6 @@ in
               download_since = "20260913";
             };
           };
-        };
-      };
-
-      course-lib = instanceDefaults // {
-        # Download only when explicitly started, including the initial download.
-        schedule = null;
-        subscriptions = {
-          __preset__ = subscriptionDefaults;
           # playlist positions become episode numbers in filenames and NFOs
           # if YouTube removes/reorders lessons, archived numbering needs manual reconciliation
           "Jellyfin TV Show Collection | Max 2160p" = {
@@ -125,16 +113,16 @@ in
       name = "yt-refresh";
       runtimeInputs = [ pkgs.systemd ];
       text = ''
-        sudo systemctl start ytdl-sub-learning-feed.service
-        exec sudo journalctl -fu ytdl-sub-learning-feed.service
+        sudo systemctl start '${acaytUnit}.service'
+        exec sudo journalctl -fu '${acaytUnit}.service'
       '';
     })
   ];
 
   # create directories as root after mounting the library, before starting downloader
   systemd.services.ytdl-sub-directories = {
-    requiredBy = downloadUnits;
-    before = downloadUnits;
+    requiredBy = [ "${acaytUnit}.service" ];
+    before = [ "${acaytUnit}.service" ];
     unitConfig.RequiresMountsFor = [ libDir ];
     serviceConfig.Type = "oneshot";
     script = ''
@@ -145,8 +133,11 @@ in
   };
 
   # Require the media disk so downloads cannot land on the root filesystem if it is absent.
-  systemd.services.ytdl-sub-learning-feed.unitConfig.RequiresMountsFor = [ libDir ];
-  systemd.services.ytdl-sub-course-lib.unitConfig.RequiresMountsFor = [ libDir ];
+  systemd.services.${acaytUnit} = {
+    # Start on activation/boot as well as the timer; archives skip fetched videos.
+    wantedBy = [ "multi-user.target" ];
+    unitConfig.RequiresMountsFor = [ libDir ];
+  };
 
   systemd.services.jellyfin.serviceConfig.SupplementaryGroups = [ "render" ];
   systemd.services.jellyfin.unitConfig.RequiresMountsFor = [ "${libDir}/jellyfin" ];

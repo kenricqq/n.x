@@ -82,3 +82,42 @@ test("Laurentii preserves its installation and uses the shared NixOS home", () =
   expect(config.ddcutil && config.i2c).toBe(true);
   expect(config.groups).toContain("i2c");
 }, 120_000);
+
+test("Jellyfin uses one automatic downloader for channels and courses", () => {
+  const config = evaluate(`c:
+    let
+      names = builtins.filter (n: builtins.match "ytdl-sub.*" n != null) (builtins.attrNames c.systemd.services);
+      feed = c.systemd.services.ytdl-sub-acayt;
+      directories = c.systemd.services.ytdl-sub-directories;
+    in {
+      inherit names;
+      inherit (directories) requiredBy before;
+      instances = builtins.attrNames c.services.ytdl-sub.instances;
+      subscriptions = c.services.ytdl-sub.instances.acayt.subscriptions;
+      start = feed.serviceConfig.ExecStart;
+      mounts = feed.unitConfig.RequiresMountsFor;
+      wantedBy = feed.wantedBy;
+      condition = feed.unitConfig.ConditionPathExists or null;
+      postStop = feed.postStop;
+      timer = c.systemd.timers.ytdl-sub-acayt.timerConfig.OnCalendar;
+    }`);
+
+  const unit = "ytdl-sub-acayt";
+  expect(config.instances).toEqual(["acayt"]);
+  expect(config.names).toEqual([unit, "ytdl-sub-directories"]);
+  expect(config.requiredBy).toEqual([`${unit}.service`]);
+  expect(config.before).toEqual(config.requiredBy);
+  expect(config.start).toContain("/bin/ytdl-sub --config ");
+  expect(config.mounts).toEqual(["/mnt/library"]);
+  expect(config.wantedBy).toContain("multi-user.target");
+  expect(config.timer).toEqual(["0/6:0"]);
+  expect(config.condition).toBeNull();
+  expect(config.postStop).toBe("");
+  expect(config.subscriptions.__preset__.overrides.tv_show_directory).toBe("/mnt/library/jellyfin/yt");
+  const channel = config.subscriptions["Jellyfin TV Show by Date | Max 2160p"]["~3Blue1Brown"];
+  const course = config.subscriptions["Jellyfin TV Show Collection | Max 2160p"]["Neural Networks - Zero to Hero"];
+  expect(channel.download_since).toBe("20260913");
+  expect(course.overrides.download_since).toBe("19700101");
+  expect(course.overrides.tv_show_collection_episode_ordering).toBe("playlist-index");
+  expect(course.ytdl_options.break_on_existing).toBe(false);
+}, 120_000);

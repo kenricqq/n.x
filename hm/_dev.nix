@@ -2,7 +2,6 @@
   host,
   lib,
   pkgs,
-  machine,
   ...
 }:
 
@@ -27,7 +26,7 @@ in
     ./dev/pi.nix
     ./dev/vcs.nix
   ]
-  ++ lib.optionals (isLinux) [
+  ++ lib.optionals isLinux [
     # running ollama-cuda, only cachyos machine w discrete gpu
     ./dev/ollama.nix
   ];
@@ -36,7 +35,7 @@ in
     packages = with pkgs; [
       lua
 
-      herdr # agentic multiplexer
+      # herdr # agentic multiplexer
 
       hunk # diff viewer
 

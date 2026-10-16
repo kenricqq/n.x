@@ -13,6 +13,9 @@
 
 ## Nix / Home Manager sources and modules
 
+- Match module-generated systemd instance names with `utils.escapeSystemdPath`. In ytdl-sub, raw hyphens created empty services while mount dependencies and directory setup missed the actual downloaders. Quote escaped unit names in shell commands.
+  - Check evaluated units have `ExecStart`, and dependency targets and command arguments match the generated unit names.
+
 - Check sandboxed app preferences in their container as well as the ordinary user domain. Photos retained `IPXDefaultEnhancedVisualSearchEnabled=true` in its container after the ordinary domain read false.
   - Check both preference locations and the app's Settings when available. Derive container paths from the configured user's home; an outside-process CoreFoundation read alone does not prove the app sees the same value.
 
