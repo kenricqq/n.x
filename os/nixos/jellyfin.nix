@@ -98,7 +98,9 @@ in
               ytdl_options.break_on_existing = false;
               overrides = {
                 s01_url = "https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ";
-                s01_name = "Lessons";
+                s01_name = "Neural Networks: Zero to Hero";
+                # Mixed-channel playlists can otherwise use a guest uploader's avatar.
+                tv_show_poster_file_name = "";
                 tv_show_collection_episode_ordering = "playlist-index";
                 # 01/01/1970
                 download_since = "19700101";

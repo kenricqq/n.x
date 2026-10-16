@@ -185,6 +185,7 @@ in
       "networkmanager"
       "wheel"
       "i2c"
+      "jellyfin"
     ];
     packages = [ pkgs.tree ];
   };
