@@ -35,6 +35,7 @@
 
     secrets = {
       FLAKEHUB_TOKEN = { };
+      JELLYFIN_API_KEY = { };
       TS_AUTHKEY = { };
 
       # don't really use raindrop anymore...

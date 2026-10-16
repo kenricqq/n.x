@@ -58,8 +58,8 @@ let
     yt-dlp
   ];
 
-  ytMusic = mkScriptCommand {
-    name = "yt-music";
+  ytAudio = mkScriptCommand {
+    name = "yt-audio";
     runtimeInputs = youtubeRuntimeInputs;
   };
 
@@ -352,7 +352,7 @@ in
     jjWorkspace
     list-ports
     mergepdf
-    ytMusic
+    ytAudio
     ytVideo
   ]
   ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [

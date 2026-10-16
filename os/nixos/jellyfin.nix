@@ -1,5 +1,7 @@
 {
+  config,
   lib,
+  machine,
   pkgs,
   utils,
   ...
@@ -109,6 +111,21 @@ in
   };
 
   environment.systemPackages = [
+    (pkgs.writeShellApplication {
+      name = "jescan";
+      runtimeInputs = [ pkgs.curl ];
+      text = ''
+        api_key_file=${lib.escapeShellArg config.home-manager.users.${machine.user}.sops.secrets.JELLYFIN_API_KEY.path}
+        if ! api_key="$(< "$api_key_file")" || [[ -z "$api_key" ]]; then
+          printf 'Missing or empty SOPS secret JELLYFIN_API_KEY at %s. Activate Home Manager secrets.\n' "$api_key_file" >&2
+          exit 1
+        fi
+        printf 'Authorization: MediaBrowser Token="%s"\n' "$api_key" |
+          curl -q --fail --silent --show-error --data "" --header @- \
+            http://127.0.0.1:8096/Library/Refresh
+        printf 'Jellyfin library scan requested.\n'
+      '';
+    })
     (pkgs.writeShellApplication {
       name = "yt-refresh";
       runtimeInputs = [ pkgs.systemd ];

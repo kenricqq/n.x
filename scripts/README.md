@@ -22,7 +22,7 @@ dependencies and runs ShellCheck during the build.
 - `jjw` manages Jujutsu workspaces. Its filesystem and Jujutsu behavior is
   shared; Nushell and Zsh only wrap the `cd` and `new` cases because a child
   process cannot change its parent shell's directory.
-- `yt-music` and `yt-video` are portable `yt-dlp` frontends. `ytm` and `ytv` are
+- `yt-audio` and `yt-video` are portable `yt-dlp` frontends. `yta` and `ytv` are
   optional interactive aliases.
 - `toggle-sketchybar-gap` is a Darwin-only command packaged by
   `hm/macos/aerospace.nix` from `toggle-sketchybar-gap.sh`, with Python and the

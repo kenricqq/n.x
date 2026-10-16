@@ -2,7 +2,7 @@
 
 usage() {
   printf '%s\n' \
-    'Usage: yt-music [-o DIRECTORY] [-f FORMAT] URL' \
+    'Usage: yt-audio [-o DIRECTORY] [-f FORMAT] URL' \
     '' \
     'Defaults:' \
     '  directory  YT_MUSIC_DIR, XDG_MUSIC_DIR, or ~/Music' \
@@ -47,7 +47,7 @@ while (( $# )); do
       break
       ;;
     -*)
-      printf 'yt-music: unknown option: %s\n' "$1" >&2
+      printf 'yt-audio: unknown option: %s\n' "$1" >&2
       usage >&2
       exit 2
       ;;

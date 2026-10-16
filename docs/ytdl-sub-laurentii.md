@@ -38,6 +38,10 @@ State directory: `/var/lib/ytdl-sub/acayt`. Subscription names and media paths a
 
 After activation, optionally run `yt-refresh` to check both subscriptions immediately and follow download logs. Laurentii runs it locally; Mac and Meridian use SSH with a terminal for sudo, targeting Laurentii through their `ytHost` profile. Ctrl-C stops log viewing; the downloader continues. This does not trigger a Jellyfin library scan.
 
+Run `jescan` to request a scan of all configured Jellyfin libraries. It runs locally on Laurentii; Mac and Meridian SSH into Laurentii using the same `ytHost` routing. Success means the scan request was accepted, not that scanning has finished. [Scan endpoint](https://github.com/jellyfin/jellyfin/blob/master/Jellyfin.Api/Controllers/LibraryController.cs).
+
+One-time setup: create an API key named `jescan` in Jellyfin's Dashboard → API Keys, then use `sec` to save it as `JELLYFIN_API_KEY` in encrypted `secrets/secrets.yaml`. Home Manager declares the secret in `hm/security.nix`; activate Laurentii's configuration to install the command and provision the secret. The command reads the evaluated SOPS secret path at runtime. Remote commands use Laurentii's secret. Authentication uses Jellyfin's current `Authorization: MediaBrowser` header, passed to curl through stdin. [Authorization format](https://gist.github.com/nielsvanvelzen/ea047d9028f676185832e51ffaf12a6f).
+
 Neither subscription needs an initial command. Follow automatic downloads on Laurentii:
 
 ```sh

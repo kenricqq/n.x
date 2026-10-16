@@ -40,8 +40,6 @@ let
     snip = edit "${paths.hm}/snippets";
     todo = "dooit";
     whtr = "curl wttr.in/Santa+Cruz";
-    ytm = "yt-music";
-    ytv = "yt-video";
     zoa = "zoxide add";
   };
 
@@ -65,6 +63,16 @@ let
     nsh = "home-profile shell";
     port = "list-ports";
     sec = "home-profile secrets";
+  };
+
+  mediaAliases = {
+    yta = "yt-audio";
+    ytv = "yt-video";
+  }
+  # laurentii installs these as local commands in os/nixos/jellyfin.nix
+  // lib.optionalAttrs (machine ? ytHost) {
+    jescan = "ssh -t ${machine.ytHost.user}@${machine.ytHost.name} /run/current-system/sw/bin/jescan"; # jellyfin rescan
+    yt-refresh = "ssh -t ${machine.ytHost.user}@${machine.ytHost.name} /run/current-system/sw/bin/yt-refresh";
   };
 
   repoFiles = {
@@ -255,15 +263,13 @@ let
     }
     // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
       clip = "wl-copy";
-    }
-    // lib.optionalAttrs (machine ? ytHost) {
-      yt-refresh = "ssh -t ${machine.ytHost.user}@${machine.ytHost.name} /run/current-system/sw/bin/yt-refresh";
     };
 
   common =
     coreAliases
     // navigationAliases
     // workflowAliases
+    // mediaAliases
     // platformAliases
     // mkEditorAliases paths.nixrt repoFiles
     // mkEditorAliases paths.nixrt machineFiles

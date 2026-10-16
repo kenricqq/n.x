@@ -1,4 +1,7 @@
 import { expect, test } from "bun:test";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repo = fileURLToPath(new URL("../", import.meta.url)).replace(/\/$/, "");
@@ -9,12 +12,12 @@ function runJSON(command: string[]) {
   return JSON.parse(result.stdout.toString());
 }
 
-function evaluate(expression: string) {
+function evaluate(expression: string, attribute = "nixosConfigurations.laurentii.config") {
   return runJSON([
     "nix", "eval", "--json", "--offline", "--no-write-lock-file",
     "--option", "allow-import-from-derivation", "false",
     "--option", "max-jobs", "0", "--option", "builders", "",
-    `${repo}#nixosConfigurations.laurentii.config`, "--apply", expression,
+    `${repo}#${attribute}`, "--apply", expression,
   ]);
 }
 
@@ -81,6 +84,102 @@ test("Laurentii preserves its installation and uses the shared NixOS home", () =
   expect(config.lgInput && config.lgCompletion).toBe(true);
   expect(config.ddcutil && config.i2c).toBe(true);
   expect(config.groups).toContain("i2c");
+  expect(config.groups).toContain("jellyfin");
+}, 120_000);
+
+test("jescan sends authenticated requests and reports failures", async () => {
+  const { drvPath, apiKeyPath } = evaluate(`c: {
+    drvPath = (builtins.head (builtins.filter
+      (p: (p.pname or p.name or "") == "jescan") c.environment.systemPackages)).drvPath;
+    apiKeyPath = c.home-manager.users.kenrict.sops.secrets.JELLYFIN_API_KEY.path;
+  }`);
+  const result = runJSON(["nix", "derivation", "show", drvPath]);
+  const derivations: Record<string, { env: { text: string }; structuredAttrs?: { text: string } }> =
+    result.derivations ?? result;
+  const derivation = Object.values(derivations)[0];
+  const script = (derivation.structuredAttrs ?? derivation.env).text;
+  expect(script).toContain(apiKeyPath);
+  const dir = mkdtempSync(join(tmpdir(), "jescan-"));
+  const keyFile = join(dir, "api-key");
+  const token = "0123456789abcdef0123456789abcdef";
+  const requests: { method: string; path: string; authorization: string | null; body: string }[] = [];
+  let responseStatus = 204;
+  const server = Bun.serve({
+    hostname: "127.0.0.1",
+    port: 0,
+    async fetch(request) {
+      requests.push({
+        method: request.method,
+        path: new URL(request.url).pathname,
+        authorization: request.headers.get("Authorization"),
+        body: await request.text(),
+      });
+      return new Response(null, { status: responseStatus });
+    },
+  });
+  try {
+    const fixture = script
+      .replace(apiKeyPath, keyFile)
+      .replace("http://127.0.0.1:8096", `http://127.0.0.1:${server.port}`)
+      .replace(/^export PATH=.*$/m, 'export PATH="$RESCAN_TEST_PATH"');
+    expect(fixture).not.toContain(apiKeyPath);
+    expect(fixture).not.toContain("http://127.0.0.1:8096");
+    const run = async () => {
+      const process = Bun.spawn([Bun.which("bash")!, "-c", fixture], {
+        env: { RESCAN_TEST_PATH: Bun.env.PATH! },
+        stdout: "pipe", stderr: "pipe", timeout: 5_000,
+      });
+      const [exitCode, stdout, stderr] = await Promise.all([
+        process.exited, new Response(process.stdout).text(), new Response(process.stderr).text(),
+      ]);
+      expect(stdout + stderr).not.toContain(token);
+      return { exitCode, stdout, stderr };
+    };
+    const missing = await run();
+    expect(missing.exitCode).toBe(1);
+    expect(missing.stderr).toContain("Missing or empty SOPS secret JELLYFIN_API_KEY");
+    expect(requests).toHaveLength(0);
+    writeFileSync(keyFile, "", { mode: 0o600 });
+    expect((await run()).exitCode).toBe(1);
+    expect(requests).toHaveLength(0);
+    writeFileSync(keyFile, `${token}\n`, { mode: 0o600 });
+    const success = await run();
+    expect(success.exitCode, success.stderr).toBe(0);
+    expect(success.stdout).toBe("Jellyfin library scan requested.\n");
+    expect(requests).toEqual([{
+      method: "POST", path: "/Library/Refresh", body: "",
+      authorization: `MediaBrowser Token="${token}"`,
+    }]);
+    for (responseStatus of [401, 500]) {
+      const failure = await run();
+      expect(failure.exitCode).toBe(22);
+      expect(failure.stdout).not.toContain("scan requested");
+    }
+  } finally {
+    server.stop(true);
+    rmSync(dir, { recursive: true, force: true });
+  }
+}, 120_000);
+
+test("media refresh commands use SSH on Mac and Meridian and run locally on Laurentii", () => {
+  for (const [attribute, remote] of [
+    ["nixosConfigurations.laurentii.config.home-manager.users.kenrict", false],
+    ["darwinConfigurations.m0nix.config.home-manager.users.kenrictee", true],
+    ["homeConfigurations.meridian.config", true],
+  ] as const) {
+    const aliases = evaluate(`c: map (shell: let a = c.programs.\${shell}.shellAliases; in {
+      jescan = a.jescan or null;
+      yt-refresh = a.yt-refresh or null;
+      inherit (a) yta ytv;
+    })
+      [ "bash" "zsh" "nushell" ]`, attribute);
+    expect(aliases).toEqual(Array(3).fill({
+      jescan: remote ? "ssh -t kenrict@laurentii /run/current-system/sw/bin/jescan" : null,
+      "yt-refresh": remote ? "ssh -t kenrict@laurentii /run/current-system/sw/bin/yt-refresh" : null,
+      yta: "yt-audio",
+      ytv: "yt-video",
+    }));
+  }
 }, 120_000);
 
 test("Jellyfin uses one automatic downloader for channels and courses", () => {
