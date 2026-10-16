@@ -33,7 +33,7 @@ in
     ## Markup & Config
     iwe
     # marksman               # Markdown LSP
-    taplo # TOML
+    tombi # TOML
     simple-completion-language-server # snippets
     kdlfmt # kdl (config for zellij)
     # starpls # starlark

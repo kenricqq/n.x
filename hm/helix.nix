@@ -2,6 +2,7 @@
   config,
   lib,
   machine,
+  host,
   pkgs,
   paths,
   inputs,
@@ -118,7 +119,10 @@ in
           language-servers = [
             # "sql-language-server"
             "sqls"
-            # "sqruff"
+            {
+              name = "sqruff";
+              only-features = [ "diagnostics" ];
+            }
           ];
         }
         {
@@ -132,22 +136,8 @@ in
         {
           name = "toml";
           auto-format = true;
-          formatter = {
-            command = "oxfmt";
-            args = [
-              "--stdin-filepath"
-              "buffer.toml"
-            ];
-          };
-          # formatter = {
-          #   command = "taplo";
-          #   args = [
-          #     "format"
-          #     "-"
-          #   ];
-          # };
           language-servers = [
-            "taplo"
+            "tombi"
           ];
         }
         {
@@ -216,6 +206,7 @@ in
             unit = "    ";
           };
           language-servers = [
+            "clangd"
             "scls"
           ];
         }
@@ -331,8 +322,8 @@ in
             ];
           };
           language-servers = [
+            "typescript-language-server"
             "oxlint-language-server"
-            "tsgo"
             "scls"
           ];
         }
@@ -347,8 +338,8 @@ in
             ];
           };
           language-servers = [
+            "typescript-language-server"
             "oxlint-language-server"
-            "tsgo"
             "scls"
           ];
         }
@@ -363,8 +354,8 @@ in
             ];
           };
           language-servers = [
+            "typescript-language-server"
             "oxlint-language-server"
-            "tsgo"
             "scls"
           ];
         }
@@ -499,76 +490,30 @@ in
           args = [ "server" ];
         };
 
-        tsgo = {
-          command = "tsgo";
-          args = [
-            "--lsp"
-            "--stdio"
-          ];
-          config.typescript = {
-            "suggest" = {
-              "completeFunctionCalls" = true;
-            };
-            "tsserver" = {
-              "enableTracing" = true;
-              "pluginPaths" = [
-                "typescript-plugin-css-modules"
-                "./node_modules"
-              ];
-              "experimental" = {
-                "enableProjectDiagnostics" = true;
-              };
-            };
-            "inlayHints" = {
-              "parameterTypes"."enabled" = true;
-              "variableTypes"."enabled" = true;
-              "propertyDeclarationTypes"."enabled" = true;
-              "functionLikeReturnTypes" = true;
-              "enumMemberValues"."enabled" = true;
-              "parameterNames"."enabled" = "all";
-            };
-            "format" = {
-              "enable" = false;
-              "semicolons" = "remove";
-            };
-            "preferences" = {
-              "importModuleSpecifier" = "non-relative";
-              "importModuleSpecifierEnding" = "auto";
-            };
-            "updateImportsOnFileMove"."enabled" = "always";
-          };
-        };
         nixd = {
           command = "nixd";
           args = [
             "--semantic-tokens=true"
             "--log=error"
           ];
-          config.nixd = {
-            formatting.command = [ "${lib.getExe pkgs.nixfmt}" ];
-          };
-          # config.nixd =
-          #   let
-          #     darwinOpts = ''
-          #       (let
-          #         flake = builtins.getFlake (toString ./.);
-          #         names = builtins.attrNames flake.darwinConfigurations;
-          #         name =
-          #           if names == [ ] then
-          #             throw "nixd: no darwinConfigurations found in flake"
-          #           else
-          #             builtins.head names;
-          #       in
-          #         (builtins.getAttr name flake.darwinConfigurations).options)
-          #     '';
-          #   in
-          #   {
-          #     formatting.command = [ "${lib.getExe pkgs.nixfmt}" ];
-          #     options = {
-          #       nix-darwin.expr = darwinOpts;
-          #       home-manager.expr = "${darwinOpts}.home-manager.users.type.getSubOptions []";
-          #     };
-          #   };
+          config.nixd =
+            let
+              flake = "(builtins.getFlake ${builtins.toJSON nixrt})";
+              systemOptions = "${flake}.${
+                if host.isDarwin then "darwinConfigurations" else "nixosConfigurations"
+              }.${builtins.toJSON machine.name}.options";
+            in
+            {
+              formatting.command = [ "${lib.getExe pkgs.nixfmt}" ];
+              options =
+                if host.isLinux then
+                  { home-manager.expr = "${flake}.homeConfigurations.${builtins.toJSON machine.name}.options"; }
+                else
+                  {
+                    system.expr = systemOptions;
+                    home-manager.expr = "${systemOptions}.home-manager.users.type.getSubOptions []";
+                  };
+            };
         };
 
         vscode-css-language-server = {
@@ -592,13 +537,6 @@ in
         sqruff = {
           command = "sqruff";
           args = [ "lsp" ];
-          config = {
-            dialect = "postgres";
-            exclude_rules = [
-              "LT12"
-              "L009"
-            ]; # L009
-          };
         };
         sqls = {
           command = "sqls";
@@ -657,7 +595,6 @@ in
           config = {
             cargo.targetDir = true;
             check.command = "clippy";
-            cargo.features = "all";
           };
         };
 
